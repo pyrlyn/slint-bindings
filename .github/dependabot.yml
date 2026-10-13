@@ -1,0 +1,15 @@
+# Dependabot: weekly GitHub Actions updates, grouped patch and minor/major (pyrlyn template).
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    open-pull-requests-limit: 5
+    groups:
+      actions-patch:
+        update-types: ["patch"]
+      actions:
+        update-types: ["minor", "major"]
