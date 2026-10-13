@@ -6,15 +6,14 @@
 //! frame whenever it wants one. The CPU path paints into a buffer the host
 //! owns. On macOS and Windows, FemtoVG can paint into a host surface instead.
 
-mod demo;
 #[cfg(any(target_os = "macos", target_os = "windows"))]
 mod gpu;
 mod host;
 mod ime;
 mod keys;
 mod platform;
+pub mod runtime;
 
-pub use demo::DemoForm;
 #[cfg(any(target_os = "macos", target_os = "windows"))]
 pub use gpu::GpuHost;
 pub use host::{EmbeddedHost, Frame, PointerButton};
@@ -76,4 +75,19 @@ pub enum Error {
     /// error, which is not a fixed set.
     #[error("gpu: {0}")]
     Gpu(String),
+    /// A `.slint` file could not be read.
+    #[error("cannot read {}: {source}", path.display())]
+    Read {
+        /// The file the caller named.
+        path: std::path::PathBuf,
+        /// What the file system reported.
+        source: std::io::Error,
+    },
+    /// The `.slint` source did not compile; the text is the compiler's diagnostics.
+    #[error("{0}")]
+    Compile(String),
+    /// The JSON bridge refused a property, callback or value (unknown name,
+    /// wrong type, malformed JSON). The interpreter reports these as text.
+    #[error("{0}")]
+    Component(String),
 }

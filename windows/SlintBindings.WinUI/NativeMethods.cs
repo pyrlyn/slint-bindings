@@ -18,11 +18,41 @@ internal struct SbFrame
 [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
 internal delegate void SbSubmittedFn(IntPtr userData, IntPtr name);
 
+// `argsJson` is a UTF-8 JSON array, valid only during the call.
+[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+internal delegate void SbCallbackFn(IntPtr userData, IntPtr argsJson);
+
 internal static partial class NativeMethods
 {
     private const string Lib = "slint_bindings_ffi";
 
     [LibraryImport(Lib)] internal static partial IntPtr sb_last_error();
+
+    // `source` null reads the file at `path`.
+    [LibraryImport(Lib, StringMarshalling = StringMarshalling.Utf8)]
+    internal static partial IntPtr sb_compile(string? source, string path);
+    [LibraryImport(Lib)] internal static partial void sb_definition_free(IntPtr definition);
+    [LibraryImport(Lib)] internal static partial IntPtr sb_component_new(IntPtr definition, uint width, uint height, float scale);
+    [LibraryImport(Lib)] internal static partial IntPtr sb_component_new_metal(IntPtr definition, IntPtr layer, uint width, uint height, float scale);
+    [LibraryImport(Lib)] internal static partial IntPtr sb_component_new_swapchain(IntPtr definition, IntPtr panel, uint width, uint height, float scale);
+
+    [LibraryImport(Lib, StringMarshalling = StringMarshalling.Utf8)]
+    [return: MarshalAs(UnmanagedType.U1)]
+    internal static partial bool sb_set_property_json(IntPtr host, string name, string json);
+
+    // Returns an owned UTF-8 string (free with sb_string_free) or null.
+    [LibraryImport(Lib, StringMarshalling = StringMarshalling.Utf8)]
+    internal static partial IntPtr sb_get_property_json(IntPtr host, string name);
+
+    // Returns an owned UTF-8 string (free with sb_string_free) or null.
+    [LibraryImport(Lib, StringMarshalling = StringMarshalling.Utf8)]
+    internal static partial IntPtr sb_invoke_json(IntPtr host, string name, string argsJson);
+
+    [LibraryImport(Lib, StringMarshalling = StringMarshalling.Utf8)]
+    [return: MarshalAs(UnmanagedType.U1)]
+    internal static partial bool sb_on_callback(IntPtr host, string name, IntPtr callback, IntPtr userData);
+
+    [LibraryImport(Lib)] internal static partial void sb_string_free(IntPtr text);
     [LibraryImport(Lib)] internal static partial IntPtr sb_demo_new(uint width, uint height, float scale);
     [LibraryImport(Lib)] internal static partial IntPtr sb_demo_new_metal(IntPtr layer, uint width, uint height, float scale);
     [LibraryImport(Lib)] internal static partial IntPtr sb_demo_new_swapchain(IntPtr panel, uint width, uint height, float scale);
