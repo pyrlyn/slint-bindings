@@ -1,8 +1,6 @@
 - T5. CI
 - T9. Packaging (M4)
 - T10. Multiple hosts and popups
-- T11.1. Runtime components: core and C ABI
-- T11.2. Runtime components: hosts load the demo from a file
 - T12. Weft → Slint renderer
 - T13. Typed host APIs
 - T14. Accessibility spike

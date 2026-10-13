@@ -106,3 +106,45 @@ The same renderer presents into a `SwapChainPanel`. The panel passes
 chain and calls `SetSwapChain` on the UI thread. `CompositionScaleChanged`
 resizes it. A failed COM query or adapter keeps the `WriteableBitmap` path.
 The window was not launched, and the frame-time checkpoint was not measured.
+
+### T11.1. Runtime components: core and C ABI
+
+T11 (runtime components, generic API), Rust half. `.slint` is compiled at run
+time with `slint-interpreter` (`=1.18.1`, the same pin as `slint`; one
+`i-slint-core`), and properties and callbacks cross as JSON through slint_dart's
+`slint-dart-interpreter`, reused as a path dependency
+(`flutter/packages/slint_build/interpreter`) and excluded from this workspace so
+it keeps flutter/'s lints and dependency versions. Closes weft T69.1's G1 and G2.
+
+- Core: `runtime::compile(source, path)` returns the last exported component
+  (`source: None` reads the file); `runtime::instantiate` hosts a
+  `ComponentInstance` in `EmbeddedHost` or `GpuHost` and returns its JSON
+  bridge. `DemoForm`, `build.rs` and `slint-build` are gone; core tests run the
+  interpreted `ui/demo.slint`, and the GPU smoke test renders it offscreen.
+- C ABI: `sb_compile`, `sb_definition_free`, `sb_component_new`,
+  `sb_component_new_metal`, `sb_component_new_swapchain`,
+  `sb_set_property_json`, `sb_get_property_json`, `sb_invoke_json`,
+  `sb_on_callback`, `sb_string_free`.
+- Rust: `SbHost::new`, `SbHost::new_gpu`, `SbHost::component`,
+  `SbHost::bridge`, `SbHost::into_raw`. A scratch staticlib that links
+  `slint-bindings-ffi` as an rlib and calls `SbHost::into_raw` exported
+  `sb_compile`, `sb_component_new`, `sb_host_render` and `sb_on_callback` (`nm`);
+  that check is not a committed test.
+- Tests: the FFI e2e loads the demo from the file and keeps the snapshots
+  pixel-identical; new cases cover JSON round trips, typed input read back,
+  bad names, values and UTF-8, invoke, clearing a callback, compile
+  diagnostics, a missing file, two hosts from one definition, a host built in
+  Rust and handed to C, and Metal without a layer.
+
+### T11.2. Runtime components: hosts load the demo from a file
+
+The Swift and WinUI hosts load `demo.slint` from a file at run time and the
+`sb_demo_*` calls left the ABI. Swift: `SlintDefinition` (`sb_compile`),
+`SlintHost(definition:…)` with `setProperty(_:json:)`, `property(_:)`,
+`invoke(_:argsJson:)` and `onCallback(_:_:)`; `SlintNSView` and
+`SlintDemoView` take the definition; the demo app reads the first `.slint`
+argument or the repository's `crates/slint-bindings-core/ui/demo.slint`. Swift
+tests cover the file-loaded form, JSON errors and invoke. WinUI: the same in
+`SlintDefinition`/`SlintHost` (C#), `SlintPanel.Definition`, and the demo copies
+`demo.slint` next to the app. `just check` passes on macOS; the WinUI projects
+were not built or run (no Windows machine here), only `just pinvoke-check`.

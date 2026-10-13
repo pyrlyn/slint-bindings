@@ -46,8 +46,6 @@ Not added: `slint_embed::events` is used only by slint_dart and stays there; `i-
 | T8 | done | P1 | 5 | 100% | cursor |
 | T9 | todo | P2 | 3 | 0% | |
 | T10 | todo | P2 | 3 | 0% | |
-| T11.1 | in progress | P1 | 4 | 0% | Claude Code / claude-opus-5-5 |
-| T11.2 | in progress | P1 | 3 | 0% | Claude Code / claude-opus-5-5 |
 | T12 | todo | P1 | 4 | 0% | |
 | T13 | todo | P2 | 4 | 0% | |
 | T14 | todo | P2 | 5 | 0% | |
@@ -176,55 +174,6 @@ own `MinimalSoftwareWindow`. Verify two `SlintNSView`s in one window and two
 windows; make Slint `PopupWindow` and menus render inside the host view (no
 native child windows) and clip correctly. Done with a demo showing two views
 and a combo-box popup in each.
-
-### T11.1. Runtime components: core and C ABI
-
-T11 (runtime components, generic API) split in two to fit the 500-line limit;
-this half is the Rust side. Replace the hard-coded demo with `slint-interpreter`:
-compile `.slint` source at runtime, set and get properties and invoke or handle
-callbacks through the JSON value bridge of slint_dart's `slint-dart-interpreter`
-(vendored under `flutter/packages/slint_build/interpreter`; reused, not
-rewritten). C ABI: `sb_compile`, `sb_component_new`, `sb_set_property_json`,
-`sb_get_property_json`, `sb_on_callback`. It also closes weft T69.1's gaps G1
-(an interpreted `ComponentInstance` hosted by `EmbeddedHost`, with a test) and
-G2 (`SbHost` over an interpreted component, a public Rust constructor and
-`SbHost::into_raw`, so a downstream crate returns `SbHost*`). Done when the
-Rust tests compile the demo form from `ui/demo.slint` at runtime and drive it
-through the new ABI, on the CPU and (macOS) the GPU path.
-
-Execution:
-1. Workspace: `slint-interpreter` (`=1.18.1`, same pin, no default features)
-   and `slint-dart-interpreter` as a path dependency.
-2. Core `runtime.rs`: `compile(source, path)` → `ComponentDefinition` (the
-   last exported component), and `Runtime`, which instantiates a definition
-   inside `EmbeddedHost` or `GpuHost` and keeps the JSON view
-   (`slint_dart_interpreter::Instance`) beside it. The build-time `DemoForm`,
-   `build.rs` and `slint-build` go; `ui/demo.slint` stays as a runtime file.
-3. FFI: `SbHost` holds an interpreted component; `SbHost::new`, `new_metal`,
-   `new_swapchain`, `component`, `into_raw` are public Rust. New calls:
-   `sb_compile`, `sb_definition_free`, `sb_component_new(_metal|_swapchain)`,
-   `sb_set_property_json`, `sb_get_property_json`, `sb_invoke_json`,
-   `sb_on_callback`, `sb_string_free`. `sb_demo_*` stay, rebuilt on the
-   interpreter, until T11.2 moves the hosts over. Header regenerated;
-   `NativeMethods.cs` gets the new imports.
-4. Tests: core unit tests run on an interpreted demo; `tests/e2e.rs` covers the
-   new calls (compile errors, unknown property, bad JSON, callbacks with JSON
-   arguments, invoke, a file path that does not exist) and the snapshots stay
-   pixel-identical. `just check` minus the Swift legs until T11.2.
-
-### T11.2. Runtime components: hosts load the demo from a file
-
-The Swift and WinUI hosts load `demo.slint` from a file at runtime through
-`sb_compile` and `sb_component_new`, set `name` and handle `submitted` through
-the JSON calls, and the `sb_demo_*` calls leave the ABI. Done when the Swift
-tests and demo app run from the file and the WinUI demo compiles against the
-new `NativeMethods.cs` (it cannot be run on macOS; say so when closing).
-
-Execution: `SlintHost` gets `init(definition:…)` and a `SlintDefinition`
-(`sb_compile`), `setProperty(json:)`, `property(json:)`, `onCallback`. The demo
-app bundles `demo.slint` as a SwiftPM resource. WinUI: the same in
-`SlintHost.cs`, the demo copies `demo.slint` to the output. Then drop
-`sb_demo_*`, regenerate the header, `just check`.
 
 ### T12. Weft → Slint renderer
 
