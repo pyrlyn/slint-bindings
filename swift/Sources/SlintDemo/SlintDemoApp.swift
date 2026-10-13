@@ -11,9 +11,21 @@ final class DemoModel {
     var submissions: [String] = []
 }
 
+/// The form the demo shows: the first `.slint` argument, else the repository's
+/// `demo.slint`. `swift run` builds from the checkout, as `Package.swift`
+/// links the Rust library from it.
+@MainActor
+private func loadDefinition() -> Result<SlintDefinition, any Error> {
+    let path = CommandLine.arguments.dropFirst().first { $0.hasSuffix(".slint") } ?? URL(fileURLWithPath: #filePath)
+        .appendingPathComponent("../../../../crates/slint-bindings-core/ui/demo.slint")
+        .standardizedFileURL.path
+    return Result { try SlintDefinition(path: path) }
+}
+
 @main
 struct SlintDemoApp: App {
     @State private var model = DemoModel()
+    private let definition = loadDefinition()
 
     init() {
         // `swift run` starts a bare process; make it a regular app with a Dock icon and focus.
@@ -23,13 +35,19 @@ struct SlintDemoApp: App {
 
     var body: some Scene {
         WindowGroup("Slint Bindings demo") {
-            ContentView(model: model)
+            switch definition {
+            case .success(let definition):
+                ContentView(model: model, definition: definition)
+            case .failure(let error):
+                Text(String(describing: error)).padding()
+            }
         }
     }
 }
 
 struct ContentView: View {
     @Bindable var model: DemoModel
+    let definition: SlintDefinition
 
     var body: some View {
         HStack(spacing: 0) {
@@ -46,7 +64,7 @@ struct ContentView: View {
 
             Divider()
 
-            SlintDemoView(name: model.name) { submitted in
+            SlintDemoView(definition: definition, name: model.name) { submitted in
                 model.submissions.append(submitted)
             }
             .frame(minWidth: 320, minHeight: 220)

@@ -15,6 +15,10 @@
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="2.5.1" />
   </ItemGroup>
   <ItemGroup>
+    <!-- Loaded at run time through sb_compile; one file shared with the Rust tests and the Swift demo. -->
+    <None Include="..\..\crates\slint-bindings-core\ui\demo.slint" Link="demo.slint" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\SlintBindings.WinUI\SlintBindings.WinUI.csproj" />
   </ItemGroup>
 </Project>

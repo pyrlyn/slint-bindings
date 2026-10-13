@@ -15,9 +15,6 @@ internal struct SbFrame
     public byte Failed;
 }
 
-[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-internal delegate void SbSubmittedFn(IntPtr userData, IntPtr name);
-
 // `argsJson` is a UTF-8 JSON array, valid only during the call.
 [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
 internal delegate void SbCallbackFn(IntPtr userData, IntPtr argsJson);
@@ -53,9 +50,6 @@ internal static partial class NativeMethods
     internal static partial bool sb_on_callback(IntPtr host, string name, IntPtr callback, IntPtr userData);
 
     [LibraryImport(Lib)] internal static partial void sb_string_free(IntPtr text);
-    [LibraryImport(Lib)] internal static partial IntPtr sb_demo_new(uint width, uint height, float scale);
-    [LibraryImport(Lib)] internal static partial IntPtr sb_demo_new_metal(IntPtr layer, uint width, uint height, float scale);
-    [LibraryImport(Lib)] internal static partial IntPtr sb_demo_new_swapchain(IntPtr panel, uint width, uint height, float scale);
 
     [LibraryImport(Lib)]
     [return: MarshalAs(UnmanagedType.U1)]
@@ -161,12 +155,6 @@ internal static partial class NativeMethods
     [LibraryImport(Lib)]
     [return: MarshalAs(UnmanagedType.U1)]
     internal static partial bool sb_host_ime_completed(IntPtr host, [MarshalAs(UnmanagedType.U1)] bool canceled);
-
-    [LibraryImport(Lib, StringMarshalling = StringMarshalling.Utf8)]
-    internal static partial void sb_demo_set_name(IntPtr host, string name);
-
-    [LibraryImport(Lib)]
-    internal static partial void sb_demo_on_submitted(IntPtr host, IntPtr callback, IntPtr userData);
 
     internal static string LastError() =>
         Marshal.PtrToStringUTF8(sb_last_error()) ?? "unknown error";

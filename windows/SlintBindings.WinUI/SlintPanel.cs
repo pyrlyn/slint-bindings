@@ -30,6 +30,9 @@ public sealed class SlintPanel : UserControl
     private XamlRoot? _xamlRoot;
 
     public SlintHost? Host { get; private set; }
+
+    /// <summary>What the panel shows. Set it before the panel loads.</summary>
+    public SlintDefinition? Definition { get; set; }
     public string? LastError { get; private set; }
 
     public SlintPanel()
@@ -85,7 +88,7 @@ public sealed class SlintPanel : UserControl
     {
         try
         {
-            Host ??= OpenHost();
+            Host ??= OpenHost(Definition ?? throw new SlintException("SlintPanel.Definition is not set"));
         }
         catch (SlintException ex)
         {
@@ -145,13 +148,13 @@ public sealed class SlintPanel : UserControl
         RenderFrame();
     }
 
-    private SlintHost OpenHost()
+    private SlintHost OpenHost(SlintDefinition definition)
     {
         IntPtr native = 0;
         try
         {
             native = Marshal.GetComInterfaceForObject<SwapChainPanel, ISwapChainPanelNative>(_swapChain);
-            var host = new SlintHost(1, 1, PixelScale, native);
+            var host = new SlintHost(definition, 1, 1, PixelScale, native);
             if (host.IsGpu)
             {
                 _image.Visibility = Visibility.Collapsed;
@@ -170,7 +173,7 @@ public sealed class SlintPanel : UserControl
         }
         _swapChain.Visibility = Visibility.Collapsed;
         _image.Visibility = Visibility.Visible;
-        return new SlintHost(1, 1, PixelScale);
+        return new SlintHost(definition, 1, 1, PixelScale);
     }
 
     private void RenderFrame()

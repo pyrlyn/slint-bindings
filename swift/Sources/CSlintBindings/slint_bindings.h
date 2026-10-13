@@ -72,11 +72,6 @@ typedef struct SbFrame {
  */
 typedef void (*SbCallbackFn)(void *user_data, const char *args_json);
 
-/**
- * C callback for `submitted(string)`: `user_data`, then the UTF-8 name. Null clears it.
- */
-typedef void (*SbSubmittedFn)(void *user_data, const char *name);
-
 #ifdef __cplusplus
 extern "C" {
 #endif // __cplusplus
@@ -149,27 +144,6 @@ struct SbHost *sb_component_new_swapchain(const struct SbDefinition *definition,
                                           float scale);
 
 /**
- * Creates the demo form at `width`×`height` physical pixels. Null on failure.
- */
-struct SbHost *sb_demo_new(uint32_t width, uint32_t height, float scale);
-
-/**
- * [`sb_component_new_metal`] for the demo form.
- *
- * # Safety
- * `layer` is null or a live `CAMetalLayer` that outlives the returned host.
- */
-struct SbHost *sb_demo_new_metal(void *layer, uint32_t width, uint32_t height, float scale);
-
-/**
- * [`sb_component_new_swapchain`] for the demo form.
- *
- * # Safety
- * `panel` is null or a live `ISwapChainPanel` that outlives the returned host.
- */
-struct SbHost *sb_demo_new_swapchain(void *panel, uint32_t width, uint32_t height, float scale);
-
-/**
  * 1 when `host` presents on the GPU.
  *
  * # Safety
@@ -178,8 +152,8 @@ struct SbHost *sb_demo_new_swapchain(void *panel, uint32_t width, uint32_t heigh
 bool sb_host_is_gpu(const struct SbHost *host);
 
 /**
- * Presents one frame into the surface passed to `sb_demo_new_metal` or
- * `sb_demo_new_swapchain`. `failed` is 1 on a CPU host or a lost swapchain.
+ * Presents one frame into the surface passed to `sb_component_new_metal` or
+ * `sb_component_new_swapchain`. `failed` is 1 on a CPU host or a lost swapchain.
  *
  * # Safety
  * `host` must be null or live.
@@ -190,7 +164,8 @@ struct SbFrame sb_host_gpu_render(struct SbHost *host);
  * Destroys a host. Null is ignored.
  *
  * # Safety
- * `host` must be null or a pointer from [`sb_demo_new`] not freed before.
+ * `host` must be null or a pointer from `sb_component_new*` (or
+ * [`SbHost::into_raw`]) not freed before.
  */
 void sb_host_free(struct SbHost *host);
 
@@ -501,23 +476,6 @@ bool sb_on_callback(const struct SbHost *host,
  * `text` is null or a string from those calls, not freed before.
  */
 void sb_string_free(char *text);
-
-/**
- * Sets the demo form's `name` property.
- *
- * # Safety
- * `host` must be null or live; `name` null or NUL-terminated.
- */
-void sb_demo_set_name(const struct SbHost *host, const char *name);
-
-/**
- * Registers `callback` for the demo form's `submitted(name)`; null clears it.
- * `user_data` is passed back untouched and must outlive the host.
- *
- * # Safety
- * `host` must be null or live.
- */
-void sb_demo_on_submitted(const struct SbHost *host, SbSubmittedFn callback, void *user_data);
 
 #ifdef __cplusplus
 }  // extern "C"

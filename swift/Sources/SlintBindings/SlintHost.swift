@@ -23,25 +23,48 @@ public enum SlintPointerButton: UInt8 {
 }
 
 @MainActor
-private final class SubmittedBox {
+private final class CallbackBox {
     let handler: @MainActor (String) -> Void
     init(_ handler: @escaping @MainActor (String) -> Void) { self.handler = handler }
 }
 
-/// The demo form. CPU frames land in a buffer this object owns; a Metal host
-/// presents into the `CAMetalLayer` passed at init.
+/// A `.slint` file compiled at run time: its main (last exported) component.
+@MainActor
+public final class SlintDefinition {
+    fileprivate let handle: OpaquePointer
+
+    /// Compiles `source`, or the file at `path` when `source` is nil. `path`
+    /// also names the file in diagnostics and resolves relative imports.
+    public init(path: String, source: String? = nil) throws {
+        let compiled = source.map { sb_compile($0, path) } ?? sb_compile(nil, path)
+        guard let compiled else { throw SlintError.last() }
+        handle = compiled
+    }
+
+    isolated deinit {
+        sb_definition_free(handle)
+    }
+}
+
+/// One component of a `SlintDefinition`. CPU frames land in a buffer this
+/// object owns; a Metal host presents into the `CAMetalLayer` passed at init.
 @MainActor
 public final class SlintHost {
     private let handle: OpaquePointer
     private var buffer: [UInt8] = []
-    private var submitted: Unmanaged<SubmittedBox>?
+    private var callbacks: [String: Unmanaged<CallbackBox>] = [:]
     public private(set) var pixelWidth = 1
     public private(set) var pixelHeight = 1
     public let rendersOnGpu: Bool
 
     /// Creates the component at `width`×`height` physical pixels, on the CPU.
-    public init(pixelWidth: Int, pixelHeight: Int, scale: CGFloat) throws {
-        guard let handle = sb_demo_new(UInt32(max(pixelWidth, 1)), UInt32(max(pixelHeight, 1)), Float(scale)) else {
+    public init(definition: SlintDefinition, pixelWidth: Int, pixelHeight: Int, scale: CGFloat) throws {
+        guard let handle = sb_component_new(
+            definition.handle,
+            UInt32(max(pixelWidth, 1)),
+            UInt32(max(pixelHeight, 1)),
+            Float(scale)
+        ) else {
             throw SlintError.last()
         }
         self.handle = handle
@@ -52,8 +75,15 @@ public final class SlintHost {
 
     /// Creates the component presenting into `metalLayer` (`CAMetalLayer`).
     /// The layer must stay alive until this host is released.
-    public init(metalLayer: UnsafeMutableRawPointer, pixelWidth: Int, pixelHeight: Int, scale: CGFloat) throws {
-        guard let handle = sb_demo_new_metal(
+    public init(
+        definition: SlintDefinition,
+        metalLayer: UnsafeMutableRawPointer,
+        pixelWidth: Int,
+        pixelHeight: Int,
+        scale: CGFloat
+    ) throws {
+        guard let handle = sb_component_new_metal(
+            definition.handle,
             metalLayer,
             UInt32(max(pixelWidth, 1)),
             UInt32(max(pixelHeight, 1)),
@@ -68,9 +98,11 @@ public final class SlintHost {
     }
 
     isolated deinit {
-        // Clear the callback first so Rust never calls into a released box.
-        sb_demo_on_submitted(handle, nil, nil)
-        submitted?.release()
+        // Clear the callbacks first so Rust never calls into a released box.
+        for (name, box) in callbacks {
+            _ = sb_on_callback(handle, name, nil, nil)
+            box.release()
+        }
         sb_host_free(handle)
     }
 
@@ -174,25 +206,46 @@ public final class SlintHost {
         _ = sb_host_focus_changed(handle, focused)
     }
 
-    // Demo component properties and callbacks. The Weft milestone replaces these
-    // with a generic property bridge.
+    // Properties and callbacks, as JSON values: `"text"`, `42`, `true`,
+    // `"#ff0000"`, `"Enum.value"`, arrays for models, objects for structs.
 
-    public func setName(_ name: String) {
-        sb_demo_set_name(handle, name)
+    public func setProperty(_ name: String, json: String) throws {
+        guard sb_set_property_json(handle, name, json) else { throw SlintError.last() }
     }
 
-    public func onSubmitted(_ handler: @escaping @MainActor (String) -> Void) {
-        let box = Unmanaged.passRetained(SubmittedBox(handler))
-        sb_demo_on_submitted(handle, { userData, name in
-            guard let userData, let name else { return }
-            let text = String(cString: name)
-            // Slint invokes callbacks synchronously while dispatching input, which
-            // only ever happens from the main-actor methods above.
+    public func property(_ name: String) throws -> String {
+        try Self.take(sb_get_property_json(handle, name))
+    }
+
+    /// Calls the callback `name` with a JSON array of arguments; returns its JSON result.
+    @discardableResult
+    public func invoke(_ name: String, argsJson: String = "[]") throws -> String {
+        try Self.take(sb_invoke_json(handle, name, argsJson))
+    }
+
+    /// Handles the callback `name`; `handler` gets its arguments as a JSON array.
+    public func onCallback(_ name: String, _ handler: @escaping @MainActor (String) -> Void) throws {
+        let box = Unmanaged.passRetained(CallbackBox(handler))
+        let registered = sb_on_callback(handle, name, { userData, args in
+            guard let userData, let args else { return }
+            let json = String(cString: args)
+            // Slint invokes callbacks synchronously while dispatching input or
+            // `invoke`, which only ever happens from the main-actor methods above.
             MainActor.assumeIsolated {
-                Unmanaged<SubmittedBox>.fromOpaque(userData).takeUnretainedValue().handler(text)
+                Unmanaged<CallbackBox>.fromOpaque(userData).takeUnretainedValue().handler(json)
             }
         }, box.toOpaque())
-        submitted?.release()
-        submitted = box
+        guard registered else {
+            box.release()
+            throw SlintError.last()
+        }
+        // The replaced closure, the only holder of the old box, is gone now.
+        callbacks.updateValue(box, forKey: name)?.release()
+    }
+
+    private static func take(_ text: UnsafeMutablePointer<CChar>?) throws -> String {
+        guard let text else { throw SlintError.last() }
+        defer { sb_string_free(text) }
+        return String(cString: text)
     }
 }

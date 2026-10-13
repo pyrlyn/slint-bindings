@@ -30,9 +30,6 @@ thread_local! {
     static LAST_ERROR: RefCell<Option<CString>> = const { RefCell::new(None) };
 }
 
-/// C callback for `submitted(string)`: `user_data`, then the UTF-8 name. Null clears it.
-pub type SbSubmittedFn = Option<extern "C" fn(user_data: *mut c_void, name: *const c_char)>;
-
 /// C callback for [`sb_on_callback`]: `user_data`, then the arguments as a
 /// UTF-8 JSON array, valid only during the call.
 pub type SbCallbackFn = Option<extern "C" fn(user_data: *mut c_void, args_json: *const c_char)>;
@@ -277,7 +274,7 @@ fn guard<T>(fail: T, body: impl FnOnce() -> Result<T, Error>) -> T {
 }
 
 /// # Safety
-/// `host` must be null or a live pointer returned by [`sb_demo_new`].
+/// `host` must be null or a live pointer returned by `sb_component_new*`.
 unsafe fn host_ref<'a>(host: *const SbHost) -> Option<&'a SbHost> {
     // SAFETY: the caller guarantees `host` is null or live and unaliased by `sb_host_free`.
     unsafe { host.as_ref() }
@@ -453,60 +450,6 @@ pub unsafe extern "C" fn sb_component_new_swapchain(
     })
 }
 
-/// The demo form, compiled at run time from the source the hosts load.
-fn demo_definition() -> Result<SbDefinition, Error> {
-    let source = include_str!("../../slint-bindings-core/ui/demo.slint");
-    Ok(SbDefinition(runtime::compile(
-        Some(source),
-        Path::new("demo.slint"),
-    )?))
-}
-
-/// Creates the demo form at `width`×`height` physical pixels. Null on failure.
-#[unsafe(no_mangle)]
-pub extern "C" fn sb_demo_new(width: u32, height: u32, scale: f32) -> *mut SbHost {
-    guard(ptr::null_mut(), || {
-        let definition = demo_definition()?;
-        Ok(SbHost::new(&definition.0, width, height, scale)?.into_raw())
-    })
-}
-
-/// [`sb_component_new_metal`] for the demo form.
-///
-/// # Safety
-/// `layer` is null or a live `CAMetalLayer` that outlives the returned host.
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn sb_demo_new_metal(
-    layer: *mut c_void,
-    width: u32,
-    height: u32,
-    scale: f32,
-) -> *mut SbHost {
-    guard(ptr::null_mut(), || {
-        let definition = demo_definition()?;
-        // SAFETY: forwarded caller contract; `definition` lives for the call.
-        Ok(unsafe { sb_component_new_metal(&definition, layer, width, height, scale) })
-    })
-}
-
-/// [`sb_component_new_swapchain`] for the demo form.
-///
-/// # Safety
-/// `panel` is null or a live `ISwapChainPanel` that outlives the returned host.
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn sb_demo_new_swapchain(
-    panel: *mut c_void,
-    width: u32,
-    height: u32,
-    scale: f32,
-) -> *mut SbHost {
-    guard(ptr::null_mut(), || {
-        let definition = demo_definition()?;
-        // SAFETY: forwarded caller contract; `definition` lives for the call.
-        Ok(unsafe { sb_component_new_swapchain(&definition, panel, width, height, scale) })
-    })
-}
-
 /// 1 when `host` presents on the GPU.
 ///
 /// # Safety
@@ -517,8 +460,8 @@ pub unsafe extern "C" fn sb_host_is_gpu(host: *const SbHost) -> bool {
     unsafe { host_ref(host) }.is_some_and(|h| h.host.is_gpu())
 }
 
-/// Presents one frame into the surface passed to `sb_demo_new_metal` or
-/// `sb_demo_new_swapchain`. `failed` is 1 on a CPU host or a lost swapchain.
+/// Presents one frame into the surface passed to `sb_component_new_metal` or
+/// `sb_component_new_swapchain`. `failed` is 1 on a CPU host or a lost swapchain.
 ///
 /// # Safety
 /// `host` must be null or live.
@@ -547,11 +490,12 @@ pub unsafe extern "C" fn sb_host_gpu_render(host: *mut SbHost) -> SbFrame {
 /// Destroys a host. Null is ignored.
 ///
 /// # Safety
-/// `host` must be null or a pointer from [`sb_demo_new`] not freed before.
+/// `host` must be null or a pointer from `sb_component_new*` (or
+/// [`SbHost::into_raw`]) not freed before.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn sb_host_free(host: *mut SbHost) {
     if !host.is_null() {
-        // SAFETY: the pointer came from `Box::into_raw` in `sb_demo_new` and is freed once.
+        // SAFETY: the pointer came from `Box::into_raw` in `SbHost::into_raw` and is freed once.
         drop(unsafe { Box::from_raw(host) });
     }
 }
@@ -1230,67 +1174,6 @@ pub unsafe extern "C" fn sb_string_free(text: *mut c_char) {
     }
 }
 
-/// Sets the demo form's `name` property.
-///
-/// # Safety
-/// `host` must be null or live; `name` null or NUL-terminated.
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn sb_demo_set_name(host: *const SbHost, name: *const c_char) {
-    guard((), || {
-        // SAFETY: forwarded caller contract.
-        let Some(h) = (unsafe { host_ref(host) }) else {
-            return Err(Error::InvalidArgument("a null host was passed"));
-        };
-        // SAFETY: forwarded caller contract.
-        let name = unsafe { str_arg(name) }?;
-        h.component()
-            .set_property("name", runtime::Value::String(name.into()))
-            .map_err(|err| Error::Component(err.to_string()))
-    });
-}
-
-/// Registers `callback` for the demo form's `submitted(name)`; null clears it.
-/// `user_data` is passed back untouched and must outlive the host.
-///
-/// # Safety
-/// `host` must be null or live.
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn sb_demo_on_submitted(
-    host: *const SbHost,
-    callback: SbSubmittedFn,
-    user_data: *mut c_void,
-) {
-    guard((), || {
-        // SAFETY: forwarded caller contract.
-        let Some(h) = (unsafe { host_ref(host) }) else {
-            return Err(Error::InvalidArgument("a null host was passed"));
-        };
-        let component = h.component();
-        let Some(callback) = callback else {
-            return component
-                .set_callback("submitted", |_| runtime::Value::Void)
-                .map_err(|err| Error::Component(err.to_string()));
-        };
-        // Raw pointers are not `'static + Fn`-friendly; carry the address instead.
-        let user_data = user_data as usize;
-        component
-            .set_callback("submitted", move |args| {
-                let name = match args.first() {
-                    Some(runtime::Value::String(name)) => name.as_str(),
-                    _ => "",
-                };
-                // `name` is valid only for the duration of this callback; the host
-                // must copy it before returning.
-                match CString::new(name) {
-                    Ok(name) => callback(user_data as *mut c_void, name.as_ptr()),
-                    Err(_) => set_error("submitted name contains an interior NUL".to_owned()),
-                }
-                runtime::Value::Void
-            })
-            .map_err(|err| Error::Component(err.to_string()))
-    });
-}
-
 /// Runs `f` on a dedicated thread so parallel `cargo test` shares one Slint owner.
 #[doc(hidden)]
 pub fn run_on_test_ui_thread<R, F>(f: F) -> R
@@ -1346,10 +1229,23 @@ mod tests {
     const WIDTH: u32 = 64;
     const HEIGHT: u32 = 48;
 
+    /// A tiny component compiled in memory; the demo file is the e2e's job.
+    fn new_host(width: u32, height: u32, scale: f32) -> *mut SbHost {
+        let source = c"export component T inherits Window { background: #336699; TextInput {} }";
+        // SAFETY: both strings are NUL-terminated literals.
+        unsafe {
+            let definition = sb_compile(source.as_ptr(), c"t.slint".as_ptr());
+            assert!(!definition.is_null());
+            let host = sb_component_new(definition, width, height, scale);
+            sb_definition_free(definition);
+            host
+        }
+    }
+
     #[test]
     fn render_through_the_c_abi_writes_a_frame() {
         run_on_test_ui_thread(|| {
-            let host = sb_demo_new(WIDTH, HEIGHT, 1.0);
+            let host = new_host(WIDTH, HEIGHT, 1.0);
             assert!(!host.is_null());
             // SAFETY: `host` is live until the free below.
             unsafe {
@@ -1364,7 +1260,7 @@ mod tests {
     #[test]
     fn short_buffer_fails_with_a_message() {
         run_on_test_ui_thread(|| {
-            let host = sb_demo_new(WIDTH, HEIGHT, 1.0);
+            let host = new_host(WIDTH, HEIGHT, 1.0);
             // SAFETY: `host` is live until the free below.
             unsafe {
                 let mut buf = vec![0u8; 1];
@@ -1384,7 +1280,7 @@ mod tests {
                 assert_eq!(sb_host_frame_len(ptr::null()), 0);
                 assert!(!sb_host_pointer_moved(ptr::null(), 0.0, 0.0));
                 assert!(!sb_last_error().is_null());
-                assert!(sb_demo_new(WIDTH, HEIGHT, 0.0).is_null());
+                assert!(new_host(WIDTH, HEIGHT, 0.0).is_null());
                 assert!(!sb_last_error().is_null());
             }
         });
@@ -1393,7 +1289,7 @@ mod tests {
     #[test]
     fn invalid_pointer_button_is_refused() {
         run_on_test_ui_thread(|| {
-            let host = sb_demo_new(WIDTH, HEIGHT, 1.0);
+            let host = new_host(WIDTH, HEIGHT, 1.0);
             // SAFETY: `host` is live until the free below.
             unsafe {
                 assert!(!sb_host_pointer_pressed(host, 0.0, 0.0, 9));
@@ -1406,7 +1302,7 @@ mod tests {
     #[test]
     fn invalid_utf8_key_text_is_refused() {
         run_on_test_ui_thread(|| {
-            let host = sb_demo_new(WIDTH, HEIGHT, 1.0);
+            let host = new_host(WIDTH, HEIGHT, 1.0);
             let bytes = [0x80u8, 0];
             // SAFETY: `host` is live; `bytes` is a NUL-terminated invalid UTF-8 string.
             unsafe {
@@ -1420,7 +1316,7 @@ mod tests {
     #[test]
     fn another_thread_is_refused() {
         run_on_test_ui_thread(|| {
-            let host = sb_demo_new(WIDTH, HEIGHT, 1.0);
+            let host = new_host(WIDTH, HEIGHT, 1.0);
             let addr = host as usize;
             let ok = std::thread::spawn(move || {
                 // SAFETY: the pointer is not freed until this thread joins; we only
