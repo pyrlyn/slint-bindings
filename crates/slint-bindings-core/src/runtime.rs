@@ -44,7 +44,7 @@ pub fn compile(source: Option<&str>, path: &Path) -> Result<ComponentDefinition,
     definitions
         .into_iter()
         .map(|Definition(definition)| definition)
-        .max_by_key(|definition| declared_at(source, &definition.name()))
+        .max_by_key(|definition| declared_at(source, definition.name()))
         .ok_or_else(|| Error::Compile("no exported component".to_owned()))
 }
 
