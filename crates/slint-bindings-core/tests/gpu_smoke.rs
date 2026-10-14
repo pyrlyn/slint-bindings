@@ -6,11 +6,18 @@
 
 #![cfg(any(target_os = "macos", target_os = "windows"))]
 
-use slint_bindings_core::{DemoForm, Error, GpuHost};
+use std::path::Path;
+
+use slint_bindings_core::runtime::compile;
+use slint_bindings_core::{Error, GpuHost};
 
 #[test]
 fn offscreen_frame_paints_when_a_device_exists() -> Result<(), Error> {
-    let host = match GpuHost::new_offscreen(DemoForm::new, 64, 64, 1.0) {
+    let definition = compile(
+        None,
+        Path::new(concat!(env!("CARGO_MANIFEST_DIR"), "/ui/demo.slint")),
+    )?;
+    let host = match GpuHost::new_offscreen(|| definition.create(), 64, 64, 1.0) {
         Ok(host) => host,
         Err(Error::Gpu(_)) => return Ok(()),
         Err(err) => return Err(err),

@@ -12,7 +12,11 @@ struct Snapshots {
     @Test func signInViewScreenshotMatchesTheSnapshot() throws {
         // The golden is the CPU frame. The default view presents on Metal, which
         // does not put a CGImage in `layer.contents`.
-        let view = SlintNSView(frame: NSRect(x: 0, y: 0, width: 320, height: 200), prefersGpu: false)
+        let view = SlintNSView(
+            frame: NSRect(x: 0, y: 0, width: 320, height: 200),
+            definition: try demoDefinition(),
+            prefersGpu: false
+        )
         let window = NSWindow(
             contentRect: NSRect(x: 0, y: 0, width: 320, height: 200),
             styleMask: [.borderless],
@@ -28,9 +32,9 @@ struct Snapshots {
     }
 
     @Test func namedFieldScreenshotMatchesTheSnapshot() throws {
-        let host = try SlintHost(pixelWidth: 320, pixelHeight: 200, scale: 1)
+        let host = try SlintHost(definition: try demoDefinition(), pixelWidth: 320, pixelHeight: 200, scale: 1)
         _ = try host.renderIfNeeded()
-        host.setName("Ada")
+        try host.setProperty("name", json: #""Ada""#)
         let image = try #require(try host.renderIfNeeded().image)
         try expectPixels(image, match: "sign-in-ada")
     }

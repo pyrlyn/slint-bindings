@@ -38,13 +38,17 @@ SwiftUI / AppKit ─┐                       ┌─ WinUI 3 (C#)
 
 ## How a frame happens
 
+0. The host compiles a `.slint` file at run time (`sb_compile`) and creates a
+   component of it (`sb_component_new`). Properties and callbacks cross as JSON
+   (`sb_set_property_json`, `sb_get_property_json`, `sb_invoke_json`,
+   `sb_on_callback`). The demo form is `crates/slint-bindings-core/ui/demo.slint`.
 1. The host view tracks its size and backing scale and calls `sb_host_resize`.
 2. On every display-link tick (`CADisplayLink` on macOS,
    `CompositionTarget.Rendering` on WinUI) the host calls `sb_tick`, then
    either `sb_host_gpu_render` or `sb_host_render`. Slint repaints only when
    something changed.
 3. GPU presentation is a `CAMetalLayer` sublayer on macOS
-   (`sb_demo_new_metal`) or a WinUI `SwapChainPanel` (`sb_demo_new_swapchain`).
+   (`sb_component_new_metal`) or a WinUI `SwapChainPanel` (`sb_component_new_swapchain`).
    wgpu creates the swap chain. During a live resize the Metal layer sets
    `presentsWithTransaction` so the frame is not stretched. If that constructor
    fails, the host presents the CPU frame (`CGImage` layer contents take RGBA8;

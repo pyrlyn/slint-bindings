@@ -46,7 +46,6 @@ Not added: `slint_embed::events` is used only by slint_dart and stays there; `i-
 | T8 | done | P1 | 5 | 100% | cursor |
 | T9 | todo | P2 | 3 | 0% | |
 | T10 | todo | P2 | 3 | 0% | |
-| T11 | todo | P1 | 4 | 0% | |
 | T12 | todo | P1 | 4 | 0% | |
 | T13 | todo | P2 | 4 | 0% | |
 | T14 | todo | P2 | 5 | 0% | |
@@ -175,15 +174,6 @@ own `MinimalSoftwareWindow`. Verify two `SlintNSView`s in one window and two
 windows; make Slint `PopupWindow` and menus render inside the host view (no
 native child windows) and clip correctly. Done with a demo showing two views
 and a combo-box popup in each.
-
-### T11. Runtime components (generic API)
-
-Replace the hard-coded demo with `slint-interpreter`: compile `.slint` source
-at runtime, set and get properties and invoke or handle callbacks through a
-JSON value bridge (the shape slint_dart's `slint-dart-interpreter` already
-uses; reuse after T3). C ABI: `sb_compile`, `sb_component_new`,
-`sb_set_property_json`, `sb_get_property_json`, `sb_on_callback`. Done when the
-demo form is loaded from a file at runtime on both hosts.
 
 ### T12. Weft → Slint renderer
 
