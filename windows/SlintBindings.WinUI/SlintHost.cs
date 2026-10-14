@@ -49,16 +49,34 @@ public sealed class SlintHost : IDisposable
     /// that must stay alive until <see cref="Dispose"/>.
     /// </summary>
     public SlintHost(SlintDefinition definition, int pixelWidth, int pixelHeight, float scale, IntPtr swapChainPanel)
+        : this(swapChainPanel == IntPtr.Zero
+            ? NativeMethods.sb_component_new(definition.Handle, (uint)Math.Max(pixelWidth, 1), (uint)Math.Max(pixelHeight, 1), scale)
+            : NativeMethods.sb_component_new_swapchain(
+                definition.Handle, swapChainPanel, (uint)Math.Max(pixelWidth, 1), (uint)Math.Max(pixelHeight, 1), scale))
     {
-        var width = (uint)Math.Max(pixelWidth, 1);
-        var height = (uint)Math.Max(pixelHeight, 1);
-        _handle = swapChainPanel == IntPtr.Zero
-            ? NativeMethods.sb_component_new(definition.Handle, width, height, scale)
-            : NativeMethods.sb_component_new_swapchain(definition.Handle, swapChainPanel, width, height, scale);
-        if (_handle == IntPtr.Zero) throw new SlintException(NativeMethods.LastError());
-        IsGpu = NativeMethods.sb_host_is_gpu(_handle);
-        PixelWidth = Math.Max(pixelWidth, 1);
-        PixelHeight = Math.Max(pixelHeight, 1);
+    }
+
+    /// <summary>
+    /// Takes ownership of an <c>SbHost*</c> that another library made, such as
+    /// weft's <c>ws_surface_new</c>. Zero throws the library's last error.
+    /// </summary>
+    public static SlintHost Adopt(IntPtr handle) => new(handle);
+
+    private unsafe SlintHost(IntPtr handle)
+    {
+        if (handle == IntPtr.Zero) throw new SlintException(NativeMethods.LastError());
+        uint width, height;
+        if (!NativeMethods.sb_host_pixel_size(handle, &width, &height))
+        {
+            var error = NativeMethods.LastError();
+            NativeMethods.sb_host_free(handle);
+            throw new SlintException(error);
+        }
+        // The size comes from the host: an adopted one was sized by code that never told C#.
+        _handle = handle;
+        IsGpu = NativeMethods.sb_host_is_gpu(handle);
+        PixelWidth = (int)width;
+        PixelHeight = (int)height;
     }
 
     private static void OnCallbackNative(IntPtr userData, IntPtr argsJson)

@@ -50,7 +50,6 @@ Not added: `slint_embed::events` is used only by slint_dart and stays there; `i-
 | T14 | todo | P2 | 5 | 0% | |
 | T15 | todo | P3 | 3 | 0% | |
 | T17 | todo | P3 | 3 | 0% | |
-| T71 | in progress | P1 | 4 | 0% | Claude Code / claude-opus-5-5 |
 
 ## Milestones
 
@@ -202,27 +201,3 @@ Compile the core to `wasm32-unknown-unknown` with the software renderer
 drawing into a canvas (`ImageData`), or Slint's own web backend, and render Weft
 trees in the browser through the existing Weft WASM tooling. Done when the
 login sample renders in a browser from its `.weft` file.
-
-### T71. WinUI 3 hosts a component built elsewhere (weft G4, T68 on Windows)
-
-Weft's Windows shell (weft T69.1e) hands `SlintPanel` a host from its own
-library. The panel creates hosts only from `Definition`, and CI compiles the
-WinUI code without running any of it. Done when `SlintHost.Adopt` takes a host
-pointer from another library, `SlintPanel.HostFactory` takes the host from the
-caller (swap chain or bitmap), an MSTest project on `windows-latest` drives the
-weft login screen through `SlintHost` (render, input, callback, adoption), and
-CI launches the WinUI demo on that screen and checks that its window is up and
-not one colour.
-
-Execution:
-
-1. C#: `SlintHost.Adopt(IntPtr)` (size from `sb_host_pixel_size`);
-   `SlintPanel.HostFactory` (`Func<IntPtr, SlintHost>`; the argument is the swap
-   chain panel, or zero); `OpenHost` keeps what the factory returns.
-2. `windows/SlintBindings.Tests` (MSTest): the fixture renders BGRA that is not one
-   colour; Tab, typing and Enter raise `perform`; an adopted host renders.
-3. The demo takes a `.slint` path argument. The `windows-host` job runs
-   `dotnet test`, then starts the demo self-contained on the fixture, captures its
-   window, fails on a single colour and uploads the capture.
-
-Verify: the `windows-host` CI job.

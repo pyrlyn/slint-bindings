@@ -65,10 +65,29 @@ jobs:
       - uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5
         with:
           dotnet-version: 10.0.x
+      - name: C# host tests
+        # An MSTest.Sdk project is a Microsoft.Testing.Platform executable;
+        # `dotnet test` would need the repo-wide MTP opt-in.
+        run: dotnet run --project windows/SlintBindings.Tests
+        env:
+          DOTNET_CLI_TELEMETRY_OPTOUT: "1"
       - name: WinUI host
-        run: dotnet build windows/SlintDemo.WinUI -p:Platform=x64
+        # The demo carries the Windows App SDK runtime (its csproj); the runner has none installed.
+        run: dotnet build windows/SlintDemo.WinUI -p:Platform=x64 -p:RuntimeIdentifier=win-x64
         env:
           EnableWindowsTargeting: true
+      - name: Weft screen in a WinUI window
+        shell: pwsh
+        run: |
+          $exe = Get-ChildItem windows/SlintDemo.WinUI/bin -Recurse -Filter SlintDemo.WinUI.exe | Select-Object -First 1
+          ./windows/smoke.ps1 -Exe $exe.FullName -Slint fixtures/weft/login.slint -Out weft-winui.png
+      - name: Window capture
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: weft-winui
+          path: weft-winui.png
+          if-no-files-found: ignore
 
   gate:
     needs: [rust, macos, windows-host]

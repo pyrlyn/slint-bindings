@@ -181,6 +181,36 @@ T68.
 
 `just check` passes on macOS.
 
+### T71. WinUI 3 hosts a component built elsewhere (weft G4, T68 on Windows)
+
+Weft's Windows shell (weft T69.1e) hands `SlintPanel` a host from its own
+library. The panel created hosts only from `Definition`, and CI compiled the
+WinUI code without running any of it.
+
+- `SlintHost.Adopt(IntPtr)` takes ownership of an `SbHost*` another library
+  made and reads its size from `sb_host_pixel_size`; zero, or a failed size
+  read, throws that library's last error (the host is freed first). The public
+  constructors go through it.
+- `SlintPanel.HostFactory` (`Func<IntPtr, SlintHost>`) makes the host instead of
+  `Definition`. It gets the `ISwapChainPanelNative` pointer, or zero for a CPU
+  host; a CPU host returned for the pointer is kept, and a throw for the pointer
+  asks again with zero. `Definition` is now a factory too.
+- `windows/SlintBindings.Tests` (MSTest.Sdk, Microsoft.Testing.Platform, run with
+  `dotnet run --project`): compiles `SlintHost.cs` and `NativeMethods.cs` rather
+  than referencing the WinUI library, so it needs no Windows App Runtime. On the
+  weft login screen it checks the BGRA frame is not one colour, walks the
+  columns to click (the reset link while submit is disabled, then submit and
+  "Create an account"), types into both fields with Backtab between them, and
+  presses Enter; `perform` gets each action. An adopted host keeps its size and
+  renders; adopting a failed constructor throws.
+- The demo takes a `.slint` path argument and shows that file through
+  `HostFactory`, listing its `perform` calls. `windows/smoke.ps1` starts it on
+  the weft screen, captures the window and fails when the Slint panel is one
+  colour.
+- CI `windows-host`: the host tests, a self-contained build
+  (`WindowsAppSDKSelfContained`), the smoke run, and the capture as the
+  `weft-winui` artifact.
+
 ### T12. Weft → Slint renderer (dropped)
 
 Dropped, not done. It would have built `slint-bindings-weft`, a second Weft →

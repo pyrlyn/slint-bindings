@@ -31,8 +31,17 @@ public sealed class SlintPanel : UserControl
 
     public SlintHost? Host { get; private set; }
 
-    /// <summary>What the panel shows. Set it before the panel loads.</summary>
+    /// <summary>What the panel shows. Set it, or <see cref="HostFactory"/>, before the panel loads.</summary>
     public SlintDefinition? Definition { get; set; }
+
+    /// <summary>
+    /// Makes the host instead of <see cref="Definition"/>, for a host another
+    /// library builds (wrap its pointer with <see cref="SlintHost.Adopt"/>).
+    /// The argument is an <c>ISwapChainPanelNative</c> pointer to present into,
+    /// or zero for a CPU host. A CPU host returned for a pointer is kept; a
+    /// throw for a pointer asks again with zero.
+    /// </summary>
+    public Func<IntPtr, SlintHost>? HostFactory { get; set; }
     public string? LastError { get; private set; }
 
     public SlintPanel()
@@ -88,7 +97,8 @@ public sealed class SlintPanel : UserControl
     {
         try
         {
-            Host ??= OpenHost(Definition ?? throw new SlintException("SlintPanel.Definition is not set"));
+            Host ??= OpenHost(HostFactory ?? FactoryFor(
+                Definition ?? throw new SlintException("Set SlintPanel.Definition or SlintPanel.HostFactory")));
         }
         catch (SlintException ex)
         {
@@ -148,20 +158,19 @@ public sealed class SlintPanel : UserControl
         RenderFrame();
     }
 
-    private SlintHost OpenHost(SlintDefinition definition)
+    private Func<IntPtr, SlintHost> FactoryFor(SlintDefinition definition) =>
+        panel => new SlintHost(definition, 1, 1, PixelScale, panel);
+
+    private SlintHost OpenHost(Func<IntPtr, SlintHost> factory)
     {
         IntPtr native = 0;
         try
         {
             native = Marshal.GetComInterfaceForObject<SwapChainPanel, ISwapChainPanelNative>(_swapChain);
-            var host = new SlintHost(definition, 1, 1, PixelScale, native);
-            if (host.IsGpu)
-            {
-                _image.Visibility = Visibility.Collapsed;
-                _swapChain.Visibility = Visibility.Visible;
-                return host;
-            }
-            host.Dispose();
+            var host = factory(native);
+            _image.Visibility = host.IsGpu ? Visibility.Collapsed : Visibility.Visible;
+            _swapChain.Visibility = host.IsGpu ? Visibility.Visible : Visibility.Collapsed;
+            return host;
         }
         catch (Exception ex)
         {
@@ -173,7 +182,7 @@ public sealed class SlintPanel : UserControl
         }
         _swapChain.Visibility = Visibility.Collapsed;
         _image.Visibility = Visibility.Visible;
-        return new SlintHost(definition, 1, 1, PixelScale);
+        return factory(IntPtr.Zero);
     }
 
     private void RenderFrame()
