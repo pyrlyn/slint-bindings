@@ -69,3 +69,15 @@ jobs:
         run: dotnet build windows/SlintDemo.WinUI -p:Platform=x64
         env:
           EnableWindowsTargeting: true
+
+  gate:
+    needs: [rust, macos, windows-host]
+    # always(): report failed or cancelled needs instead of reading a skipped gate as passing.
+    if: >-
+      always()
+      && (github.event_name != 'pull_request' || !github.event.pull_request.draft)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: pyrlyn/ci/.github/actions/gate@4e652d891cc6e6f0be316eda1a1f9630d76a8b7e # main
+        with:
+          needs: ${{ toJSON(needs) }}
