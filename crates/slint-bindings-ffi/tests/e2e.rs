@@ -712,13 +712,31 @@ fn metal_without_a_layer_is_refused() {
 
 // A screen weft's `weft-slint` generated (fixtures/weft/login.slint): Weft
 // controls become std-widgets, and every action calls `perform(action, id)`.
-// Hit targets in logical px at 480 wide: the email field's row at y 84, the
-// submit button's at y 184, "Create an account" at (349, 220).
+// Each platform's fonts move its rows, so the test finds targets by column at
+// 480 logical px wide: down x 100 lie the email field, the password field,
+// the submit button and "Forgot password?"; up x 440 from the bottom,
+// "Create an account" comes first.
 const WEFT_WIDTH: u32 = 480;
 const WEFT_HEIGHT: u32 = 800;
-const WEFT_EMAIL: (f32, f32) = (100.0, 84.0);
-const WEFT_SUBMIT: (f32, f32) = (100.0, 184.0);
-const WEFT_SIGNUP: (f32, f32) = (349.0, 220.0);
+const WEFT_LEFT: f32 = 100.0;
+const WEFT_RIGHT: f32 = 440.0;
+
+/// Clicks down (or up) the column at `x` every 2 px until a callback lands in
+/// `performed`; false when none does.
+fn click_until_performed(
+    host: &Host,
+    performed: *const Vec<String>,
+    x: f32,
+    ys: impl Iterator<Item = u32>,
+) -> bool {
+    // SAFETY: the test owns `performed` and reads it between calls only.
+    let len = || unsafe { (*performed).len() };
+    let before = len();
+    ys.step_by(2).any(|y| {
+        click(host, x, y as f32);
+        len() > before
+    })
+}
 
 /// Collects each callback's raw JSON arguments.
 extern "C" fn on_args(user_data: *mut c_void, args_json: *const c_char) {
@@ -778,26 +796,34 @@ fn weft_generated_screen_shows_and_takes_input() {
         };
         assert!(ok, "{}", last_error());
 
-        // The submit button is disabled while the email is empty.
-        click(&host, WEFT_SUBMIT.0, WEFT_SUBMIT.1);
-        assert!(performed.is_empty());
-
         // SAFETY: `host` is live.
         unsafe { assert!(sb_host_focus_changed(host.0, true)) }
-        click(&host, WEFT_EMAIL.0, WEFT_EMAIL.1);
+        let log: *const Vec<String> = &raw const performed;
+        // The submit button is disabled while the email is empty, so the
+        // column's first callback is the reset link below it. The walk ends
+        // with the password field focused.
+        assert!(click_until_performed(&host, log, WEFT_LEFT, 0..WEFT_HEIGHT));
+        type_ascii(&host, "secret");
+        assert_eq!(get(&host, "password").as_deref(), Some("\"secret\""));
+        type_ascii(&host, "\u{19}"); // Backtab, to the email field.
         type_ascii(&host, "ada@example.com");
         assert_eq!(get(&host, "email").as_deref(), Some("\"ada@example.com\""));
         let (frame, _) = render(&host);
         assert_eq!(frame.redrawn, 1);
 
-        click(&host, WEFT_SUBMIT.0, WEFT_SUBMIT.1);
-        // Enter in the field submits the form too (`accepted`).
-        click(&host, WEFT_EMAIL.0, WEFT_EMAIL.1);
+        // Enter in the field submits the form (`accepted`); so does the button.
         type_ascii(&host, "\n");
-        click(&host, WEFT_SIGNUP.0, WEFT_SIGNUP.1);
+        assert!(click_until_performed(&host, log, WEFT_LEFT, 0..WEFT_HEIGHT));
+        assert!(click_until_performed(
+            &host,
+            log,
+            WEFT_RIGHT,
+            (0..WEFT_HEIGHT).rev()
+        ));
         assert_eq!(
             performed,
             [
+                r#"["nav.reset","reset"]"#,
                 r#"["auth.submit","form"]"#,
                 r#"["auth.submit","form"]"#,
                 r#"["nav.signup","signup"]"#
