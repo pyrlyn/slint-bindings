@@ -38,11 +38,27 @@ pub fn compile(source: Option<&str>, path: &Path) -> Result<ComponentDefinition,
     let definitions = Engine::new()
         .compile(source, &path.to_string_lossy())
         .map_err(Error::Compile)?;
+    // The engine does not keep source order, so pick the component whose
+    // declaration comes last in `source`; ties (e.g. imported re-exports) keep
+    // the engine's last one.
     definitions
         .into_iter()
-        .last()
         .map(|Definition(definition)| definition)
+        .max_by_key(|definition| declared_at(source, &definition.name()))
         .ok_or_else(|| Error::Compile("no exported component".to_owned()))
+}
+
+/// Byte offset of the last `component <name>` declaration in `source`.
+fn declared_at(source: &str, name: &str) -> Option<usize> {
+    let needle = format!("component {name}");
+    source
+        .match_indices(&needle)
+        .filter(|(at, _)| {
+            let end = at + needle.len();
+            !source[end..].starts_with(|c: char| c.is_alphanumeric() || c == '_' || c == '-')
+        })
+        .map(|(at, _)| at)
+        .last()
 }
 
 /// Creates a component of `definition` inside the host that `open` builds and
