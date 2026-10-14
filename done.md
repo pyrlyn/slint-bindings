@@ -148,3 +148,16 @@ tests cover the file-loaded form, JSON errors and invoke. WinUI: the same in
 `SlintDefinition`/`SlintHost` (C#), `SlintPanel.Definition`, and the demo copies
 `demo.slint` next to the app. `just check` passes on macOS; the WinUI projects
 were not built or run (no Windows machine here), only `just pinvoke-check`.
+
+### T12. Weft → Slint renderer (dropped)
+
+Dropped, not done. It would have built `slint-bindings-weft`, a second Weft →
+Slint mapping beside weft's own `weft-slint` (weft T67), which already
+generates every corpus screen. The creator approved dropping it (weft T69.1,
+decision 3). The hosts show `weft-slint`'s output instead: T70 and T71.
+
+### T16. Slint desktop app for Weft (dropped)
+
+Dropped, not done. Weft builds its desktop editor itself (weft T69,
+WeftStudio) on these bindings; a second app here would duplicate it. Approved
+with T12 (weft T69.1, decision 3).

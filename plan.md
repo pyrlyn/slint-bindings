@@ -19,7 +19,6 @@ New bugs, dead code and moves from a read-only Cursor cloud review of `main` (ag
 | T25 | P1 | bug | confirmed | `SlintPanel.cs:48`, `:65-72` | WinUI ignores DPI / rasterization-scale changes (macOS handles them in `viewDidChangeBackingProperties`). Subscribe to `XamlRoot.Changed`. |
 | T26 | P1 | bug | confirmed | `SlintPanel.cs:65-72`; `SlintHost.cs:45-46` | A WinUI resize allocates a new `WriteableBitmap` without painting, and `Host.Resize` can throw with no catch on the UI thread. Catch it, surface the last error, then render and `Invalidate()` at the end of `SyncSize`. |
 | T27 | P1 | dead code | confirmed | `flutter/` (464 files; only `flutter/packages/slint/rust/embed` is used, `Cargo.toml:16`); `flutter/.github/workflows/ci.yml:6-8` never runs | Once T19 gives `slint-embed` its home, delete the rest of the `flutter/` tree, including its nested CI. |
-| T28 | P1 | move | confirmed | Weft → Slint rendering: T12, `plan.md:129-131` (`slint-bindings-weft`) → `weft-slint` in listepo/weft | weft's plan already generates Slint in `weft-slint` (weft T69). Re-scope T12 to consume it rather than add a second renderer here. |
 | T29 | P2 | bug | confirmed | `crates/slint-bindings-ffi/src/lib.rs:295-321`; `SlintNSView.swift:157-164` | No key-repeat path: Slint 1.18.1 has `WindowEvent::KeyPressRepeated`, the FFI has only press/release and Swift ignores `isARepeat`. Add `sb_host_key_repeated`. |
 | T30 | P2 | bug | confirmed | `crates/slint-bindings-ffi/src/lib.rs:95-100` | Invalid UTF-8 C strings silently become `""` (`to_str().unwrap_or_default()`). Return `InvalidArgument` through `sb_last_error`. |
 | T31 | P2 | bug | confirmed | `crates/slint-bindings-core/src/platform.rs:17-18` | `InstallError::BufferMismatch` is reported as `ForeignPlatform`. Give it its own error. |
@@ -30,10 +29,11 @@ New bugs, dead code and moves from a read-only Cursor cloud review of `main` (ag
 | T36 | P2 | bug | suspected | `crates/slint-bindings-core/src/host.rs:277-279` | First-responder changes are sent as `WindowActiveChanged`, which Slint defines as window focus. Keep it as a documented approximation, or send it only when the host window activates. |
 | T37 | P2 | bug | suspected | `crates/slint-bindings-ffi/src/lib.rs:203-211`, `:173`, `:364-368` | A reentrant `sb_host_render` from a callback would alias `&SbHost` and `&mut SbHost` while `submitted` runs inside dispatch. Document "no reentrancy", or put the host in a `RefCell`. |
 | T38 | P2 | bug | suspected | `SlintPanel.cs:88-99` | WinUI never calls `CapturePointer`. Capture on press; release on up/cancel. |
-| T39 | P2 | move | confirmed | T16 "Slint desktop app for Weft" (`plan.md:155-160`) → weft studio (weft T69) | weft's plan builds the desktop app; re-scope or drop T16 here. |
 | T40 | P2 | move | suspected | FFI `guard` / `sb_last_error` (`crates/slint-bindings-ffi/src/lib.rs:63-84`) → a shared helper | Only if weft-studio-ffi wants the same panic/error slot (about 30 lines; taken from weft's plan, not checked here). |
 
 Already tracked here, not added again: the Metal/D3D12 texture backends should come from slint_dart's `slint-skia-ffi`, not a new copy; T7 and T8 already name slint_dart's `platform/metal.rs` and `platform/d3d.rs`.
+
+Settled: T28 and T39. T12 and T16 were dropped (`done.md`); T70 and T71 host the Slint that weft's `weft-slint` generates instead.
 
 Not added: `slint_embed::events` is used only by slint_dart and stays there; `i-slint-core` is a deliberate dependency (feature unification), not dead.
 
@@ -46,12 +46,12 @@ Not added: `slint_embed::events` is used only by slint_dart and stays there; `i-
 | T8 | done | P1 | 5 | 100% | cursor |
 | T9 | todo | P2 | 3 | 0% | |
 | T10 | todo | P2 | 3 | 0% | |
-| T12 | todo | P1 | 4 | 0% | |
 | T13 | todo | P2 | 4 | 0% | |
 | T14 | todo | P2 | 5 | 0% | |
 | T15 | todo | P3 | 3 | 0% | |
-| T16 | todo | P2 | 3 | 0% | |
 | T17 | todo | P3 | 3 | 0% | |
+| T70 | in progress | P1 | 4 | 0% | Claude Code / claude-opus-5-5 |
+| T71 | in progress | P1 | 4 | 0% | Claude Code / claude-opus-5-5 |
 
 ## Milestones
 
@@ -64,8 +64,8 @@ remaining tasks until the creator decides how to proceed.
 | M2: Both hosts, shared core | Same core on WinUI; no duplicated code with slint_dart | T3 (done), T4 (done), T5, T6 | WinUI demo builds and runs; text fields take typed text on both hosts; CI is green. |
 | M3: GPU | GPU rendering into the host surface | T7, T8 | 4K view under 4 ms/frame; resize without tearing or black frames; no regressions in input. No-go on one OS keeps the CPU path there. |
 | M4: Distribution | Consumable packages | T9 | An app outside this repo adds the package (SwiftPM binary target, NuGet) and runs the demo. |
-| M5: Real components and Weft | Any `.slint` component and Weft trees, with typed host APIs | T11, T12, T13 | A Weft sample screen (login form) renders in both hosts from its Weft source, and edits flow both ways. |
-| M6: Platform depth | Multiple views, accessibility, iOS, desktop app, web | T10, T14, T15, T16, T17 | VoiceOver and Narrator read the embedded UI; iOS demo runs on a device. |
+| M5: Real components and Weft | Any `.slint` component, screens generated by Weft's `weft-slint`, and typed host APIs | T11, T13, T70, T71 | A screen generated by `weft-slint` (the login form) renders and takes input in both hosts, from a host built by another library. |
+| M6: Platform depth | Multiple views, accessibility, iOS, web | T10, T14, T15, T17 | VoiceOver and Narrator read the embedded UI; iOS demo runs on a device. |
 
 ## Risks
 
@@ -175,16 +175,6 @@ windows; make Slint `PopupWindow` and menus render inside the host view (no
 native child windows) and clip correctly. Done with a demo showing two views
 and a combo-box popup in each.
 
-### T12. Weft → Slint renderer
-
-Map a validated Weft document (screen, form, field, button, stack, grid,
-slots, states) to `.slint` source through the Weft Rust crates
-(`weft-core`, `weft-catalog`), compile it with T11, and wire Weft actions to
-host callbacks. Start with the Weft login sample. Keep the mapping in its own
-crate (`slint-bindings-weft`) so this repository does not depend on Weft
-unless that feature is on. Done when the login sample renders in both hosts
-from its `.weft` file and its validation diagnostics surface in the host.
-
 ### T13. Typed host APIs
 
 Generate Swift (`@Observable` model with two-way property sync through Slint
@@ -207,15 +197,64 @@ safe-area insets, keyboard avoidance, `CADisplayLink`). Slint's own iOS port
 runs whole apps through winit; this is the embedded variant. Done when the demo
 form runs inside a SwiftUI iOS app on a device.
 
-### T16. Slint desktop app for Weft
-
-A plain Slint application (winit backend) that opens, validates and previews
-Weft files, sharing T12's renderer. This is the "Slint-first" desktop app; the
-native hosts embed the same views. Done when it opens the Weft samples.
-
 ### T17. Web build
 
 Compile the core to `wasm32-unknown-unknown` with the software renderer
 drawing into a canvas (`ImageData`), or Slint's own web backend, and render Weft
 trees in the browser through the existing Weft WASM tooling. Done when the
 login sample renders in a browser from its `.weft` file.
+
+### T70. SwiftUI hosts a component built elsewhere (weft G3, T68 on macOS)
+
+Weft's editor (weft T69.1d) builds its `SbHost*` inside its own Rust library
+(`ws_surface_new`) and shows it in `SlintNSView`. Today the view only creates
+hosts from a `SlintDefinition`, and the `SlintBindings` library target links
+`../target/debug/libslint_bindings_ffi.a` through `unsafeFlags`, so an app that
+links its own Rust library would carry a second copy of Slint. Done when
+`SlintHost` adopts a host pointer returned by another C function,
+`SlintNSView` and a generic SwiftUI `SlintView` take the host from the caller
+(CPU or Metal), the library target links no Rust library (the demo and the
+tests do), and a screen generated by weft's `weft-slint` (the login form) shows
+and takes pointer and keyboard input inside a SwiftUI window in `swift test`
+and through the C ABI in the Rust e2e.
+
+Execution:
+
+1. `fixtures/weft/login.slint`: weft's `crates/weft-slint/tests/fixtures/login.slint`
+   (generated from `corpus/login/screen.weft`), copied with its origin in a header.
+2. C ABI: `sb_host_pixel_size`, so an adopted host's size is known; regenerate the
+   header and add it to `NativeMethods.cs`.
+3. Rust e2e: compile the fixture, render 480×800, click the email field, type,
+   read `email` back; Enter raises `perform("auth.submit", "form")`.
+4. Swift: `SlintHost(adopting:)`, `SlintNSView(frame:prefersGpu:makeHost:)`, a
+   `SlintView` representable; the Rust library moves to the demo and test targets;
+   `just swift-package-check` fails when the library target has unsafe flags.
+5. Swift test: `NSHostingView(rootView: SlintView …)` in an `NSWindow`, mouse and
+   key `NSEvent`s through `NSWindow.sendEvent`, then the property, the callback and
+   a frame that is not one colour.
+
+Verify: `just check` and CI.
+
+### T71. WinUI 3 hosts a component built elsewhere (weft G4, T68 on Windows)
+
+Weft's Windows shell (weft T69.1e) hands `SlintPanel` a host from its own
+library. The panel creates hosts only from `Definition`, and CI compiles the
+WinUI code without running any of it. Done when `SlintHost.Adopt` takes a host
+pointer from another library, `SlintPanel.HostFactory` takes the host from the
+caller (swap chain or bitmap), an MSTest project on `windows-latest` drives the
+weft login screen through `SlintHost` (render, input, callback, adoption), and
+CI launches the WinUI demo on that screen and checks that its window is up and
+not one colour.
+
+Execution:
+
+1. C#: `SlintHost.Adopt(IntPtr)` (size from `sb_host_pixel_size`);
+   `SlintPanel.HostFactory` (`Func<IntPtr, SlintHost>`; the argument is the swap
+   chain panel, or zero); `OpenHost` keeps what the factory returns.
+2. `windows/SlintBindings.Tests` (MSTest): the fixture renders BGRA that is not one
+   colour; Tab, typing and Enter raise `perform`; an adopted host renders.
+3. The demo takes a `.slint` path argument. The `windows-host` job runs
+   `dotnet test`, then starts the demo self-contained on the fixture, captures its
+   window, fails on a single colour and uploads the capture.
+
+Verify: the `windows-host` CI job.

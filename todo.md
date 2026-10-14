@@ -1,9 +1,9 @@
 - T5. CI
 - T9. Packaging (M4)
 - T10. Multiple hosts and popups
-- T12. Weft → Slint renderer
 - T13. Typed host APIs
 - T14. Accessibility spike
 - T15. iOS host
-- T16. Slint desktop app for Weft
 - T17. Web build
+- T70. SwiftUI hosts a component built elsewhere (weft G3, T68 on macOS)
+- T71. WinUI 3 hosts a component built elsewhere (weft G4, T68 on Windows)
