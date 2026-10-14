@@ -7,3 +7,8 @@ codeql:
   languages: [actions, rust]
 
 # Snyk stays off (pyrlyn/ci default).
+
+# The shared dotnet check builds on Linux, where the WinUI projects (net*-windows) cannot
+# build (NETSDK1100); the C# side is covered by the Windows jobs in ci.yml.
+dotnet:
+  enabled: false
