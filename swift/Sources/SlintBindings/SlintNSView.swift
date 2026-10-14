@@ -23,19 +23,15 @@ public final class SlintNSView: NSView {
     /// Key code whose key-up should be dropped because the input method swallowed the press.
     private var suppressKeyUpCode: UInt16?
 
-    public override init(frame frameRect: NSRect) {
+    /// Shows one component of `definition`. `prefersGpu: false` keeps the CPU
+    /// `CGImage` path. Snapshot tests use it; the demo leaves the default,
+    /// which is the Metal layer.
+    public init(frame frameRect: NSRect, definition: SlintDefinition, prefersGpu: Bool = true) {
         super.init(frame: frameRect)
-        install(prefersGpu: true)
+        install(definition: definition, prefersGpu: prefersGpu)
     }
 
-    /// `prefersGpu: false` keeps the CPU `CGImage` path. Snapshot tests use it;
-    /// the demo leaves the default, which is the Metal layer.
-    public init(frame frameRect: NSRect, prefersGpu: Bool) {
-        super.init(frame: frameRect)
-        install(prefersGpu: prefersGpu)
-    }
-
-    private func install(prefersGpu: Bool) {
+    private func install(definition: SlintDefinition, prefersGpu: Bool) {
         wantsLayer = true
         // Top-left keeps a frame that is one size behind the bounds where it is,
         // instead of stretching it across the view until the new pixels arrive.
@@ -51,6 +47,7 @@ public final class SlintNSView: NSView {
             metalLayer = metal
             do {
                 host = try SlintHost(
+                    definition: definition,
                     metalLayer: Unmanaged.passUnretained(metal).toOpaque(),
                     pixelWidth: 1,
                     pixelHeight: 1,
@@ -63,7 +60,7 @@ public final class SlintNSView: NSView {
             }
         }
         do {
-            host = try SlintHost(pixelWidth: 1, pixelHeight: 1, scale: 1)
+            host = try SlintHost(definition: definition, pixelWidth: 1, pixelHeight: 1, scale: 1)
         } catch let error as SlintError {
             lastError = error
         } catch {

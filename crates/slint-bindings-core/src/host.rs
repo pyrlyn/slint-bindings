@@ -588,13 +588,37 @@ fn write_frame_bgra(out: &mut [u8], pixels: &[PremultipliedRgbaColor]) {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::DemoForm;
+    use crate::runtime::{self, ComponentInstance};
+    use slint_interpreter::Value;
 
     const WIDTH: u32 = 320;
     const HEIGHT: u32 = 200;
 
+    type DemoForm = ComponentInstance;
+
+    /// The accessors the compiled demo used to generate, over the interpreter.
+    trait DemoName {
+        fn get_name(&self) -> SharedString;
+        fn set_name(&self, name: SharedString);
+    }
+
+    impl DemoName for ComponentInstance {
+        fn get_name(&self) -> SharedString {
+            match self.get_property("name") {
+                Ok(Value::String(name)) => name,
+                // Never equal to a name a test expects.
+                _ => "<no name property>".into(),
+            }
+        }
+        fn set_name(&self, name: SharedString) {
+            let _ = self.set_property("name", Value::String(name));
+        }
+    }
+
     fn demo() -> Result<EmbeddedHost<DemoForm>, Error> {
-        EmbeddedHost::new(DemoForm::new, WIDTH, HEIGHT, 1.0)
+        let source = include_str!("../ui/demo.slint");
+        let definition = runtime::compile(Some(source), std::path::Path::new("demo.slint"))?;
+        EmbeddedHost::new(|| definition.create(), WIDTH, HEIGHT, 1.0)
     }
 
     #[test]

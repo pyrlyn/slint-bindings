@@ -15,7 +15,8 @@
 | Package | Where | Source | Why here |
 | --- | --- | --- | --- |
 | slint | local | https://github.com/slint-ui/slint | UI runtime; software renderer and custom platform API |
-| slint-build | local (build-dependency) | https://github.com/slint-ui/slint | Compiles the demo `.slint` ahead of time |
+| slint-interpreter | local | https://github.com/slint-ui/slint | Compiles `.slint` at run time (`sb_compile`) |
+| slint-dart-interpreter | local (path, `flutter/packages/slint_build/interpreter`) | https://github.com/listepo/slint_dart | Shared compile helper and JSON value bridge for properties and callbacks |
 | i-slint-core | local | https://github.com/slint-ui/slint | Feature unification only: image and SVG decoding without a backend |
 | thiserror | local | https://github.com/dtolnay/thiserror | Core error enum |
 | png | local (dev) | https://github.com/image-rs/image-png | Encode and decode the demo frame snapshots |

@@ -12,6 +12,8 @@ publish.workspace = true
 slint = { workspace = true }
 slint-embed = { workspace = true }
 i-slint-core = { workspace = true }
+slint-interpreter = { workspace = true }
+slint-dart-interpreter = { workspace = true }
 thiserror = { workspace = true }
 
 # FemtoVG's wgpu renderer is the public GPU API (Slint has no public Skia
@@ -20,9 +22,6 @@ thiserror = { workspace = true }
 [target.'cfg(any(target_os = "macos", target_os = "windows"))'.dependencies]
 slint = { workspace = true, features = ["renderer-femtovg-wgpu", "unstable-wgpu-30"] }
 pollster = "0.4.0"
-
-[build-dependencies]
-slint-build = { workspace = true }
 
 [lints]
 workspace = true

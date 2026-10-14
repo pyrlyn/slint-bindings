@@ -1,7 +1,6 @@
 - T5. CI
 - T9. Packaging (M4)
 - T10. Multiple hosts and popups
-- T11. Runtime components (generic API)
 - T12. Weft → Slint renderer
 - T13. Typed host APIs
 - T14. Accessibility spike
