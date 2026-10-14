@@ -57,44 +57,51 @@ public final class SlintHost {
     public private(set) var pixelHeight = 1
     public let rendersOnGpu: Bool
 
+    /// Takes ownership of an `SbHost*` that another library made, such as a
+    /// Rust crate that links `slint-bindings-ffi` and returns hosts from its
+    /// own C functions. Pass that call's result directly: nil means it failed
+    /// and left the reason in `sb_last_error`. The host is freed with this object.
+    public init(adopting handle: OpaquePointer?) throws {
+        guard let handle else { throw SlintError.last() }
+        var width: UInt32 = 0
+        var height: UInt32 = 0
+        guard sb_host_pixel_size(handle, &width, &height) else {
+            let error = SlintError.last()
+            sb_host_free(handle)
+            throw error
+        }
+        self.handle = handle
+        self.pixelWidth = Int(width)
+        self.pixelHeight = Int(height)
+        self.rendersOnGpu = sb_host_is_gpu(handle)
+    }
+
     /// Creates the component at `width`×`height` physical pixels, on the CPU.
-    public init(definition: SlintDefinition, pixelWidth: Int, pixelHeight: Int, scale: CGFloat) throws {
-        guard let handle = sb_component_new(
+    public convenience init(definition: SlintDefinition, pixelWidth: Int, pixelHeight: Int, scale: CGFloat) throws {
+        try self.init(adopting: sb_component_new(
             definition.handle,
             UInt32(max(pixelWidth, 1)),
             UInt32(max(pixelHeight, 1)),
             Float(scale)
-        ) else {
-            throw SlintError.last()
-        }
-        self.handle = handle
-        self.pixelWidth = max(pixelWidth, 1)
-        self.pixelHeight = max(pixelHeight, 1)
-        self.rendersOnGpu = false
+        ))
     }
 
     /// Creates the component presenting into `metalLayer` (`CAMetalLayer`).
     /// The layer must stay alive until this host is released.
-    public init(
+    public convenience init(
         definition: SlintDefinition,
         metalLayer: UnsafeMutableRawPointer,
         pixelWidth: Int,
         pixelHeight: Int,
         scale: CGFloat
     ) throws {
-        guard let handle = sb_component_new_metal(
+        try self.init(adopting: sb_component_new_metal(
             definition.handle,
             metalLayer,
             UInt32(max(pixelWidth, 1)),
             UInt32(max(pixelHeight, 1)),
             Float(scale)
-        ) else {
-            throw SlintError.last()
-        }
-        self.handle = handle
-        self.pixelWidth = max(pixelWidth, 1)
-        self.pixelHeight = max(pixelHeight, 1)
-        self.rendersOnGpu = sb_host_is_gpu(handle)
+        ))
     }
 
     isolated deinit {
