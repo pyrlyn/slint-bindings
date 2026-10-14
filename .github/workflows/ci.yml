@@ -70,21 +70,14 @@ jobs:
         env:
           EnableWindowsTargeting: true
 
-  # The org's protect-main ruleset requires one check named `gate`; this job
-  # turns the real jobs into that single check. `always()` keeps a failed or
-  # cancelled job from being reported as a skipped (and so passing) gate.
   gate:
-    if: always()
     needs: [rust, macos, windows-host]
+    # always(): report failed or cancelled needs instead of reading a skipped gate as passing.
+    if: >-
+      always()
+      && (github.event_name != 'pull_request' || !github.event.pull_request.draft)
     runs-on: ubuntu-latest
-    timeout-minutes: 5
-    permissions: {}
     steps:
-      - name: All jobs passed or were skipped
-        env:
-          RESULTS: ${{ join(needs.*.result, ' ') }}
-        run: |
-          echo "results: $RESULTS"
-          for r in $RESULTS; do
-            case "$r" in success|skipped) ;; *) exit 1 ;; esac
-          done
+      - uses: pyrlyn/ci/.github/actions/gate@4e652d891cc6e6f0be316eda1a1f9630d76a8b7e # main
+        with:
+          needs: ${{ toJSON(needs) }}
