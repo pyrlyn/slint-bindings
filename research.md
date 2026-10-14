@@ -105,3 +105,34 @@ a custom platform has to provide it itself (plan T14).
 | swift-bridge | Idiomatic Swift both ways | Swift only | No |
 | Swift C++ interop over Slint's C++ API | Reuses `slint-platform.h`, `SkiaRenderer` | Drags CMake and the C++ SDK into SwiftPM; the community PoC hit `extern "C"` import limits | No |
 | csbindgen / generated P/Invoke | Keeps C# in sync with the header | Extra tool | T6 |
+
+## 7. Recheck for weft T68 (2026-10-15)
+
+Section 1 still holds. Checked on 2026-10-15 through the GitHub API and the
+crates.io API (slint-ui/slint `master` at `6ba819d`):
+
+- The latest `slint` is still 1.18.1 (published 2026-09-21); there is no 1.19
+  ([crates.io API](https://crates.io/api/v1/crates/slint),
+  [releases](https://github.com/slint-ui/slint/releases)).
+- `api/` holds `cpp`, `node`, `python`, `rs`, `slint-sc` and `wasm-interpreter`;
+  `internal/backends` holds `android-activity`, `linuxkms`, `qt`, `selector`,
+  `testing` and `winit`. There is no Swift, AppKit, .NET or WinUI binding or backend
+  ([api/](https://github.com/slint-ui/slint/tree/master/api)).
+- The Swift PR [#11167](https://github.com/slint-ui/slint/pull/11167) is still an open
+  draft (last updated 2026-08-21). Issues [#1005](https://github.com/slint-ui/slint/issues/1005)
+  (Swift) and [#4207](https://github.com/slint-ui/slint/issues/4207) (C#) are open.
+- No open or recently merged PR adds Swift, AppKit, WinUI or .NET support. The nearest
+  platform work is C++ only: [#13193](https://github.com/slint-ui/slint/pull/13193)
+  (C++ platform API: native menus and input methods, open) and
+  [#14047](https://github.com/slint-ui/slint/pull/14047) ("core: Let several contexts
+  share one platform", merged 2026-10-14, unreleased), which bears on T10.
+- Discussion [#6585](https://github.com/slint-ui/slint/discussions/6585) (attach to a
+  parent `HWND` / `NSView`) has no chosen answer; issue
+  [#4640](https://github.com/slint-ui/slint/issues/4640) is unchanged.
+- C++ on iOS ([#13580](https://github.com/slint-ui/slint/pull/13580)) is merged but in
+  no release yet.
+
+So weft consumes these bindings rather than official ones. Weft's T67 converter
+(`weft-slint`) produces plain `.slint` with `std-widgets` and a
+`perform(action, id)` callback; the hosts compile it at run time (T11) and show
+it (T70 on macOS, T71 on Windows).
