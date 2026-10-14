@@ -5,4 +5,3 @@
 - T14. Accessibility spike
 - T15. iOS host
 - T17. Web build
-- T71. WinUI 3 hosts a component built elsewhere (weft G4, T68 on Windows)

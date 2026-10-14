@@ -27,6 +27,7 @@
 | Package | Where | Source | Why here |
 | --- | --- | --- | --- |
 | Microsoft.WindowsAppSDK | local (`windows/*.csproj`) | https://github.com/microsoft/WindowsAppSDK | WinUI 3 |
+| MSTest.Sdk | local (`windows/SlintBindings.Tests`, project SDK 4.5.1) | https://github.com/microsoft/testfx | C# host tests on Microsoft.Testing.Platform |
 
 ## SwiftPM
 

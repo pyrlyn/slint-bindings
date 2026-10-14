@@ -1,12 +1,14 @@
 # Windows host (WinUI 3)
 
-The control mirrors the Swift host. CI compiles it (`dotnet build` after
-`just windows-dll`). Running the demo window still takes a Windows machine.
+The control mirrors the Swift host. CI runs the host tests, builds the demo
+and opens it on the weft login screen (`fixtures/weft/login.slint`), failing
+when the Slint panel is one colour (`smoke.ps1`).
 
 | Project | What it is |
 | --- | --- |
 | `SlintBindings.WinUI` | `SlintPanel` control, `SlintHost` (owns the Rust handle), P/Invoke declarations |
-| `SlintDemo.WinUI` | Unpackaged demo app: a WinUI pane and a Slint pane sharing state |
+| `SlintDemo.WinUI` | Unpackaged demo app: a WinUI pane and a Slint pane sharing state. A `.slint` path argument shows that file instead and lists its `perform` calls |
+| `SlintBindings.Tests` | MSTest: the weft screen through `SlintHost` (render, typing, clicks, callbacks, adoption). Compiles the host's sources, so it needs no Windows App Runtime |
 
 ## Build (on Windows)
 
@@ -15,11 +17,23 @@ mise install
 just windows-dll
 # ARM64: just windows-dll aarch64-pc-windows-msvc
 dotnet build windows/SlintDemo.WinUI -p:Platform=x64
+dotnet run --project windows/SlintBindings.Tests
 ```
 
 The build copies `slint_bindings_ffi.dll` next to the app and under
 `runtimes/win-x64/native` (or `win-arm64` when `Platform=ARM64`). Both RIDs
 are staged when both DLLs have been built.
+
+## A host from another library
+
+A library that makes its own `SbHost*` (weft's `ws_surface_new`, say) hands it
+to the panel through `HostFactory`; `SlintHost.Adopt` takes ownership and reads
+the size from the host. The factory gets the swap chain pointer, or zero for a
+CPU host, and is asked again with zero when it throws for the pointer.
+
+```csharp
+panel.HostFactory = swapChain => SlintHost.Adopt(MakeNativeHost(swapChain));
+```
 
 ## Rendering path
 
@@ -34,7 +48,8 @@ are staged when both DLLs have been built.
 
 ## TODO
 
-- [x] Build on Windows CI (M2). Running the window is still manual.
+- [x] Build on Windows CI (M2), plus the host tests and a window smoke run on
+      the weft screen (T71). Typing into the window is still manual.
 - [x] `just pinvoke-check` keeps `NativeMethods.cs` on the header's `sb_*` exports.
       Marshalling stays hand-written.
 - [x] `VirtualKey` → Slint key text, including Shift+Tab, both modifier sides,
