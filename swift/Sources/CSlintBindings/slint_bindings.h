@@ -178,6 +178,15 @@ void sb_host_free(struct SbHost *host);
 size_t sb_host_frame_len(const struct SbHost *host);
 
 /**
+ * Writes the frame size in physical pixels. A host made by another library
+ * reaches Swift or C# without its size, which the CPU frame's image needs.
+ *
+ * # Safety
+ * `host` must be null or live; `width` and `height` must be null or writable.
+ */
+bool sb_host_pixel_size(const struct SbHost *host, uint32_t *width, uint32_t *height);
+
+/**
  * Resizes the frame; returns false on failure.
  *
  * # Safety

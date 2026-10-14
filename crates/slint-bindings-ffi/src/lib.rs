@@ -122,6 +122,9 @@ macro_rules! forward {
 }
 
 impl Backend {
+    fn size(&self) -> (u32, u32) {
+        forward!(self.size())
+    }
     fn frame_len(&self) -> usize {
         forward!(self.frame_len())
     }
@@ -508,6 +511,35 @@ pub unsafe extern "C" fn sb_host_free(host: *mut SbHost) {
 pub unsafe extern "C" fn sb_host_frame_len(host: *const SbHost) -> usize {
     // SAFETY: forwarded caller contract.
     unsafe { host_ref(host) }.map_or(0, |h| h.host.frame_len())
+}
+
+/// Writes the frame size in physical pixels. A host made by another library
+/// reaches Swift or C# without its size, which the CPU frame's image needs.
+///
+/// # Safety
+/// `host` must be null or live; `width` and `height` must be null or writable.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn sb_host_pixel_size(
+    host: *const SbHost,
+    width: *mut u32,
+    height: *mut u32,
+) -> bool {
+    guard(false, || {
+        // SAFETY: forwarded caller contract.
+        let Some(h) = (unsafe { host_ref(host) }) else {
+            return Err(Error::InvalidArgument("a null host was passed"));
+        };
+        if width.is_null() || height.is_null() {
+            return Err(Error::InvalidArgument("a null size pointer was passed"));
+        }
+        let (w, h) = h.host.size();
+        // SAFETY: both pointers are non-null and writable per the caller's contract.
+        unsafe {
+            *width = w;
+            *height = h;
+        }
+        Ok(true)
+    })
 }
 
 /// Resizes the frame; returns false on failure.

@@ -61,6 +61,10 @@ internal static partial class NativeMethods
 
     [LibraryImport(Lib)]
     [return: MarshalAs(UnmanagedType.U1)]
+    internal static unsafe partial bool sb_host_pixel_size(IntPtr host, uint* width, uint* height);
+
+    [LibraryImport(Lib)]
+    [return: MarshalAs(UnmanagedType.U1)]
     internal static partial bool sb_host_resize(IntPtr host, uint width, uint height, float scale);
 
     [LibraryImport(Lib)] internal static unsafe partial SbFrame sb_host_render(IntPtr host, byte* buf, nuint len);

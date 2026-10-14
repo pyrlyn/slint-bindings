@@ -149,6 +149,38 @@ tests cover the file-loaded form, JSON errors and invoke. WinUI: the same in
 `demo.slint` next to the app. `just check` passes on macOS; the WinUI projects
 were not built or run (no Windows machine here), only `just pinvoke-check`.
 
+### T70. SwiftUI hosts a component built elsewhere (weft G3, T68 on macOS)
+
+Weft's editor builds its `SbHost*` in its own Rust library and shows it in
+`SlintNSView` (weft T69.1d). Closes weft T69.1's G3 and the macOS half of weft
+T68.
+
+- `SlintHost(adopting:)` takes ownership of an `SbHost*` another C function
+  returned; nil throws that call's `sb_last_error`. The definition initializers
+  go through it. `sb_host_pixel_size` (new in the C ABI and `NativeMethods.cs`)
+  gives an adopted host's size.
+- `SlintNSView(frame:prefersGpu:makeHost:)` takes the host from the caller. With
+  `prefersGpu` the factory is offered a `CAMetalLayer`; a CPU host drops the
+  layer, and a throw is retried without it. `SlintNSView(frame:host:)` and the
+  definition initializer build on it. `SlintView` is the same as a SwiftUI view.
+- The `SlintBindings` library target links no Rust library; the demo and test
+  targets do. `just swift-package-check` (in `just check`) fails when the
+  library target has unsafe flags.
+- `fixtures/weft/login.slint` is weft's `weft-slint` output for the login screen
+  (weft `b623a5b9`). The Rust e2e renders it at 480×800 (not one colour), clicks
+  the email field, types into it, reads `email` back, and gets
+  `perform("auth.submit", "form")` from the button and from Enter and
+  `perform("nav.signup", "signup")` from the link; the button does nothing while
+  the email is empty. The Swift test shows the same screen in `SlintView` inside
+  an `NSHostingView` in an `NSWindow`, with a host adopted from raw `sb_*` calls,
+  and sends `NSEvent` mouse and key events to the view: the frame is not one
+  colour, the view becomes first responder, the typed email lands, and the
+  clicks raise `perform`. The events go to the view's responder methods, not
+  `NSWindow.sendEvent`: a test process is not the active app, so its window
+  never becomes key, and AppKit keeps a click in a window that is not key.
+
+`just check` passes on macOS.
+
 ### T12. Weft → Slint renderer (dropped)
 
 Dropped, not done. It would have built `slint-bindings-weft`, a second Weft →

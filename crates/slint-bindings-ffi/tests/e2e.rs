@@ -14,9 +14,9 @@ use slint_bindings_ffi::{
     sb_definition_free, sb_get_property_json, sb_host_composition_commit,
     sb_host_composition_update, sb_host_focus_changed, sb_host_frame_len, sb_host_free,
     sb_host_is_gpu, sb_host_key_pressed, sb_host_key_released, sb_host_key_repeated,
-    sb_host_pointer_moved, sb_host_pointer_pressed, sb_host_pointer_released, sb_host_render,
-    sb_host_resize, sb_invoke_json, sb_last_error, sb_on_callback, sb_set_property_json,
-    sb_string_free, sb_tick,
+    sb_host_pixel_size, sb_host_pointer_moved, sb_host_pointer_pressed, sb_host_pointer_released,
+    sb_host_render, sb_host_resize, sb_invoke_json, sb_last_error, sb_on_callback,
+    sb_set_property_json, sb_string_free, sb_tick,
 };
 
 const FORM_WIDTH: u32 = 320;
@@ -706,6 +706,147 @@ fn metal_without_a_layer_is_refused() {
             assert!(host.is_null());
             assert!(last_error().contains("null"), "{}", last_error());
             sb_definition_free(definition);
+        }
+    });
+}
+
+// A screen weft's `weft-slint` generated (fixtures/weft/login.slint): Weft
+// controls become std-widgets, and every action calls `perform(action, id)`.
+// Each platform's fonts move its rows, so the test finds targets by column at
+// 480 logical px wide: down x 100 lie the email field, the password field,
+// the submit button and "Forgot password?"; up x 440 from the bottom,
+// "Create an account" comes first.
+const WEFT_WIDTH: u32 = 480;
+const WEFT_HEIGHT: u32 = 800;
+const WEFT_LEFT: f32 = 100.0;
+const WEFT_RIGHT: f32 = 440.0;
+
+/// Clicks down (or up) the column at `x` every 2 px until a callback lands in
+/// `performed`; false when none does.
+fn click_until_performed(
+    host: &Host,
+    performed: *const Vec<String>,
+    x: f32,
+    ys: impl Iterator<Item = u32>,
+) -> bool {
+    // SAFETY: the test owns `performed` and reads it between calls only.
+    let len = || unsafe { (*performed).len() };
+    let before = len();
+    ys.step_by(2).any(|y| {
+        click(host, x, y as f32);
+        len() > before
+    })
+}
+
+/// Collects each callback's raw JSON arguments.
+extern "C" fn on_args(user_data: *mut c_void, args_json: *const c_char) {
+    if user_data.is_null() || args_json.is_null() {
+        return;
+    }
+    // SAFETY: the FFI passes a CString that is valid for this call.
+    let args = unsafe { CStr::from_ptr(args_json) }.to_string_lossy();
+    // SAFETY: the test passes a live `Vec<String>` it does not touch during the call.
+    unsafe { &mut *user_data.cast::<Vec<String>>() }.push(args.into_owned());
+}
+
+#[test]
+fn weft_generated_screen_shows_and_takes_input() {
+    run_on_test_ui_thread(|| {
+        let path = CString::new(concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/../../fixtures/weft/login.slint"
+        ))
+        .unwrap_or_default();
+        // SAFETY: `path` is NUL-terminated; a null source reads the file.
+        let definition = unsafe { sb_compile(ptr::null(), path.as_ptr()) };
+        assert!(!definition.is_null(), "sb_compile failed: {}", last_error());
+        // SAFETY: `definition` is live until the free right after.
+        let host = Host(unsafe { sb_component_new(definition, WEFT_WIDTH, WEFT_HEIGHT, 1.0) });
+        // SAFETY: from `sb_compile`, freed once.
+        unsafe { sb_definition_free(definition) };
+        assert!(
+            !host.0.is_null(),
+            "sb_component_new failed: {}",
+            last_error()
+        );
+
+        let (mut width, mut height) = (0, 0);
+        // SAFETY: `host` is live; both pointers are writable.
+        assert!(unsafe { sb_host_pixel_size(host.0, &raw mut width, &raw mut height) });
+        assert_eq!((width, height), (WEFT_WIDTH, WEFT_HEIGHT));
+
+        let (frame, buf) = render(&host);
+        assert_eq!(frame.redrawn, 1);
+        let first = &buf[..4];
+        assert!(
+            buf.chunks(4).any(|px| px != first),
+            "the screen is one colour"
+        );
+
+        let mut performed: Vec<String> = Vec::new();
+        let name = CString::new("perform").unwrap_or_default();
+        // SAFETY: `host` is live; `performed` outlives every callback below.
+        let ok = unsafe {
+            sb_on_callback(
+                host.0,
+                name.as_ptr(),
+                Some(on_args),
+                (&raw mut performed).cast(),
+            )
+        };
+        assert!(ok, "{}", last_error());
+
+        // SAFETY: `host` is live.
+        unsafe { assert!(sb_host_focus_changed(host.0, true)) }
+        let log: *const Vec<String> = &raw const performed;
+        // The submit button is disabled while the email is empty, so the
+        // column's first callback is the reset link below it. The walk ends
+        // with the password field focused.
+        assert!(click_until_performed(&host, log, WEFT_LEFT, 0..WEFT_HEIGHT));
+        type_ascii(&host, "secret");
+        assert_eq!(get(&host, "password").as_deref(), Some("\"secret\""));
+        type_ascii(&host, "\u{19}"); // Backtab, to the email field.
+        type_ascii(&host, "ada@example.com");
+        assert_eq!(get(&host, "email").as_deref(), Some("\"ada@example.com\""));
+        let (frame, _) = render(&host);
+        assert_eq!(frame.redrawn, 1);
+
+        // Enter in the field submits the form (`accepted`); so does the button.
+        type_ascii(&host, "\n");
+        assert!(click_until_performed(&host, log, WEFT_LEFT, 0..WEFT_HEIGHT));
+        assert!(click_until_performed(
+            &host,
+            log,
+            WEFT_RIGHT,
+            (0..WEFT_HEIGHT).rev()
+        ));
+        assert_eq!(
+            performed,
+            [
+                r#"["nav.reset","reset"]"#,
+                r#"["auth.submit","form"]"#,
+                r#"["auth.submit","form"]"#,
+                r#"["nav.signup","signup"]"#
+            ]
+        );
+    });
+}
+
+#[test]
+fn pixel_size_refuses_null_arguments() {
+    run_on_test_ui_thread(|| {
+        let host = open(FORM_WIDTH, FORM_HEIGHT, 1.0);
+        let mut width = 0;
+        // SAFETY: null host and null out-pointers are what the call must refuse.
+        unsafe {
+            assert!(!sb_host_pixel_size(
+                ptr::null(),
+                &raw mut width,
+                &raw mut width
+            ));
+            assert!(last_error().contains("null host"), "{}", last_error());
+            assert!(!sb_host_pixel_size(host.0, ptr::null_mut(), &raw mut width));
+            assert!(last_error().contains("null size"), "{}", last_error());
         }
     });
 }

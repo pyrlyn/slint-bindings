@@ -7,6 +7,7 @@
 | just | mise | Recipes (`justfile`) | https://github.com/casey/just |
 | cbindgen | global (`cargo install cbindgen`) | Generates the C header from the FFI crate (`just header`) | https://github.com/mozilla/cbindgen |
 | Xcode (swift, SwiftPM) | Mac App Store | Builds the Swift package and the macOS demo | https://developer.apple.com/xcode/ |
+| jq | global (preinstalled on GitHub's macOS runners; `brew install jq`) | Reads `swift package dump-package` in `just swift-package-check` | https://github.com/jqlang/jq |
 | .NET SDK 10 | mise (`dotnet`, global) | Builds the WinUI projects (Windows only) | https://github.com/dotnet/sdk |
 | dunnage | ketch | Post-test `target/` cleanup in `just test`; a no-op when missing | https://github.com/listepo/dunnage |
 
