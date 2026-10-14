@@ -10,6 +10,10 @@
     <RuntimeIdentifiers>win-x64;win-arm64</RuntimeIdentifiers>
     <!-- Unpackaged for the spike; MSIX packaging is M6. -->
     <WindowsPackageType>None</WindowsPackageType>
+    <!-- Carries the Windows App SDK runtime, so the demo starts on a machine
+         (or CI runner) without it installed. Set here, not on the command
+         line, where it would reach the class library and fail its build. -->
+    <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="2.5.1" />
