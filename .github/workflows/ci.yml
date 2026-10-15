@@ -77,6 +77,7 @@ jobs:
       always()
       && (github.event_name != 'pull_request' || !github.event.pull_request.draft)
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - uses: pyrlyn/ci/.github/actions/gate@4e652d891cc6e6f0be316eda1a1f9630d76a8b7e # main
         with:
