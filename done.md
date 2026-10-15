@@ -107,6 +107,22 @@ chain and calls `SetSwapChain` on the UI thread. `CompositionScaleChanged`
 resizes it. A failed COM query or adapter keeps the `WriteableBitmap` path.
 The window was not launched, and the frame-time checkpoint was not measured.
 
+### T19. Drop Intel macOS leftovers from the Flutter copy
+
+`flutter/` still listed Intel targets after the workspace dropped Intel macOS:
+the copied CI installed `x86_64-apple-darwin` for a universal macOS release
+build and `x86_64-apple-darwin`/`x86_64-apple-ios` for the Skia job, and
+`rustTriple` mapped iOS x64 (a simulator that only runs on Intel Macs) to
+`x86_64-apple-ios`. The macOS x64 mapping was already gone.
+
+Plan: remove both Intel targets from `flutter/.github/workflows/ci.yml`, drop
+the `(OS.iOS, Architecture.x64)` arm from `cargo_builder.dart`, so an Intel
+request fails with the existing `UnsupportedError`. Check with `git grep`
+that no `x86_64-apple-*` target remains under `flutter/`.
+
+Result: the CI installs `aarch64-apple-darwin` and `aarch64-apple-ios-sim`
+only; `rustTriple` knows only arm64 Apple targets.
+
 ### T11.1. Runtime components: core and C ABI
 
 T11 (runtime components, generic API), Rust half. `.slint` is compiled at run

@@ -199,7 +199,6 @@ String rustTriple(CodeConfig code) {
       code.iOS.targetSdk == IOSSdk.iPhoneSimulator
           ? 'aarch64-apple-ios-sim'
           : 'aarch64-apple-ios',
-    (OS.iOS, Architecture.x64) => 'x86_64-apple-ios',
     (OS.linux, Architecture.arm64) => 'aarch64-unknown-linux-gnu',
     (OS.linux, Architecture.x64) => 'x86_64-unknown-linux-gnu',
     (OS.linux, Architecture.arm) => 'armv7-unknown-linux-gnueabihf',
