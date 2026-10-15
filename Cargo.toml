@@ -1,5 +1,9 @@
 [workspace]
 members = ["crates/*"]
+# A path dependency under this root would join the workspace and take its
+# lints; this one is slint_dart's code, linted and tested in flutter/'s own
+# workspace, which it also inherits its dependency versions from.
+exclude = ["flutter/packages/slint_build/interpreter"]
 resolver = "3"
 
 [workspace.package]
@@ -17,7 +21,12 @@ slint-embed = { path = "flutter/packages/slint/rust/embed" }
 # M1 spike renders on the CPU only: no backend, no event loop, no GPU context,
 # so the host app keeps its own run loop.
 slint = { version = "=1.18.1", default-features = false, features = ["std", "compat-1-18", "renderer-software"] }
-slint-build = "=1.18.1"
+# Runtime `.slint` (T11): the same exact pin as `slint`. No backend or renderer:
+# the core installs the platform and the software renderer itself.
+slint-interpreter = { version = "=1.18.1", default-features = false, features = ["std", "compat-1-18"] }
+# Shared with flutter/: compile, instantiate and the JSON value bridge for
+# properties and callbacks (slint_dart's `slint-dart-interpreter`).
+slint-dart-interpreter = { path = "flutter/packages/slint_build/interpreter" }
 # Feature unification only: without a backend, nothing turns on image and SVG
 # decoding, and std-widgets ships its icons as embedded SVG. Internal crate, so
 # it moves in lockstep with `slint` (exact pins on all three).

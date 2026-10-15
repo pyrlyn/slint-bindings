@@ -1,6 +1,7 @@
 // C# owner of one embedded Slint component. UI-thread only, like the Swift SlintHost.
 
 using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -8,20 +9,38 @@ namespace SlintBindings.WinUI;
 
 public sealed class SlintException(string message) : Exception(message);
 
+/// <summary>A <c>.slint</c> file compiled at run time: its main (last exported) component.</summary>
+public sealed class SlintDefinition : IDisposable
+{
+    internal IntPtr Handle { get; private set; }
+
+    /// <summary>Compiles <paramref name="source"/>, or the file at <paramref name="path"/> when it is null.</summary>
+    public SlintDefinition(string path, string? source = null)
+    {
+        Handle = NativeMethods.sb_compile(source, path);
+        if (Handle == IntPtr.Zero) throw new SlintException(NativeMethods.LastError());
+    }
+
+    public void Dispose()
+    {
+        NativeMethods.sb_definition_free(Handle);
+        Handle = IntPtr.Zero;
+    }
+}
+
 public sealed class SlintHost : IDisposable
 {
+    // One thunk for every callback; a static field keeps it alive while Rust holds its pointer.
+    private static readonly SbCallbackFn CallbackThunk = OnCallbackNative;
     private IntPtr _handle;
-    private SbSubmittedFn? _submittedThunk; // keeps the delegate alive while Rust holds its pointer
-    private GCHandle _self;
+    private readonly Dictionary<string, GCHandle> _callbacks = new();
 
     public int PixelWidth { get; private set; } = 1;
     public int PixelHeight { get; private set; } = 1;
     public bool IsGpu { get; }
 
-    public event Action<string>? Submitted;
-
-    public SlintHost(int pixelWidth, int pixelHeight, float scale)
-        : this(pixelWidth, pixelHeight, scale, IntPtr.Zero)
+    public SlintHost(SlintDefinition definition, int pixelWidth, int pixelHeight, float scale)
+        : this(definition, pixelWidth, pixelHeight, scale, IntPtr.Zero)
     {
     }
 
@@ -29,26 +48,77 @@ public sealed class SlintHost : IDisposable
     /// GPU host. <paramref name="swapChainPanel"/> is an <c>ISwapChainPanel</c>
     /// that must stay alive until <see cref="Dispose"/>.
     /// </summary>
-    public SlintHost(int pixelWidth, int pixelHeight, float scale, IntPtr swapChainPanel)
+    public SlintHost(SlintDefinition definition, int pixelWidth, int pixelHeight, float scale, IntPtr swapChainPanel)
+        : this(swapChainPanel == IntPtr.Zero
+            ? NativeMethods.sb_component_new(definition.Handle, (uint)Math.Max(pixelWidth, 1), (uint)Math.Max(pixelHeight, 1), scale)
+            : NativeMethods.sb_component_new_swapchain(
+                definition.Handle, swapChainPanel, (uint)Math.Max(pixelWidth, 1), (uint)Math.Max(pixelHeight, 1), scale))
     {
-        var width = (uint)Math.Max(pixelWidth, 1);
-        var height = (uint)Math.Max(pixelHeight, 1);
-        _handle = swapChainPanel == IntPtr.Zero
-            ? NativeMethods.sb_demo_new(width, height, scale)
-            : NativeMethods.sb_demo_new_swapchain(swapChainPanel, width, height, scale);
-        if (_handle == IntPtr.Zero) throw new SlintException(NativeMethods.LastError());
-        IsGpu = NativeMethods.sb_host_is_gpu(_handle);
-        PixelWidth = Math.Max(pixelWidth, 1);
-        PixelHeight = Math.Max(pixelHeight, 1);
-        _self = GCHandle.Alloc(this, GCHandleType.Weak);
-        _submittedThunk = OnSubmittedNative;
-        NativeMethods.sb_demo_on_submitted(_handle, Marshal.GetFunctionPointerForDelegate(_submittedThunk), GCHandle.ToIntPtr(_self));
     }
 
-    private static void OnSubmittedNative(IntPtr userData, IntPtr name)
+    /// <summary>
+    /// Takes ownership of an <c>SbHost*</c> that another library made, such as
+    /// weft's <c>ws_surface_new</c>. Zero throws the library's last error.
+    /// </summary>
+    public static SlintHost Adopt(IntPtr handle) => new(handle);
+
+    private unsafe SlintHost(IntPtr handle)
     {
-        if (GCHandle.FromIntPtr(userData).Target is SlintHost host)
-            host.Submitted?.Invoke(Marshal.PtrToStringUTF8(name) ?? "");
+        if (handle == IntPtr.Zero) throw new SlintException(NativeMethods.LastError());
+        uint width, height;
+        if (!NativeMethods.sb_host_pixel_size(handle, &width, &height))
+        {
+            var error = NativeMethods.LastError();
+            NativeMethods.sb_host_free(handle);
+            throw new SlintException(error);
+        }
+        // The size comes from the host: an adopted one was sized by code that never told C#.
+        _handle = handle;
+        IsGpu = NativeMethods.sb_host_is_gpu(handle);
+        PixelWidth = (int)width;
+        PixelHeight = (int)height;
+    }
+
+    private static void OnCallbackNative(IntPtr userData, IntPtr argsJson)
+    {
+        if (GCHandle.FromIntPtr(userData).Target is Action<string> handler)
+            handler(Marshal.PtrToStringUTF8(argsJson) ?? "[]");
+    }
+
+    // Properties and callbacks as JSON values: "\"text\"", "42", "true", "\"#ff0000\"",
+    // arrays for models, objects for structs.
+
+    public void SetProperty(string name, string json)
+    {
+        if (!NativeMethods.sb_set_property_json(_handle, name, json))
+            throw new SlintException(NativeMethods.LastError());
+    }
+
+    public string GetProperty(string name) => TakeString(NativeMethods.sb_get_property_json(_handle, name));
+
+    /// <summary>Calls the callback <paramref name="name"/> with a JSON array; returns its JSON result.</summary>
+    public string Invoke(string name, string argsJson = "[]") =>
+        TakeString(NativeMethods.sb_invoke_json(_handle, name, argsJson));
+
+    /// <summary>Handles the callback <paramref name="name"/>; the handler gets its arguments as a JSON array.</summary>
+    public void OnCallback(string name, Action<string> handler)
+    {
+        var box = GCHandle.Alloc(handler);
+        if (!NativeMethods.sb_on_callback(_handle, name, Marshal.GetFunctionPointerForDelegate(CallbackThunk), GCHandle.ToIntPtr(box)))
+        {
+            box.Free();
+            throw new SlintException(NativeMethods.LastError());
+        }
+        // The replaced closure, the only holder of the old handle, is gone now.
+        if (_callbacks.Remove(name, out var old)) old.Free();
+        _callbacks[name] = box;
+    }
+
+    private static string TakeString(IntPtr text)
+    {
+        if (text == IntPtr.Zero) throw new SlintException(NativeMethods.LastError());
+        try { return Marshal.PtrToStringUTF8(text) ?? ""; }
+        finally { NativeMethods.sb_string_free(text); }
     }
 
     public static void Tick() => NativeMethods.sb_tick();
@@ -106,7 +176,6 @@ public sealed class SlintHost : IDisposable
     public void KeyReleased(string text) => NativeMethods.sb_host_key_released(_handle, text);
     public void KeyRepeated(string text) => NativeMethods.sb_host_key_repeated(_handle, text);
     public void FocusChanged(bool focused) => NativeMethods.sb_host_focus_changed(_handle, focused);
-    public void SetName(string name) => NativeMethods.sb_demo_set_name(_handle, name);
 
     public bool ImeStarted() => NativeMethods.sb_host_ime_started(_handle);
     public bool ImeComposing() => NativeMethods.sb_host_ime_composing(_handle);
@@ -144,10 +213,14 @@ public sealed class SlintHost : IDisposable
     public void Dispose()
     {
         if (_handle == IntPtr.Zero) return;
-        NativeMethods.sb_demo_on_submitted(_handle, IntPtr.Zero, IntPtr.Zero);
+        // Clear the callbacks first so Rust never calls into a freed handle.
+        foreach (var (name, box) in _callbacks)
+        {
+            NativeMethods.sb_on_callback(_handle, name, IntPtr.Zero, IntPtr.Zero);
+            box.Free();
+        }
+        _callbacks.Clear();
         NativeMethods.sb_host_free(_handle);
         _handle = IntPtr.Zero;
-        if (_self.IsAllocated) _self.Free();
-        _submittedThunk = null;
     }
 }
