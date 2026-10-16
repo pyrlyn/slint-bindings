@@ -6,3 +6,7 @@
 /windows/**/obj/
 /windows/**/*.user
 .DS_Store
+# Local files (pyrlyn template).
+/.serena
+.env
+.env.local

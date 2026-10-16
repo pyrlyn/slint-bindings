@@ -1,0 +1,14 @@
+# Configuration for pyrlyn/ci's ci.yml, called from pipeline.yml (docs/config.md in
+# pyrlyn/ci). Language CI stays in ci.yml; this file turns on the scans.
+version: 1
+
+codeql:
+  # Every language here that supports `build-mode: none` (Dart, Swift and C# do not).
+  languages: [actions, rust]
+
+# Snyk stays off (pyrlyn/ci default).
+
+# The shared dotnet check builds on Linux, where the WinUI projects (net*-windows) cannot
+# build (NETSDK1100); the C# side is covered by the Windows jobs in ci.yml.
+dotnet:
+  enabled: false
