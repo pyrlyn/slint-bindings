@@ -40,8 +40,8 @@ SwiftUI / AppKit ─┐                       ┌─ WinUI 3 (C#)
 2. На кожному тіку (`CADisplayLink` на macOS, `CompositionTarget.Rendering` у WinUI)
    хост викликає `sb_tick`, потім `sb_host_gpu_render` або `sb_host_render`.
    Slint перемальовує кадр лише коли щось змінилось.
-3. GPU — це підшар `CAMetalLayer` на macOS (`sb_demo_new_metal`) або
-   `SwapChainPanel` у WinUI (`sb_demo_new_swapchain`). Ланцюжок створює wgpu.
+3. GPU — це підшар `CAMetalLayer` на macOS (`sb_component_new_metal`) або
+   `SwapChainPanel` у WinUI (`sb_component_new_swapchain`). Ланцюжок створює wgpu.
    Поки користувач тягне край вікна, у шару Metal увімкнено
    `presentsWithTransaction`, і кадр не розтягується. Якщо конструктор не
    вдався, хост показує CPU-кадр (вміст шару `CGImage` на macOS — RGBA8;

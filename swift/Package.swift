@@ -5,9 +5,11 @@
 import Foundation
 import PackageDescription
 
-// M1 links Cargo's debug output directly (`just swift-build` builds it first).
-// M4 replaces this with an XCFramework binary target, which SwiftPM consumers
-// outside this repository need anyway: unsafe flags are refused in dependencies.
+// The library target links no Rust library: the app does. An app may link its
+// own Rust library that carries `slint-bindings-ffi` (weft's editor does), and a
+// second copy of Slint would not see the platform the first one installed.
+// This package's demo and tests link Cargo's debug output (`just swift-build`
+// builds it first). M4 adds an XCFramework binary target for plain consumers.
 let packageDir = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
 let rustStaticLib = packageDir
     .appendingPathComponent("../target/debug/libslint_bindings_ffi.a")
@@ -26,7 +28,6 @@ let package = Package(
             name: "SlintBindings",
             dependencies: ["CSlintBindings"],
             linkerSettings: [
-                .unsafeFlags([rustStaticLib]),
                 // What the Rust side (fontique, Slint's image and text stack) links against.
                 .linkedFramework("AppKit"),
                 .linkedFramework("CoreFoundation"),
@@ -35,7 +36,15 @@ let package = Package(
                 .linkedFramework("Foundation"),
             ]
         ),
-        .executableTarget(name: "SlintDemo", dependencies: ["SlintBindings"]),
-        .testTarget(name: "SlintBindingsTests", dependencies: ["SlintBindings"]),
+        .executableTarget(
+            name: "SlintDemo",
+            dependencies: ["SlintBindings"],
+            linkerSettings: [.unsafeFlags([rustStaticLib])]
+        ),
+        .testTarget(
+            name: "SlintBindingsTests",
+            dependencies: ["SlintBindings"],
+            linkerSettings: [.unsafeFlags([rustStaticLib])]
+        ),
     ]
 )

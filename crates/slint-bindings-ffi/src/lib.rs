@@ -4,18 +4,25 @@
 //! never unwind into Swift or C#, and stores the failure text for
 //! [`sb_last_error`]. All calls must come from the thread that created the
 //! host (the host app's UI thread), because Slint objects are not `Send`.
+//!
+//! A downstream Rust library may link this crate as an rlib and hand out
+//! hosts it built itself ([`SbHost::new`], [`SbHost::into_raw`]); the `sb_*`
+//! symbols are then exported from that library, as long as it references
+//! this crate (any call into it does).
 
 #![allow(non_camel_case_types)]
 
 use std::cell::RefCell;
 use std::ffi::{CStr, CString, c_char, c_void};
 use std::panic::{AssertUnwindSafe, catch_unwind};
+use std::path::Path;
 use std::ptr;
 
 #[cfg(any(target_os = "macos", target_os = "windows"))]
 use slint_bindings_core::GpuHost;
+use slint_bindings_core::runtime::{self, ComponentDefinition, ComponentInstance, Instance};
 use slint_bindings_core::{
-    AppKitKey, DemoForm, EmbeddedHost, Error, PointerButton, VirtualKeyEvent, appkit_key_text,
+    AppKitKey, EmbeddedHost, Error, PointerButton, VirtualKeyEvent, appkit_key_text,
     virtual_key_command, virtual_key_text,
 };
 
@@ -23,18 +30,85 @@ thread_local! {
     static LAST_ERROR: RefCell<Option<CString>> = const { RefCell::new(None) };
 }
 
-/// C callback for `submitted(string)`: `user_data`, then the UTF-8 name. Null clears it.
-pub type SbSubmittedFn = Option<extern "C" fn(user_data: *mut c_void, name: *const c_char)>;
+/// C callback for [`sb_on_callback`]: `user_data`, then the arguments as a
+/// UTF-8 JSON array, valid only during the call.
+pub type SbCallbackFn = Option<extern "C" fn(user_data: *mut c_void, args_json: *const c_char)>;
 
-/// Opaque handle to the demo form and its pixel buffer.
+/// Opaque handle to a compiled `.slint` component definition ([`sb_compile`]).
+pub struct SbDefinition(ComponentDefinition);
+
+/// Opaque handle to one interpreted component and its pixel buffer or GPU surface.
 pub struct SbHost {
+    // Declared first so the bridge's handle drops before the host's window.
+    component: Instance,
     host: Backend,
 }
 
 enum Backend {
-    Cpu(EmbeddedHost<DemoForm>),
+    Cpu(EmbeddedHost<ComponentInstance>),
     #[cfg(any(target_os = "macos", target_os = "windows"))]
-    Gpu(GpuHost<DemoForm>),
+    Gpu(GpuHost<ComponentInstance>),
+}
+
+impl SbHost {
+    /// Creates a component of `definition` drawn on the CPU at
+    /// `width`×`height` physical pixels.
+    pub fn new(
+        definition: &ComponentDefinition,
+        width: u32,
+        height: u32,
+        scale: f32,
+    ) -> Result<Self, Error> {
+        let (host, component) = runtime::instantiate(definition, |make| {
+            EmbeddedHost::new(make, width, height, scale)
+        })?;
+        Ok(Self {
+            component,
+            host: Backend::Cpu(host),
+        })
+    }
+
+    /// Creates a component of `definition` presenting into `surface`: a
+    /// `CAMetalLayer` on macOS, an `ISwapChainPanel` on Windows.
+    ///
+    /// # Safety
+    /// `surface` is live and outlives the host.
+    #[cfg(any(target_os = "macos", target_os = "windows"))]
+    pub unsafe fn new_gpu(
+        definition: &ComponentDefinition,
+        surface: *mut c_void,
+        width: u32,
+        height: u32,
+        scale: f32,
+    ) -> Result<Self, Error> {
+        if surface.is_null() {
+            return Err(Error::InvalidArgument("the GPU surface is null"));
+        }
+        let (host, component) = runtime::instantiate(definition, |make| {
+            // SAFETY: forwarded caller contract.
+            unsafe { GpuHost::new(make, surface, width, height, scale) }
+        })?;
+        Ok(Self {
+            component,
+            host: Backend::Gpu(host),
+        })
+    }
+
+    /// The interpreted component, for Rust callers that set properties or
+    /// callbacks directly.
+    pub fn component(&self) -> &ComponentInstance {
+        &self.component.inner
+    }
+
+    /// The component's JSON bridge (what `sb_*_json` and `sb_on_callback` use).
+    pub fn bridge(&self) -> &Instance {
+        &self.component
+    }
+
+    /// Hands the host to C. Free it with [`sb_host_free`].
+    pub fn into_raw(self) -> *mut SbHost {
+        Box::into_raw(Box::new(self))
+    }
 }
 
 macro_rules! forward {
@@ -48,6 +122,9 @@ macro_rules! forward {
 }
 
 impl Backend {
+    fn size(&self) -> (u32, u32) {
+        forward!(self.size())
+    }
     fn frame_len(&self) -> usize {
         forward!(self.frame_len())
     }
@@ -142,9 +219,6 @@ impl Backend {
     fn ime_completed(&self, canceled: bool) -> Result<(), Error> {
         forward!(self.ime_completed(canceled))
     }
-    fn component(&self) -> &DemoForm {
-        forward!(self.component())
-    }
 }
 
 /// Result of [`sb_host_render`].
@@ -203,7 +277,7 @@ fn guard<T>(fail: T, body: impl FnOnce() -> Result<T, Error>) -> T {
 }
 
 /// # Safety
-/// `host` must be null or a live pointer returned by [`sb_demo_new`].
+/// `host` must be null or a live pointer returned by `sb_component_new*`.
 unsafe fn host_ref<'a>(host: *const SbHost) -> Option<&'a SbHost> {
     // SAFETY: the caller guarantees `host` is null or live and unaliased by `sb_host_free`.
     unsafe { host.as_ref() }
@@ -248,45 +322,97 @@ pub extern "C" fn sb_last_error() -> *const c_char {
     LAST_ERROR.with_borrow(|slot| slot.as_ref().map_or(ptr::null(), |s| s.as_ptr()))
 }
 
-/// Creates the demo form at `width`×`height` physical pixels. Null on failure.
+/// Compiles `.slint` source and returns its main component (the last exported
+/// one). `path` names the file for diagnostics and relative imports; when
+/// `source` is null, the file at `path` is read. Null on failure, with the
+/// compiler's diagnostics in [`sb_last_error`]. Free with [`sb_definition_free`].
+///
+/// # Safety
+/// `source` is null or NUL-terminated; `path` is NUL-terminated. Both are
+/// valid for the call.
 #[unsafe(no_mangle)]
-pub extern "C" fn sb_demo_new(width: u32, height: u32, scale: f32) -> *mut SbHost {
+pub unsafe extern "C" fn sb_compile(
+    source: *const c_char,
+    path: *const c_char,
+) -> *mut SbDefinition {
     guard(ptr::null_mut(), || {
-        let host = EmbeddedHost::new(DemoForm::new, width, height, scale)?;
-        Ok(Box::into_raw(Box::new(SbHost {
-            host: Backend::Cpu(host),
-        })))
+        // SAFETY: forwarded caller contract.
+        let path = unsafe { required_str(path, "the .slint path is null") }?;
+        let source = if source.is_null() {
+            None
+        } else {
+            // SAFETY: forwarded caller contract.
+            Some(unsafe { str_arg(source) }?)
+        };
+        let definition = runtime::compile(source, Path::new(path))?;
+        Ok(Box::into_raw(Box::new(SbDefinition(definition))))
     })
 }
 
-/// Creates the demo on a `CAMetalLayer` (`layer`). Null on failure, including
-/// on every OS other than macOS and when the GPU adapter cannot be opened.
-/// The caller then uses [`sb_demo_new`].
+/// Destroys a definition. Hosts created from it stay valid. Null is ignored.
 ///
 /// # Safety
-/// `layer` is null or a live `CAMetalLayer` that outlives the returned host.
+/// `definition` is null or a pointer from [`sb_compile`] not freed before.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn sb_demo_new_metal(
+pub unsafe extern "C" fn sb_definition_free(definition: *mut SbDefinition) {
+    if !definition.is_null() {
+        // SAFETY: the pointer came from `Box::into_raw` in `sb_compile` and is freed once.
+        drop(unsafe { Box::from_raw(definition) });
+    }
+}
+
+/// # Safety
+/// `definition` must be null or live.
+unsafe fn definition_ref<'a>(definition: *const SbDefinition) -> Result<&'a SbDefinition, Error> {
+    // SAFETY: the caller guarantees `definition` is null or live.
+    unsafe { definition.as_ref() }.ok_or(Error::InvalidArgument("a null definition was passed"))
+}
+
+/// Creates a component of `definition` drawn on the CPU at `width`×`height`
+/// physical pixels. Null on failure. Free with [`sb_host_free`].
+///
+/// # Safety
+/// `definition` must be null or live.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn sb_component_new(
+    definition: *const SbDefinition,
+    width: u32,
+    height: u32,
+    scale: f32,
+) -> *mut SbHost {
+    guard(ptr::null_mut(), || {
+        // SAFETY: forwarded caller contract.
+        let definition = unsafe { definition_ref(definition) }?;
+        Ok(SbHost::new(&definition.0, width, height, scale)?.into_raw())
+    })
+}
+
+/// Creates a component of `definition` on a `CAMetalLayer` (`layer`). Null on
+/// failure, including on every OS other than macOS and when the GPU adapter
+/// cannot be opened; the caller then uses [`sb_component_new`].
+///
+/// # Safety
+/// `definition` must be null or live; `layer` is null or a live
+/// `CAMetalLayer` that outlives the returned host.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn sb_component_new_metal(
+    definition: *const SbDefinition,
     layer: *mut c_void,
     width: u32,
     height: u32,
     scale: f32,
 ) -> *mut SbHost {
     guard(ptr::null_mut(), || {
+        // SAFETY: forwarded caller contract.
+        let definition = unsafe { definition_ref(definition) }?;
         #[cfg(target_os = "macos")]
         {
-            if layer.is_null() {
-                return Err(Error::InvalidArgument("the Metal layer is null"));
-            }
             // SAFETY: the caller keeps the layer alive until `sb_host_free`.
-            let host = unsafe { GpuHost::new(DemoForm::new, layer, width, height, scale) }?;
-            Ok(Box::into_raw(Box::new(SbHost {
-                host: Backend::Gpu(host),
-            })))
+            Ok(unsafe { SbHost::new_gpu(&definition.0, layer, width, height, scale) }?.into_raw())
         }
         #[cfg(not(target_os = "macos"))]
         {
-            let _ = (layer, width, height, scale);
+            let _ = (definition, layer, width, height, scale);
             Err(Error::Gpu(
                 "Metal rendering is only available on macOS".into(),
             ))
@@ -294,33 +420,32 @@ pub unsafe extern "C" fn sb_demo_new_metal(
     })
 }
 
-/// Creates the demo on an `ISwapChainPanel` (`panel`). Null on failure,
-/// including on every OS other than Windows. The caller then uses [`sb_demo_new`].
+/// Creates a component of `definition` on an `ISwapChainPanel` (`panel`).
+/// Null on failure, including on every OS other than Windows; the caller then
+/// uses [`sb_component_new`].
 ///
 /// # Safety
-/// `panel` is null or a live `ISwapChainPanel` that outlives the returned host.
+/// `definition` must be null or live; `panel` is null or a live
+/// `ISwapChainPanel` that outlives the returned host.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn sb_demo_new_swapchain(
+pub unsafe extern "C" fn sb_component_new_swapchain(
+    definition: *const SbDefinition,
     panel: *mut c_void,
     width: u32,
     height: u32,
     scale: f32,
 ) -> *mut SbHost {
     guard(ptr::null_mut(), || {
+        // SAFETY: forwarded caller contract.
+        let definition = unsafe { definition_ref(definition) }?;
         #[cfg(target_os = "windows")]
         {
-            if panel.is_null() {
-                return Err(Error::InvalidArgument("the swap chain panel is null"));
-            }
             // SAFETY: the caller keeps the panel alive until `sb_host_free`.
-            let host = unsafe { GpuHost::new(DemoForm::new, panel, width, height, scale) }?;
-            Ok(Box::into_raw(Box::new(SbHost {
-                host: Backend::Gpu(host),
-            })))
+            Ok(unsafe { SbHost::new_gpu(&definition.0, panel, width, height, scale) }?.into_raw())
         }
         #[cfg(not(target_os = "windows"))]
         {
-            let _ = (panel, width, height, scale);
+            let _ = (definition, panel, width, height, scale);
             Err(Error::Gpu(
                 "SwapChainPanel rendering is only available on Windows".into(),
             ))
@@ -338,8 +463,8 @@ pub unsafe extern "C" fn sb_host_is_gpu(host: *const SbHost) -> bool {
     unsafe { host_ref(host) }.is_some_and(|h| h.host.is_gpu())
 }
 
-/// Presents one frame into the surface passed to `sb_demo_new_metal` or
-/// `sb_demo_new_swapchain`. `failed` is 1 on a CPU host or a lost swapchain.
+/// Presents one frame into the surface passed to `sb_component_new_metal` or
+/// `sb_component_new_swapchain`. `failed` is 1 on a CPU host or a lost swapchain.
 ///
 /// # Safety
 /// `host` must be null or live.
@@ -368,11 +493,12 @@ pub unsafe extern "C" fn sb_host_gpu_render(host: *mut SbHost) -> SbFrame {
 /// Destroys a host. Null is ignored.
 ///
 /// # Safety
-/// `host` must be null or a pointer from [`sb_demo_new`] not freed before.
+/// `host` must be null or a pointer from `sb_component_new*` (or
+/// [`SbHost::into_raw`]) not freed before.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn sb_host_free(host: *mut SbHost) {
     if !host.is_null() {
-        // SAFETY: the pointer came from `Box::into_raw` in `sb_demo_new` and is freed once.
+        // SAFETY: the pointer came from `Box::into_raw` in `SbHost::into_raw` and is freed once.
         drop(unsafe { Box::from_raw(host) });
     }
 }
@@ -385,6 +511,35 @@ pub unsafe extern "C" fn sb_host_free(host: *mut SbHost) {
 pub unsafe extern "C" fn sb_host_frame_len(host: *const SbHost) -> usize {
     // SAFETY: forwarded caller contract.
     unsafe { host_ref(host) }.map_or(0, |h| h.host.frame_len())
+}
+
+/// Writes the frame size in physical pixels. A host made by another library
+/// reaches Swift or C# without its size, which the CPU frame's image needs.
+///
+/// # Safety
+/// `host` must be null or live; `width` and `height` must be null or writable.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn sb_host_pixel_size(
+    host: *const SbHost,
+    width: *mut u32,
+    height: *mut u32,
+) -> bool {
+    guard(false, || {
+        // SAFETY: forwarded caller contract.
+        let Some(h) = (unsafe { host_ref(host) }) else {
+            return Err(Error::InvalidArgument("a null host was passed"));
+        };
+        if width.is_null() || height.is_null() {
+            return Err(Error::InvalidArgument("a null size pointer was passed"));
+        }
+        let (w, h) = h.host.size();
+        // SAFETY: both pointers are non-null and writable per the caller's contract.
+        unsafe {
+            *width = w;
+            *height = h;
+        }
+        Ok(true)
+    })
 }
 
 /// Resizes the frame; returns false on failure.
@@ -476,7 +631,7 @@ pub unsafe extern "C" fn sb_host_render_bgra(
 #[unsafe(no_mangle)]
 pub extern "C" fn sb_tick() {
     guard((), || {
-        EmbeddedHost::<DemoForm>::tick();
+        EmbeddedHost::<ComponentInstance>::tick();
         Ok(())
     });
 }
@@ -907,59 +1062,148 @@ pub unsafe extern "C" fn sb_virtual_key_text(
     })
 }
 
-/// Sets the demo form's `name` property.
-///
 /// # Safety
-/// `host` must be null or live; `name` null or NUL-terminated.
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn sb_demo_set_name(host: *const SbHost, name: *const c_char) {
-    guard((), || {
-        // SAFETY: forwarded caller contract.
-        let Some(h) = (unsafe { host_ref(host) }) else {
-            return Err(Error::InvalidArgument("a null host was passed"));
-        };
-        // SAFETY: forwarded caller contract.
-        h.host
-            .component()
-            .set_name(unsafe { str_arg(name) }?.into());
-        Ok(())
-    });
+/// `text` must be null or a NUL-terminated string valid for the call.
+unsafe fn required_str<'a>(text: *const c_char, missing: &'static str) -> Result<&'a str, Error> {
+    if text.is_null() {
+        return Err(Error::InvalidArgument(missing));
+    }
+    // SAFETY: forwarded caller contract.
+    unsafe { str_arg(text) }
 }
 
-/// Registers `callback` for the demo form's `submitted(name)`; null clears it.
-/// `user_data` is passed back untouched and must outlive the host.
+/// Hands `text` to C as a string the caller frees with [`sb_string_free`].
+fn owned_c_string(text: String) -> Result<*mut c_char, Error> {
+    CString::new(text)
+        .map(CString::into_raw)
+        .map_err(|_| Error::InvalidArgument("the value contains an interior NUL"))
+}
+
+/// Sets the public property `name` from its JSON value (`"text"`, `42`,
+/// `true`, `"#ff0000"`, `"Enum.value"`, arrays and objects for models and
+/// structs). False on an unknown property, a wrong type or malformed JSON.
 ///
 /// # Safety
-/// `host` must be null or live.
+/// `host` must be null or live; `name` and `json` are NUL-terminated.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn sb_demo_on_submitted(
+pub unsafe extern "C" fn sb_set_property_json(
     host: *const SbHost,
-    callback: SbSubmittedFn,
-    user_data: *mut c_void,
-) {
-    guard((), || {
+    name: *const c_char,
+    json: *const c_char,
+) -> bool {
+    // SAFETY: forwarded caller contract.
+    unsafe {
+        with_host(host, |h| {
+            let name = required_str(name, "the property name is null")?;
+            let json = required_str(json, "the property value is null")?;
+            h.component
+                .set_property_json(name, json)
+                .map_err(Error::Component)
+        })
+    }
+}
+
+/// The public property `name` as JSON, or null on failure. Free with
+/// [`sb_string_free`].
+///
+/// # Safety
+/// `host` must be null or live; `name` is NUL-terminated.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn sb_get_property_json(
+    host: *const SbHost,
+    name: *const c_char,
+) -> *mut c_char {
+    guard(ptr::null_mut(), || {
         // SAFETY: forwarded caller contract.
-        let Some(h) = (unsafe { host_ref(host) }) else {
-            return Err(Error::InvalidArgument("a null host was passed"));
-        };
-        let component = h.host.component();
-        let Some(callback) = callback else {
-            component.on_submitted(|_| {});
-            return Ok(());
-        };
-        // Raw pointers are not `'static + Fn`-friendly; carry the address instead.
-        let user_data = user_data as usize;
-        component.on_submitted(move |name| {
-            // `name` is valid only for the duration of this callback; the host
-            // must copy it before returning.
-            let Ok(name) = CString::new(name.as_str()) else {
-                set_error("submitted name contains an interior NUL".to_owned());
-                return;
+        let h =
+            unsafe { host_ref(host) }.ok_or(Error::InvalidArgument("a null host was passed"))?;
+        // SAFETY: forwarded caller contract.
+        let name = unsafe { required_str(name, "the property name is null") }?;
+        owned_c_string(
+            h.component
+                .get_property_json(name)
+                .map_err(Error::Component)?,
+        )
+    })
+}
+
+/// Invokes the public callback `name` with a JSON array of arguments and
+/// returns its result as JSON (`null` for a callback without one), or null on
+/// failure. Free the result with [`sb_string_free`].
+///
+/// # Safety
+/// `host` must be null or live; `name` and `args_json` are NUL-terminated.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn sb_invoke_json(
+    host: *const SbHost,
+    name: *const c_char,
+    args_json: *const c_char,
+) -> *mut c_char {
+    guard(ptr::null_mut(), || {
+        // SAFETY: forwarded caller contract.
+        let h =
+            unsafe { host_ref(host) }.ok_or(Error::InvalidArgument("a null host was passed"))?;
+        // SAFETY: forwarded caller contract.
+        let name = unsafe { required_str(name, "the callback name is null") }?;
+        // SAFETY: forwarded caller contract.
+        let args = unsafe { required_str(args_json, "the arguments are null") }?;
+        owned_c_string(
+            h.component
+                .invoke_json(name, args)
+                .map_err(Error::Component)?,
+        )
+    })
+}
+
+/// Handles the public callback `name` in the host: `callback` receives
+/// `user_data` and the arguments as a JSON array. A callback with a return
+/// type returns its type's default to Slint. Null `callback` clears it.
+/// `user_data` is passed back untouched and must stay valid until the
+/// callback is replaced or the host is freed. False on an unknown callback.
+///
+/// # Safety
+/// `host` must be null or live; `name` is NUL-terminated.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn sb_on_callback(
+    host: *const SbHost,
+    name: *const c_char,
+    callback: SbCallbackFn,
+    user_data: *mut c_void,
+) -> bool {
+    // SAFETY: forwarded caller contract.
+    unsafe {
+        with_host(host, |h| {
+            let name = required_str(name, "the callback name is null")?;
+            // Raw pointers are not `'static + Fn`-friendly; carry the address instead.
+            let user_data = user_data as usize;
+            let handler: runtime::JsonCallback = match callback {
+                None => Box::new(|_| None),
+                Some(callback) => Box::new(move |args: &str| {
+                    // JSON escapes NUL, so this only fails on a bridge bug.
+                    match CString::new(args) {
+                        Ok(args) => callback(user_data as *mut c_void, args.as_ptr()),
+                        Err(_) => set_error("callback arguments contain an interior NUL".into()),
+                    }
+                    None
+                }),
             };
-            callback(user_data as *mut c_void, name.as_ptr());
-        });
-        Ok(())
-    });
+            h.component
+                .set_callback_json(name, handler)
+                .map_err(Error::Component)
+        })
+    }
+}
+
+/// Frees a string returned by [`sb_get_property_json`] or [`sb_invoke_json`]. Null is ignored.
+///
+/// # Safety
+/// `text` is null or a string from those calls, not freed before.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn sb_string_free(text: *mut c_char) {
+    if !text.is_null() {
+        // SAFETY: the pointer came from `CString::into_raw` and is freed once.
+        drop(unsafe { CString::from_raw(text) });
+    }
 }
 
 /// Runs `f` on a dedicated thread so parallel `cargo test` shares one Slint owner.
@@ -1017,10 +1261,23 @@ mod tests {
     const WIDTH: u32 = 64;
     const HEIGHT: u32 = 48;
 
+    /// A tiny component compiled in memory; the demo file is the e2e's job.
+    fn new_host(width: u32, height: u32, scale: f32) -> *mut SbHost {
+        let source = c"export component T inherits Window { background: #336699; TextInput {} }";
+        // SAFETY: both strings are NUL-terminated literals.
+        unsafe {
+            let definition = sb_compile(source.as_ptr(), c"t.slint".as_ptr());
+            assert!(!definition.is_null());
+            let host = sb_component_new(definition, width, height, scale);
+            sb_definition_free(definition);
+            host
+        }
+    }
+
     #[test]
     fn render_through_the_c_abi_writes_a_frame() {
         run_on_test_ui_thread(|| {
-            let host = sb_demo_new(WIDTH, HEIGHT, 1.0);
+            let host = new_host(WIDTH, HEIGHT, 1.0);
             assert!(!host.is_null());
             // SAFETY: `host` is live until the free below.
             unsafe {
@@ -1035,7 +1292,7 @@ mod tests {
     #[test]
     fn short_buffer_fails_with_a_message() {
         run_on_test_ui_thread(|| {
-            let host = sb_demo_new(WIDTH, HEIGHT, 1.0);
+            let host = new_host(WIDTH, HEIGHT, 1.0);
             // SAFETY: `host` is live until the free below.
             unsafe {
                 let mut buf = vec![0u8; 1];
@@ -1055,7 +1312,7 @@ mod tests {
                 assert_eq!(sb_host_frame_len(ptr::null()), 0);
                 assert!(!sb_host_pointer_moved(ptr::null(), 0.0, 0.0));
                 assert!(!sb_last_error().is_null());
-                assert!(sb_demo_new(WIDTH, HEIGHT, 0.0).is_null());
+                assert!(new_host(WIDTH, HEIGHT, 0.0).is_null());
                 assert!(!sb_last_error().is_null());
             }
         });
@@ -1064,7 +1321,7 @@ mod tests {
     #[test]
     fn invalid_pointer_button_is_refused() {
         run_on_test_ui_thread(|| {
-            let host = sb_demo_new(WIDTH, HEIGHT, 1.0);
+            let host = new_host(WIDTH, HEIGHT, 1.0);
             // SAFETY: `host` is live until the free below.
             unsafe {
                 assert!(!sb_host_pointer_pressed(host, 0.0, 0.0, 9));
@@ -1077,7 +1334,7 @@ mod tests {
     #[test]
     fn invalid_utf8_key_text_is_refused() {
         run_on_test_ui_thread(|| {
-            let host = sb_demo_new(WIDTH, HEIGHT, 1.0);
+            let host = new_host(WIDTH, HEIGHT, 1.0);
             let bytes = [0x80u8, 0];
             // SAFETY: `host` is live; `bytes` is a NUL-terminated invalid UTF-8 string.
             unsafe {
@@ -1091,7 +1348,7 @@ mod tests {
     #[test]
     fn another_thread_is_refused() {
         run_on_test_ui_thread(|| {
-            let host = sb_demo_new(WIDTH, HEIGHT, 1.0);
+            let host = new_host(WIDTH, HEIGHT, 1.0);
             let addr = host as usize;
             let ok = std::thread::spawn(move || {
                 // SAFETY: the pointer is not freed until this thread joins; we only

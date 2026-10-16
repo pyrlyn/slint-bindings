@@ -23,19 +23,39 @@ public final class SlintNSView: NSView {
     /// Key code whose key-up should be dropped because the input method swallowed the press.
     private var suppressKeyUpCode: UInt16?
 
-    public override init(frame frameRect: NSRect) {
+    /// Shows the host `makeHost` returns, which may come from another library
+    /// (`SlintHost(adopting:)`). With `prefersGpu`, `makeHost` first gets a
+    /// `CAMetalLayer` to present into; if it throws, or returns a CPU host,
+    /// the layer goes away and a throw is retried with nil, the CPU path.
+    /// The size the host is made at does not matter: the view resizes it.
+    public init(
+        frame frameRect: NSRect,
+        prefersGpu: Bool = true,
+        makeHost: (_ metalLayer: UnsafeMutableRawPointer?) throws -> SlintHost
+    ) {
         super.init(frame: frameRect)
-        install(prefersGpu: true)
+        install(prefersGpu: prefersGpu, makeHost: makeHost)
     }
 
-    /// `prefersGpu: false` keeps the CPU `CGImage` path. Snapshot tests use it;
-    /// the demo leaves the default, which is the Metal layer.
-    public init(frame frameRect: NSRect, prefersGpu: Bool) {
-        super.init(frame: frameRect)
-        install(prefersGpu: prefersGpu)
+    /// Shows a host made elsewhere. A GPU host needs the layer at creation, so
+    /// it goes through `init(frame:prefersGpu:makeHost:)` instead.
+    public convenience init(frame frameRect: NSRect, host: SlintHost) {
+        self.init(frame: frameRect, prefersGpu: false) { _ in host }
     }
 
-    private func install(prefersGpu: Bool) {
+    /// Shows one component of `definition`. `prefersGpu: false` keeps the CPU
+    /// `CGImage` path. Snapshot tests use it; the demo leaves the default,
+    /// which is the Metal layer.
+    public convenience init(frame frameRect: NSRect, definition: SlintDefinition, prefersGpu: Bool = true) {
+        self.init(frame: frameRect, prefersGpu: prefersGpu) { metalLayer in
+            guard let metalLayer else {
+                return try SlintHost(definition: definition, pixelWidth: 1, pixelHeight: 1, scale: 1)
+            }
+            return try SlintHost(definition: definition, metalLayer: metalLayer, pixelWidth: 1, pixelHeight: 1, scale: 1)
+        }
+    }
+
+    private func install(prefersGpu: Bool, makeHost: (UnsafeMutableRawPointer?) throws -> SlintHost) {
         wantsLayer = true
         // Top-left keeps a frame that is one size behind the bounds where it is,
         // instead of stretching it across the view until the new pixels arrive.
@@ -49,21 +69,18 @@ public final class SlintNSView: NSView {
             metal.frame = bounds
             layer?.addSublayer(metal)
             metalLayer = metal
-            do {
-                host = try SlintHost(
-                    metalLayer: Unmanaged.passUnretained(metal).toOpaque(),
-                    pixelWidth: 1,
-                    pixelHeight: 1,
-                    scale: 1
-                )
-                return
-            } catch {
+            let made = try? makeHost(Unmanaged.passUnretained(metal).toOpaque())
+            if made?.rendersOnGpu != true {
                 metal.removeFromSuperlayer()
                 metalLayer = nil
             }
+            if let made {
+                host = made
+                return
+            }
         }
         do {
-            host = try SlintHost(pixelWidth: 1, pixelHeight: 1, scale: 1)
+            host = try makeHost(nil)
         } catch let error as SlintError {
             lastError = error
         } catch {

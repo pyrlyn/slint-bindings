@@ -39,7 +39,12 @@ typedef uint8_t SbPointerButton;
 #endif // __cplusplus
 
 /**
- * Opaque handle to the demo form and its pixel buffer.
+ * Opaque handle to a compiled `.slint` component definition ([`sb_compile`]).
+ */
+typedef struct SbDefinition SbDefinition;
+
+/**
+ * Opaque handle to one interpreted component and its pixel buffer or GPU surface.
  */
 typedef struct SbHost SbHost;
 
@@ -62,9 +67,10 @@ typedef struct SbFrame {
 } SbFrame;
 
 /**
- * C callback for `submitted(string)`: `user_data`, then the UTF-8 name. Null clears it.
+ * C callback for [`sb_on_callback`]: `user_data`, then the arguments as a
+ * UTF-8 JSON array, valid only during the call.
  */
-typedef void (*SbSubmittedFn)(void *user_data, const char *name);
+typedef void (*SbCallbackFn)(void *user_data, const char *args_json);
 
 #ifdef __cplusplus
 extern "C" {
@@ -76,28 +82,66 @@ extern "C" {
 const char *sb_last_error(void);
 
 /**
- * Creates the demo form at `width`×`height` physical pixels. Null on failure.
- */
-struct SbHost *sb_demo_new(uint32_t width, uint32_t height, float scale);
-
-/**
- * Creates the demo on a `CAMetalLayer` (`layer`). Null on failure, including
- * on every OS other than macOS and when the GPU adapter cannot be opened.
- * The caller then uses [`sb_demo_new`].
+ * Compiles `.slint` source and returns its main component (the last exported
+ * one). `path` names the file for diagnostics and relative imports; when
+ * `source` is null, the file at `path` is read. Null on failure, with the
+ * compiler's diagnostics in [`sb_last_error`]. Free with [`sb_definition_free`].
  *
  * # Safety
- * `layer` is null or a live `CAMetalLayer` that outlives the returned host.
+ * `source` is null or NUL-terminated; `path` is NUL-terminated. Both are
+ * valid for the call.
  */
-struct SbHost *sb_demo_new_metal(void *layer, uint32_t width, uint32_t height, float scale);
+struct SbDefinition *sb_compile(const char *source, const char *path);
 
 /**
- * Creates the demo on an `ISwapChainPanel` (`panel`). Null on failure,
- * including on every OS other than Windows. The caller then uses [`sb_demo_new`].
+ * Destroys a definition. Hosts created from it stay valid. Null is ignored.
  *
  * # Safety
- * `panel` is null or a live `ISwapChainPanel` that outlives the returned host.
+ * `definition` is null or a pointer from [`sb_compile`] not freed before.
  */
-struct SbHost *sb_demo_new_swapchain(void *panel, uint32_t width, uint32_t height, float scale);
+void sb_definition_free(struct SbDefinition *definition);
+
+/**
+ * Creates a component of `definition` drawn on the CPU at `width`×`height`
+ * physical pixels. Null on failure. Free with [`sb_host_free`].
+ *
+ * # Safety
+ * `definition` must be null or live.
+ */
+struct SbHost *sb_component_new(const struct SbDefinition *definition,
+                                uint32_t width,
+                                uint32_t height,
+                                float scale);
+
+/**
+ * Creates a component of `definition` on a `CAMetalLayer` (`layer`). Null on
+ * failure, including on every OS other than macOS and when the GPU adapter
+ * cannot be opened; the caller then uses [`sb_component_new`].
+ *
+ * # Safety
+ * `definition` must be null or live; `layer` is null or a live
+ * `CAMetalLayer` that outlives the returned host.
+ */
+struct SbHost *sb_component_new_metal(const struct SbDefinition *definition,
+                                      void *layer,
+                                      uint32_t width,
+                                      uint32_t height,
+                                      float scale);
+
+/**
+ * Creates a component of `definition` on an `ISwapChainPanel` (`panel`).
+ * Null on failure, including on every OS other than Windows; the caller then
+ * uses [`sb_component_new`].
+ *
+ * # Safety
+ * `definition` must be null or live; `panel` is null or a live
+ * `ISwapChainPanel` that outlives the returned host.
+ */
+struct SbHost *sb_component_new_swapchain(const struct SbDefinition *definition,
+                                          void *panel,
+                                          uint32_t width,
+                                          uint32_t height,
+                                          float scale);
 
 /**
  * 1 when `host` presents on the GPU.
@@ -108,8 +152,8 @@ struct SbHost *sb_demo_new_swapchain(void *panel, uint32_t width, uint32_t heigh
 bool sb_host_is_gpu(const struct SbHost *host);
 
 /**
- * Presents one frame into the surface passed to `sb_demo_new_metal` or
- * `sb_demo_new_swapchain`. `failed` is 1 on a CPU host or a lost swapchain.
+ * Presents one frame into the surface passed to `sb_component_new_metal` or
+ * `sb_component_new_swapchain`. `failed` is 1 on a CPU host or a lost swapchain.
  *
  * # Safety
  * `host` must be null or live.
@@ -120,7 +164,8 @@ struct SbFrame sb_host_gpu_render(struct SbHost *host);
  * Destroys a host. Null is ignored.
  *
  * # Safety
- * `host` must be null or a pointer from [`sb_demo_new`] not freed before.
+ * `host` must be null or a pointer from `sb_component_new*` (or
+ * [`SbHost::into_raw`]) not freed before.
  */
 void sb_host_free(struct SbHost *host);
 
@@ -131,6 +176,15 @@ void sb_host_free(struct SbHost *host);
  * `host` must be null or live.
  */
 size_t sb_host_frame_len(const struct SbHost *host);
+
+/**
+ * Writes the frame size in physical pixels. A host made by another library
+ * reaches Swift or C# without its size, which the CPU frame's image needs.
+ *
+ * # Safety
+ * `host` must be null or live; `width` and `height` must be null or writable.
+ */
+bool sb_host_pixel_size(const struct SbHost *host, uint32_t *width, uint32_t *height);
 
 /**
  * Resizes the frame; returns false on failure.
@@ -381,21 +435,56 @@ bool sb_virtual_key_text(uint16_t virtual_key,
                          size_t out_len);
 
 /**
- * Sets the demo form's `name` property.
+ * Sets the public property `name` from its JSON value (`"text"`, `42`,
+ * `true`, `"#ff0000"`, `"Enum.value"`, arrays and objects for models and
+ * structs). False on an unknown property, a wrong type or malformed JSON.
  *
  * # Safety
- * `host` must be null or live; `name` null or NUL-terminated.
+ * `host` must be null or live; `name` and `json` are NUL-terminated.
  */
-void sb_demo_set_name(const struct SbHost *host, const char *name);
+bool sb_set_property_json(const struct SbHost *host, const char *name, const char *json);
 
 /**
- * Registers `callback` for the demo form's `submitted(name)`; null clears it.
- * `user_data` is passed back untouched and must outlive the host.
+ * The public property `name` as JSON, or null on failure. Free with
+ * [`sb_string_free`].
  *
  * # Safety
- * `host` must be null or live.
+ * `host` must be null or live; `name` is NUL-terminated.
  */
-void sb_demo_on_submitted(const struct SbHost *host, SbSubmittedFn callback, void *user_data);
+char *sb_get_property_json(const struct SbHost *host, const char *name);
+
+/**
+ * Invokes the public callback `name` with a JSON array of arguments and
+ * returns its result as JSON (`null` for a callback without one), or null on
+ * failure. Free the result with [`sb_string_free`].
+ *
+ * # Safety
+ * `host` must be null or live; `name` and `args_json` are NUL-terminated.
+ */
+char *sb_invoke_json(const struct SbHost *host, const char *name, const char *args_json);
+
+/**
+ * Handles the public callback `name` in the host: `callback` receives
+ * `user_data` and the arguments as a JSON array. A callback with a return
+ * type returns its type's default to Slint. Null `callback` clears it.
+ * `user_data` is passed back untouched and must stay valid until the
+ * callback is replaced or the host is freed. False on an unknown callback.
+ *
+ * # Safety
+ * `host` must be null or live; `name` is NUL-terminated.
+ */
+bool sb_on_callback(const struct SbHost *host,
+                    const char *name,
+                    SbCallbackFn callback,
+                    void *user_data);
+
+/**
+ * Frees a string returned by [`sb_get_property_json`] or [`sb_invoke_json`]. Null is ignored.
+ *
+ * # Safety
+ * `text` is null or a string from those calls, not freed before.
+ */
+void sb_string_free(char *text);
 
 #ifdef __cplusplus
 }  // extern "C"

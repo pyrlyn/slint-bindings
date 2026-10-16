@@ -1,0 +1,16 @@
+<!-- Tests for the C# host over slint_bindings_ffi.dll. The host's sources are
+     compiled in rather than referenced: they use no WinUI type, so the tests
+     run without the Windows App SDK runtime. The DLL is copied by
+     windows/Directory.Build.targets. -->
+<Project Sdk="MSTest.Sdk/4.5.1">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\SlintBindings.WinUI\NativeMethods.cs" Link="NativeMethods.cs" />
+    <Compile Include="..\SlintBindings.WinUI\SlintHost.cs" Link="SlintHost.cs" />
+    <None Include="..\..\fixtures\weft\login.slint" Link="login.slint" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

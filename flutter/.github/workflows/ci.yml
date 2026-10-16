@@ -61,11 +61,10 @@ jobs:
           channel: stable
           cache: true
 
-      # Flutter macOS release builds a universal binary; cargo must have the
-      # x86_64 slice target even on arm64 runners.
+      # Intel macOS is not supported, so only the arm64 slice is built.
       - uses: dtolnay/rust-toolchain@stable
         with:
-          targets: x86_64-apple-darwin,aarch64-apple-darwin
+          targets: aarch64-apple-darwin
 
       - uses: Swatinem/rust-cache@v2
 
@@ -120,7 +119,7 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: clippy
-          targets: x86_64-apple-darwin, aarch64-apple-ios-sim, x86_64-apple-ios
+          targets: aarch64-apple-ios-sim
 
       - uses: Swatinem/rust-cache@v2
 
