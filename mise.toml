@@ -1,5 +1,7 @@
 # Toolchain for slint-bindings. `mise install`, then `just check`.
 [tools]
+"cargo:https://github.com/pyrlyn/tools" = "rev:b6c641d25b09506572f6a6b4ff7d38c9019ddf35" # `mise run sweep`, `just cache`, `just swarfr` (ptools)
+"cargo:cargo-sweep" = "0.8.0" # `mise run sweep`: drops build artifacts unused for 1 day (ptools sweep)
 mold = { version = "2.42.1", os = ["linux"] } # linker, Linux only; mise [env] below turns it on where it is installed
 # Same pin as weft, so the Weft milestone can share one toolchain.
 rust = { version = "1.99.0", components = "rustfmt,clippy" }
@@ -14,3 +16,11 @@ just = "1.58.0"
 # through .cargo/config.toml. The probe variable stops `mise which` from recursing.
 CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_RUSTFLAGS = "{% if os() == 'linux' and get_env(name='MISE_MOLD_PROBE', default='') == '' %}{{ exec(command='MISE_MOLD_PROBE=1 \"' ~ mise_bin ~ '\" which mold >/dev/null 2>&1 && echo \"-C linker=clang -C link-arg=-fuse-ld=mold\" || true') }}{% endif %}"
 CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_RUSTFLAGS = "{% if os() == 'linux' and get_env(name='MISE_MOLD_PROBE', default='') == '' %}{{ exec(command='MISE_MOLD_PROBE=1 \"' ~ mise_bin ~ '\" which mold >/dev/null 2>&1 && echo \"-C linker=clang -C link-arg=-fuse-ld=mold\" || true') }}{% endif %}"
+
+[tasks.sweep]
+description = "Remove cargo build artifacts unused for 1 day (cargo-sweep, via ptools)"
+run = "ptools sweep --days 1"
+
+[tasks.sweep-dry]
+description = "Preview what sweep would remove; deletes nothing"
+run = "ptools sweep --days 1 --dry-run"
