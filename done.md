@@ -106,3 +106,136 @@ The same renderer presents into a `SwapChainPanel`. The panel passes
 chain and calls `SetSwapChain` on the UI thread. `CompositionScaleChanged`
 resizes it. A failed COM query or adapter keeps the `WriteableBitmap` path.
 The window was not launched, and the frame-time checkpoint was not measured.
+
+### T19. Drop Intel macOS leftovers from the Flutter copy
+
+`flutter/` still listed Intel targets after the workspace dropped Intel macOS:
+the copied CI installed `x86_64-apple-darwin` for a universal macOS release
+build and `x86_64-apple-darwin`/`x86_64-apple-ios` for the Skia job, and
+`rustTriple` mapped iOS x64 (a simulator that only runs on Intel Macs) to
+`x86_64-apple-ios`. The macOS x64 mapping was already gone.
+
+Plan: remove both Intel targets from `flutter/.github/workflows/ci.yml`, drop
+the `(OS.iOS, Architecture.x64)` arm from `cargo_builder.dart`, so an Intel
+request fails with the existing `UnsupportedError`. Check with `git grep`
+that no `x86_64-apple-*` target remains under `flutter/`.
+
+Result: the CI installs `aarch64-apple-darwin` and `aarch64-apple-ios-sim`
+only; `rustTriple` knows only arm64 Apple targets.
+
+### T11.1. Runtime components: core and C ABI
+
+T11 (runtime components, generic API), Rust half. `.slint` is compiled at run
+time with `slint-interpreter` (`=1.18.1`, the same pin as `slint`; one
+`i-slint-core`), and properties and callbacks cross as JSON through slint_dart's
+`slint-dart-interpreter`, reused as a path dependency
+(`flutter/packages/slint_build/interpreter`) and excluded from this workspace so
+it keeps flutter/'s lints and dependency versions. Closes weft T69.1's G1 and G2.
+
+- Core: `runtime::compile(source, path)` returns the last exported component
+  (`source: None` reads the file); `runtime::instantiate` hosts a
+  `ComponentInstance` in `EmbeddedHost` or `GpuHost` and returns its JSON
+  bridge. `DemoForm`, `build.rs` and `slint-build` are gone; core tests run the
+  interpreted `ui/demo.slint`, and the GPU smoke test renders it offscreen.
+- C ABI: `sb_compile`, `sb_definition_free`, `sb_component_new`,
+  `sb_component_new_metal`, `sb_component_new_swapchain`,
+  `sb_set_property_json`, `sb_get_property_json`, `sb_invoke_json`,
+  `sb_on_callback`, `sb_string_free`.
+- Rust: `SbHost::new`, `SbHost::new_gpu`, `SbHost::component`,
+  `SbHost::bridge`, `SbHost::into_raw`. A scratch staticlib that links
+  `slint-bindings-ffi` as an rlib and calls `SbHost::into_raw` exported
+  `sb_compile`, `sb_component_new`, `sb_host_render` and `sb_on_callback` (`nm`);
+  that check is not a committed test.
+- Tests: the FFI e2e loads the demo from the file and keeps the snapshots
+  pixel-identical; new cases cover JSON round trips, typed input read back,
+  bad names, values and UTF-8, invoke, clearing a callback, compile
+  diagnostics, a missing file, two hosts from one definition, a host built in
+  Rust and handed to C, and Metal without a layer.
+
+### T11.2. Runtime components: hosts load the demo from a file
+
+The Swift and WinUI hosts load `demo.slint` from a file at run time and the
+`sb_demo_*` calls left the ABI. Swift: `SlintDefinition` (`sb_compile`),
+`SlintHost(definition:…)` with `setProperty(_:json:)`, `property(_:)`,
+`invoke(_:argsJson:)` and `onCallback(_:_:)`; `SlintNSView` and
+`SlintDemoView` take the definition; the demo app reads the first `.slint`
+argument or the repository's `crates/slint-bindings-core/ui/demo.slint`. Swift
+tests cover the file-loaded form, JSON errors and invoke. WinUI: the same in
+`SlintDefinition`/`SlintHost` (C#), `SlintPanel.Definition`, and the demo copies
+`demo.slint` next to the app. `just check` passes on macOS; the WinUI projects
+were not built or run (no Windows machine here), only `just pinvoke-check`.
+
+### T70. SwiftUI hosts a component built elsewhere (weft G3, T68 on macOS)
+
+Weft's editor builds its `SbHost*` in its own Rust library and shows it in
+`SlintNSView` (weft T69.1d). Closes weft T69.1's G3 and the macOS half of weft
+T68.
+
+- `SlintHost(adopting:)` takes ownership of an `SbHost*` another C function
+  returned; nil throws that call's `sb_last_error`. The definition initializers
+  go through it. `sb_host_pixel_size` (new in the C ABI and `NativeMethods.cs`)
+  gives an adopted host's size.
+- `SlintNSView(frame:prefersGpu:makeHost:)` takes the host from the caller. With
+  `prefersGpu` the factory is offered a `CAMetalLayer`; a CPU host drops the
+  layer, and a throw is retried without it. `SlintNSView(frame:host:)` and the
+  definition initializer build on it. `SlintView` is the same as a SwiftUI view.
+- The `SlintBindings` library target links no Rust library; the demo and test
+  targets do. `just swift-package-check` (in `just check`) fails when the
+  library target has unsafe flags.
+- `fixtures/weft/login.slint` is weft's `weft-slint` output for the login screen
+  (weft `b623a5b9`). The Rust e2e renders it at 480×800 (not one colour), clicks
+  the email field, types into it, reads `email` back, and gets
+  `perform("auth.submit", "form")` from the button and from Enter and
+  `perform("nav.signup", "signup")` from the link; the button does nothing while
+  the email is empty. The Swift test shows the same screen in `SlintView` inside
+  an `NSHostingView` in an `NSWindow`, with a host adopted from raw `sb_*` calls,
+  and sends `NSEvent` mouse and key events to the view: the frame is not one
+  colour, the view becomes first responder, the typed email lands, and the
+  clicks raise `perform`. The events go to the view's responder methods, not
+  `NSWindow.sendEvent`: a test process is not the active app, so its window
+  never becomes key, and AppKit keeps a click in a window that is not key.
+
+`just check` passes on macOS.
+
+### T71. WinUI 3 hosts a component built elsewhere (weft G4, T68 on Windows)
+
+Weft's Windows shell (weft T69.1e) hands `SlintPanel` a host from its own
+library. The panel created hosts only from `Definition`, and CI compiled the
+WinUI code without running any of it.
+
+- `SlintHost.Adopt(IntPtr)` takes ownership of an `SbHost*` another library
+  made and reads its size from `sb_host_pixel_size`; zero, or a failed size
+  read, throws that library's last error (the host is freed first). The public
+  constructors go through it.
+- `SlintPanel.HostFactory` (`Func<IntPtr, SlintHost>`) makes the host instead of
+  `Definition`. It gets the `ISwapChainPanelNative` pointer, or zero for a CPU
+  host; a CPU host returned for the pointer is kept, and a throw for the pointer
+  asks again with zero. `Definition` is now a factory too.
+- `windows/SlintBindings.Tests` (MSTest.Sdk, Microsoft.Testing.Platform, run with
+  `dotnet run --project`): compiles `SlintHost.cs` and `NativeMethods.cs` rather
+  than referencing the WinUI library, so it needs no Windows App Runtime. On the
+  weft login screen it checks the BGRA frame is not one colour, walks the
+  columns to click (the reset link while submit is disabled, then submit and
+  "Create an account"), types into both fields with Backtab between them, and
+  presses Enter; `perform` gets each action. An adopted host keeps its size and
+  renders; adopting a failed constructor throws.
+- The demo takes a `.slint` path argument and shows that file through
+  `HostFactory`, listing its `perform` calls. `windows/smoke.ps1` starts it on
+  the weft screen, captures the window and fails when the Slint panel is one
+  colour.
+- CI `windows-host`: the host tests, a self-contained build
+  (`WindowsAppSDKSelfContained`), the smoke run, and the capture as the
+  `weft-winui` artifact.
+
+### T12. Weft → Slint renderer (dropped)
+
+Dropped, not done. It would have built `slint-bindings-weft`, a second Weft →
+Slint mapping beside weft's own `weft-slint` (weft T67), which already
+generates every corpus screen. The creator approved dropping it (weft T69.1,
+decision 3). The hosts show `weft-slint`'s output instead: T70 and T71.
+
+### T16. Slint desktop app for Weft (dropped)
+
+Dropped, not done. Weft builds its desktop editor itself (weft T69,
+WeftStudio) on these bindings; a second app here would duplicate it. Approved
+with T12 (weft T69.1, decision 3).

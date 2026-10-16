@@ -5,13 +5,22 @@ import AppKit
 @testable import SlintBindings
 import Testing
 
+/// `demo.slint` in this checkout, the file the demo app loads.
+@MainActor
+func demoDefinition() throws -> SlintDefinition {
+    let path = URL(fileURLWithPath: #filePath)
+        .appendingPathComponent("../../../../crates/slint-bindings-core/ui/demo.slint")
+        .standardizedFileURL.path
+    return try SlintDefinition(path: path)
+}
+
 @MainActor
 struct HostE2E {
     private let field = CGPoint(x: 160, y: 64)
     private let button = CGPoint(x: 80, y: 112)
 
     @Test func firstFrameIsAnImageAndTheNextIsNot() throws {
-        let host = try SlintHost(pixelWidth: 320, pixelHeight: 200, scale: 1)
+        let host = try SlintHost(definition: try demoDefinition(), pixelWidth: 320, pixelHeight: 200, scale: 1)
         let first = try host.renderIfNeeded()
         #expect(first.image != nil)
         let second = try host.renderIfNeeded()
@@ -19,7 +28,7 @@ struct HostE2E {
     }
 
     @Test func typeAsciiThenContinueSubmitsTheName() throws {
-        let host = try SlintHost(pixelWidth: 320, pixelHeight: 200, scale: 1)
+        let host = try SlintHost(definition: try demoDefinition(), pixelWidth: 320, pixelHeight: 200, scale: 1)
         _ = try host.renderIfNeeded()
         host.focusChanged(true)
         click(host, field)
@@ -28,13 +37,15 @@ struct HostE2E {
             host.keyReleased(character)
         }
         var submitted: [String] = []
-        host.onSubmitted { submitted.append($0) }
+        try host.onCallback("submitted") { submitted.append($0) }
         click(host, button)
-        #expect(submitted == ["Ada"])
+        #expect(submitted == [#"["Ada"]"#])
+        #expect(try host.property("name") == #""Ada""#)
+        #expect(try host.property("submit-count") == "1")
     }
 
-    @Test func sizedViewPresentsAFrame() {
-        let view = SlintNSView(frame: NSRect(x: 0, y: 0, width: 320, height: 200))
+    @Test func sizedViewPresentsAFrame() throws {
+        let view = SlintNSView(frame: NSRect(x: 0, y: 0, width: 320, height: 200), definition: try demoDefinition())
         let window = NSWindow(
             contentRect: NSRect(x: 0, y: 0, width: 320, height: 200),
             styleMask: [.borderless],
@@ -50,9 +61,28 @@ struct HostE2E {
     }
 
     @Test func keyRepeatDoesNotThrow() throws {
-        let host = try SlintHost(pixelWidth: 320, pixelHeight: 200, scale: 1)
+        let host = try SlintHost(definition: try demoDefinition(), pixelWidth: 320, pixelHeight: 200, scale: 1)
         _ = try host.renderIfNeeded()
         host.keyRepeated("a")
+    }
+
+    @Test func badPropertiesAndSourcesThrow() throws {
+        let host = try SlintHost(definition: try demoDefinition(), pixelWidth: 32, pixelHeight: 32, scale: 1)
+        #expect(throws: SlintError.self) { try host.setProperty("no-such-property", json: "1") }
+        #expect(throws: SlintError.self) { try host.property("no-such-property") }
+        #expect(throws: SlintError.self) { try host.onCallback("no-such-callback") { _ in } }
+        #expect(throws: SlintError.self) { try SlintDefinition(path: "/nonexistent/form.slint") }
+        #expect(throws: SlintError.self) {
+            try SlintDefinition(path: "broken.slint", source: "export component X inherits Window { foo bar }")
+        }
+    }
+
+    @Test func invokeRunsTheHostHandler() throws {
+        let host = try SlintHost(definition: try demoDefinition(), pixelWidth: 32, pixelHeight: 32, scale: 1)
+        var calls: [String] = []
+        try host.onCallback("submitted") { calls.append($0) }
+        #expect(try host.invoke("submitted", argsJson: #"["Lin"]"#) == "null")
+        #expect(calls == [#"["Lin"]"#])
     }
 
     private func click(_ host: SlintHost, _ point: CGPoint) {
