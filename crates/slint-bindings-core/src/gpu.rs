@@ -408,6 +408,11 @@ impl<C: ComponentHandle> GpuHost<C> {
         &self.component
     }
 
+    /// Current surface size in physical pixels.
+    pub fn size(&self) -> (u32, u32) {
+        (self.width, self.height)
+    }
+
     pub fn frame_len(&self) -> usize {
         0
     }

@@ -3,13 +3,12 @@
 version: 1
 
 codeql:
-  languages: [actions, csharp, java-kotlin, javascript-typescript, rust, swift]
+  # Every language here that supports `build-mode: none` (Dart, Swift and C# do not).
+  languages: [actions, rust]
 
 # Snyk stays off (pyrlyn/ci default).
-snyk:
-  enabled: false
 
-# .NET (if any) is built and tested by the local ci.yml.
+# The shared dotnet check builds on Linux, where the WinUI projects (net*-windows) cannot
+# build (NETSDK1100); the C# side is covered by the Windows jobs in ci.yml.
 dotnet:
   enabled: false
-

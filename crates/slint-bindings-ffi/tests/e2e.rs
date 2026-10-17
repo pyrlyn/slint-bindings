@@ -1,17 +1,22 @@
-//! Drives the demo form through the C ABI the hosts call.
+//! Drives the demo form through the C ABI the hosts call. The form is
+//! compiled at run time from `slint-bindings-core/ui/demo.slint`, the file
+//! the hosts load.
 //!
 //! The rectangles in `ui/demo.slint` are the hit targets (logical px, origin
 //! top-left): the name field at (160, 64) and Continue at (80, 112). Headless,
 //! so `just check` does not need a window server.
 
 use std::ffi::{CStr, CString, c_char, c_void};
+use std::ptr;
 
 use slint_bindings_ffi::{
-    SbFrame, SbHost, SbPointerButton, run_on_test_ui_thread, sb_demo_new, sb_demo_on_submitted,
-    sb_demo_set_name, sb_host_composition_commit, sb_host_composition_update,
-    sb_host_focus_changed, sb_host_frame_len, sb_host_free, sb_host_key_pressed,
-    sb_host_key_released, sb_host_key_repeated, sb_host_pointer_moved, sb_host_pointer_pressed,
-    sb_host_pointer_released, sb_host_render, sb_host_resize, sb_last_error, sb_tick,
+    SbFrame, SbHost, SbPointerButton, run_on_test_ui_thread, sb_compile, sb_component_new,
+    sb_definition_free, sb_get_property_json, sb_host_composition_commit,
+    sb_host_composition_update, sb_host_focus_changed, sb_host_frame_len, sb_host_free,
+    sb_host_is_gpu, sb_host_key_pressed, sb_host_key_released, sb_host_key_repeated,
+    sb_host_pixel_size, sb_host_pointer_moved, sb_host_pointer_pressed, sb_host_pointer_released,
+    sb_host_render, sb_host_resize, sb_invoke_json, sb_last_error, sb_on_callback,
+    sb_set_property_json, sb_string_free, sb_tick,
 };
 
 const FORM_WIDTH: u32 = 320;
@@ -29,15 +34,49 @@ struct Host(*mut SbHost);
 
 impl Drop for Host {
     fn drop(&mut self) {
-        // SAFETY: the pointer came from `sb_demo_new` and is freed once.
+        // SAFETY: the pointer came from `sb_component_new` and is freed once.
         unsafe { sb_host_free(self.0) }
     }
 }
 
+fn last_error() -> String {
+    let err = sb_last_error();
+    if err.is_null() {
+        return String::new();
+    }
+    // SAFETY: a non-null `sb_last_error` is NUL-terminated until the next call.
+    unsafe { CStr::from_ptr(err) }
+        .to_string_lossy()
+        .into_owned()
+}
+
+fn demo_path() -> CString {
+    let path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../slint-bindings-core/ui/demo.slint"
+    );
+    CString::new(path).unwrap_or_default()
+}
+
 fn open(width: u32, height: u32, scale: f32) -> Host {
-    let host = sb_demo_new(width, height, scale);
-    assert!(!host.is_null(), "sb_demo_new failed");
+    let path = demo_path();
+    // SAFETY: `path` is NUL-terminated; a null source reads the file.
+    let definition = unsafe { sb_compile(ptr::null(), path.as_ptr()) };
+    assert!(!definition.is_null(), "sb_compile failed: {}", last_error());
+    // SAFETY: `definition` is live until the free right after; the host does not borrow it.
+    let host = unsafe { sb_component_new(definition, width, height, scale) };
+    // SAFETY: from `sb_compile`, freed once.
+    unsafe { sb_definition_free(definition) };
+    assert!(!host.is_null(), "sb_component_new failed: {}", last_error());
     Host(host)
+}
+
+fn set_name(host: &Host, name: &str) {
+    let property = CString::new("name").unwrap_or_default();
+    let json = CString::new(format!("\"{name}\"")).unwrap_or_default();
+    // SAFETY: `host` is live; both strings are NUL-terminated.
+    let ok = unsafe { sb_set_property_json(host.0, property.as_ptr(), json.as_ptr()) };
+    assert!(ok, "sb_set_property_json failed: {}", last_error());
 }
 
 fn render(host: &Host) -> (SbFrame, Vec<u8>) {
@@ -83,22 +122,28 @@ fn type_ascii(host: &Host, text: &str) {
     }
 }
 
-extern "C" fn on_submitted(user_data: *mut c_void, name: *const c_char) {
-    if user_data.is_null() || name.is_null() {
+/// Collects `submitted(name)`: the arguments arrive as the JSON array `["name"]`.
+extern "C" fn on_submitted(user_data: *mut c_void, args_json: *const c_char) {
+    if user_data.is_null() || args_json.is_null() {
         return;
     }
-    // SAFETY: the test passes a live `Vec<String>`, and the FFI passes a CString that is valid for this call.
-    let text = unsafe { CStr::from_ptr(name) }
-        .to_str()
-        .unwrap_or("")
-        .to_owned();
+    // SAFETY: the FFI passes a CString that is valid for this call.
+    let args = unsafe { CStr::from_ptr(args_json) }.to_str().unwrap_or("");
+    // Test names hold no quotes or escapes, so the array is `["` + name + `"]`.
+    let name = args
+        .strip_prefix("[\"")
+        .and_then(|rest| rest.strip_suffix("\"]"))
+        .unwrap_or(args);
+    // SAFETY: the test passes a live `Vec<String>` it does not touch during the call.
     let slot = unsafe { &mut *user_data.cast::<Vec<String>>() };
-    slot.push(text);
+    slot.push(name.to_owned());
 }
 
 fn listen(host: &Host, slot: *mut Vec<String>) {
+    let name = CString::new("submitted").unwrap_or_default();
     // SAFETY: `host` is live; `slot` stays live for every callback this test fires.
-    unsafe { sb_demo_on_submitted(host.0, Some(on_submitted), slot.cast()) }
+    let ok = unsafe { sb_on_callback(host.0, name.as_ptr(), Some(on_submitted), slot.cast()) };
+    assert!(ok, "sb_on_callback failed: {}", last_error());
 }
 
 #[test]
@@ -198,9 +243,7 @@ fn host_set_name_reaches_the_submitted_callback() {
     run_on_test_ui_thread(|| {
         let host = open(FORM_WIDTH, FORM_HEIGHT, 1.0);
         let _ = render(&host);
-        let name = CString::new("Ivan").unwrap_or_default();
-        // SAFETY: `host` is live; `name` is NUL-terminated.
-        unsafe { sb_demo_set_name(host.0, name.as_ptr()) }
+        set_name(&host, "Ivan");
         let mut submitted = Vec::new();
         listen(&host, &raw mut submitted);
         click(&host, BUTTON_X, BUTTON_Y);
@@ -248,9 +291,7 @@ fn retina_demo_frame_paints() {
         assert_eq!(frame.redrawn, 1);
         assert!(buf.chunks(4).any(|px| px.len() == 4 && px[3] > 0));
 
-        let name = CString::new("Ada").unwrap_or_default();
-        // SAFETY: `host` is live; `name` is NUL-terminated.
-        unsafe { sb_demo_set_name(host.0, name.as_ptr()) }
+        set_name(&host, "Ada");
         sb_tick();
         let started = std::time::Instant::now();
         let (frame, buf) = render(&host);
@@ -371,10 +412,7 @@ fn paint(width: u32, height: u32, scale: f32, name: Option<&str>) -> Vec<u8> {
     let (frame, mut buf) = render(&host);
     assert_eq!(frame.redrawn, 1);
     if let Some(name) = name {
-        let c = CString::new(name).unwrap_or_default();
-        assert!(!c.to_bytes().is_empty());
-        // SAFETY: `host` is live; `c` is NUL-terminated.
-        unsafe { sb_demo_set_name(host.0, c.as_ptr()) }
+        set_name(&host, name);
         let (frame, named) = render(&host);
         assert_eq!(frame.redrawn, 1);
         buf = named;
@@ -430,6 +468,385 @@ fn key_repeat_is_accepted() {
             assert!(sb_host_key_pressed(host.0, a.as_ptr()));
             assert!(sb_host_key_repeated(host.0, a.as_ptr()));
             assert!(sb_host_key_released(host.0, a.as_ptr()));
+        }
+    });
+}
+
+/// Owned result of `sb_get_property_json` / `sb_invoke_json`; `None` for null.
+fn take_string(text: *mut c_char) -> Option<String> {
+    if text.is_null() {
+        return None;
+    }
+    // SAFETY: a non-null result is a NUL-terminated string the caller owns.
+    let owned = unsafe { CStr::from_ptr(text) }
+        .to_string_lossy()
+        .into_owned();
+    // SAFETY: from the FFI, freed once.
+    unsafe { sb_string_free(text) };
+    Some(owned)
+}
+
+fn get(host: &Host, name: &str) -> Option<String> {
+    let name = CString::new(name).unwrap_or_default();
+    // SAFETY: `host` is live; `name` is NUL-terminated.
+    take_string(unsafe { sb_get_property_json(host.0, name.as_ptr()) })
+}
+
+fn set(host: &Host, name: &str, json: &str) -> bool {
+    let name = CString::new(name).unwrap_or_default();
+    let json = CString::new(json).unwrap_or_default();
+    // SAFETY: `host` is live; both strings are NUL-terminated.
+    unsafe { sb_set_property_json(host.0, name.as_ptr(), json.as_ptr()) }
+}
+
+#[test]
+fn properties_round_trip_as_json_and_typing_shows_up() {
+    run_on_test_ui_thread(|| {
+        let host = open(FORM_WIDTH, FORM_HEIGHT, 1.0);
+        assert!(set(&host, "name", r#""Grace""#));
+        assert_eq!(get(&host, "name").as_deref(), Some(r#""Grace""#));
+        assert_eq!(get(&host, "submit-count").as_deref(), Some("0"));
+
+        set_name(&host, "");
+        let _ = render(&host);
+        // SAFETY: `host` is live.
+        unsafe { assert!(sb_host_focus_changed(host.0, true)) }
+        click(&host, FIELD_X, FIELD_Y);
+        type_ascii(&host, "Bo");
+        click(&host, BUTTON_X, BUTTON_Y);
+        assert_eq!(get(&host, "name").as_deref(), Some(r#""Bo""#));
+        assert_eq!(get(&host, "submit-count").as_deref(), Some("1"));
+    });
+}
+
+#[test]
+fn bad_property_calls_fail_with_a_message() {
+    run_on_test_ui_thread(|| {
+        let host = open(FORM_WIDTH, FORM_HEIGHT, 1.0);
+        assert!(!set(&host, "no-such-property", "1"));
+        assert!(
+            last_error().contains("no-such-property"),
+            "{}",
+            last_error()
+        );
+        assert!(!set(&host, "name", "{not json"));
+        assert!(!last_error().is_empty());
+        assert!(!set(&host, "name", "42"), "a number is not a string");
+        assert!(!last_error().is_empty());
+        assert_eq!(get(&host, "no-such-property"), None);
+        assert!(!last_error().is_empty());
+
+        let name = CString::new("name").unwrap_or_default();
+        let bad = [0x80u8, 0];
+        // SAFETY: null and invalid UTF-8 are part of the contract; `host` is live.
+        unsafe {
+            assert!(!sb_set_property_json(host.0, ptr::null(), name.as_ptr()));
+            assert!(!sb_set_property_json(host.0, name.as_ptr(), ptr::null()));
+            assert!(!sb_set_property_json(
+                host.0,
+                name.as_ptr(),
+                bad.as_ptr().cast()
+            ));
+            assert!(last_error().contains("UTF-8"), "{}", last_error());
+            assert!(sb_get_property_json(ptr::null(), name.as_ptr()).is_null());
+            sb_string_free(ptr::null_mut());
+        }
+    });
+}
+
+#[test]
+fn invoking_a_callback_reaches_the_host_handler() {
+    run_on_test_ui_thread(|| {
+        let host = open(FORM_WIDTH, FORM_HEIGHT, 1.0);
+        let mut submitted = Vec::new();
+        listen(&host, &raw mut submitted);
+        let name = CString::new("submitted").unwrap_or_default();
+        let args = CString::new(r#"["Lin"]"#).unwrap_or_default();
+        // SAFETY: `host` is live; the strings are NUL-terminated.
+        let result = take_string(unsafe { sb_invoke_json(host.0, name.as_ptr(), args.as_ptr()) });
+        assert_eq!(result.as_deref(), Some("null"));
+        assert_eq!(submitted, ["Lin"]);
+
+        let wrong = CString::new("[1, 2]").unwrap_or_default();
+        // SAFETY: as above.
+        let result = unsafe { sb_invoke_json(host.0, name.as_ptr(), wrong.as_ptr()) };
+        assert!(result.is_null());
+        assert!(last_error().contains("expects 1"), "{}", last_error());
+
+        // SAFETY: as above; a null callback clears the handler.
+        unsafe { assert!(sb_on_callback(host.0, name.as_ptr(), None, ptr::null_mut())) }
+        click(&host, BUTTON_X, BUTTON_Y);
+        assert_eq!(submitted, ["Lin"]);
+
+        let unknown = CString::new("no-such-callback").unwrap_or_default();
+        // SAFETY: as above.
+        unsafe {
+            assert!(!sb_on_callback(
+                host.0,
+                unknown.as_ptr(),
+                Some(on_submitted),
+                ptr::null_mut()
+            ));
+        }
+        assert!(!last_error().is_empty());
+    });
+}
+
+#[test]
+fn compile_reports_diagnostics_and_missing_files() {
+    run_on_test_ui_thread(|| {
+        let source =
+            CString::new("export component X inherits Window { foo bar }").unwrap_or_default();
+        let path = CString::new("broken.slint").unwrap_or_default();
+        // SAFETY: both strings are NUL-terminated.
+        let definition = unsafe { sb_compile(source.as_ptr(), path.as_ptr()) };
+        assert!(definition.is_null());
+        assert!(last_error().contains("broken.slint"), "{}", last_error());
+
+        let missing = CString::new("/nonexistent/form.slint").unwrap_or_default();
+        // SAFETY: as above; a null source reads the file.
+        let definition = unsafe { sb_compile(ptr::null(), missing.as_ptr()) };
+        assert!(definition.is_null());
+        assert!(
+            last_error().contains("/nonexistent/form.slint"),
+            "{}",
+            last_error()
+        );
+
+        // SAFETY: null pointers are part of the contract.
+        unsafe {
+            assert!(sb_compile(source.as_ptr(), ptr::null()).is_null());
+            assert!(sb_component_new(ptr::null(), 8, 8, 1.0).is_null());
+            assert!(last_error().contains("definition"), "{}", last_error());
+            sb_definition_free(ptr::null_mut());
+        }
+    });
+}
+
+#[test]
+fn source_compiled_in_memory_renders_on_the_cpu() {
+    run_on_test_ui_thread(|| {
+        let source = CString::new(
+            "export component Swatch inherits Window { background: #ff0000; in property <int> n; }",
+        )
+        .unwrap_or_default();
+        let path = CString::new("swatch.slint").unwrap_or_default();
+        // SAFETY: both strings are NUL-terminated.
+        let definition = unsafe { sb_compile(source.as_ptr(), path.as_ptr()) };
+        assert!(!definition.is_null(), "{}", last_error());
+        // Two hosts from one definition, the second made after a frame of the first.
+        // SAFETY: `definition` is live until the free below.
+        let (first, second) = unsafe {
+            let first = Host(sb_component_new(definition, 4, 4, 1.0));
+            let second = Host(sb_component_new(definition, 4, 4, 1.0));
+            sb_definition_free(definition);
+            (first, second)
+        };
+        assert!(!first.0.is_null() && !second.0.is_null());
+        // SAFETY: `first` is live.
+        assert!(!unsafe { sb_host_is_gpu(first.0) });
+        for host in [&first, &second] {
+            let (frame, buf) = render(host);
+            assert_eq!(frame.redrawn, 1);
+            assert_eq!(&buf[..4], &[255, 0, 0, 255]);
+        }
+        assert!(set(&first, "n", "7"));
+        assert_eq!(
+            get(&second, "n").as_deref(),
+            Some("0"),
+            "hosts share no state"
+        );
+    });
+}
+
+#[test]
+fn a_rust_crate_builds_the_host_and_hands_it_to_c() {
+    run_on_test_ui_thread(|| {
+        let path = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("../slint-bindings-core/ui/demo.slint");
+        let definition = match slint_bindings_core::runtime::compile(None, &path) {
+            Ok(definition) => definition,
+            Err(err) => panic_with(&err.to_string()),
+        };
+        let host = match SbHost::new(&definition, FORM_WIDTH, FORM_HEIGHT, 1.0) {
+            Ok(host) => host,
+            Err(err) => panic_with(&err.to_string()),
+        };
+        let seen = std::rc::Rc::new(std::cell::Cell::new(0));
+        let sink = seen.clone();
+        let set = host.component().set_callback("submitted", move |_| {
+            sink.set(sink.get() + 1);
+            slint_bindings_core::runtime::Value::Void
+        });
+        assert!(set.is_ok());
+        let host = Host(host.into_raw());
+        let _ = render(&host);
+        click(&host, BUTTON_X, BUTTON_Y);
+        assert_eq!(seen.get(), 1);
+    });
+}
+
+fn panic_with(message: &str) -> ! {
+    assert!(message.is_empty(), "{message}");
+    std::process::abort();
+}
+
+#[cfg(target_os = "macos")]
+#[test]
+fn metal_without_a_layer_is_refused() {
+    use slint_bindings_ffi::sb_component_new_metal;
+
+    run_on_test_ui_thread(|| {
+        let path = demo_path();
+        // SAFETY: `path` is NUL-terminated; the definition is freed below.
+        unsafe {
+            let definition = sb_compile(ptr::null(), path.as_ptr());
+            assert!(!definition.is_null());
+            let host = sb_component_new_metal(definition, ptr::null_mut(), 8, 8, 1.0);
+            assert!(host.is_null());
+            assert!(last_error().contains("null"), "{}", last_error());
+            sb_definition_free(definition);
+        }
+    });
+}
+
+// A screen weft's `weft-slint` generated (fixtures/weft/login.slint): Weft
+// controls become std-widgets, and every action calls `perform(action, id)`.
+// Each platform's fonts move its rows, so the test finds targets by column at
+// 480 logical px wide: down x 100 lie the email field, the password field,
+// the submit button and "Forgot password?"; up x 440 from the bottom,
+// "Create an account" comes first.
+const WEFT_WIDTH: u32 = 480;
+const WEFT_HEIGHT: u32 = 800;
+const WEFT_LEFT: f32 = 100.0;
+const WEFT_RIGHT: f32 = 440.0;
+
+/// Clicks down (or up) the column at `x` every 2 px until a callback lands in
+/// `performed`; false when none does.
+fn click_until_performed(
+    host: &Host,
+    performed: *const Vec<String>,
+    x: f32,
+    ys: impl Iterator<Item = u32>,
+) -> bool {
+    // SAFETY: the test owns `performed` and reads it between calls only.
+    let len = || unsafe { (*performed).len() };
+    let before = len();
+    ys.step_by(2).any(|y| {
+        click(host, x, y as f32);
+        len() > before
+    })
+}
+
+/// Collects each callback's raw JSON arguments.
+extern "C" fn on_args(user_data: *mut c_void, args_json: *const c_char) {
+    if user_data.is_null() || args_json.is_null() {
+        return;
+    }
+    // SAFETY: the FFI passes a CString that is valid for this call.
+    let args = unsafe { CStr::from_ptr(args_json) }.to_string_lossy();
+    // SAFETY: the test passes a live `Vec<String>` it does not touch during the call.
+    unsafe { &mut *user_data.cast::<Vec<String>>() }.push(args.into_owned());
+}
+
+#[test]
+fn weft_generated_screen_shows_and_takes_input() {
+    run_on_test_ui_thread(|| {
+        let path = CString::new(concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/../../fixtures/weft/login.slint"
+        ))
+        .unwrap_or_default();
+        // SAFETY: `path` is NUL-terminated; a null source reads the file.
+        let definition = unsafe { sb_compile(ptr::null(), path.as_ptr()) };
+        assert!(!definition.is_null(), "sb_compile failed: {}", last_error());
+        // SAFETY: `definition` is live until the free right after.
+        let host = Host(unsafe { sb_component_new(definition, WEFT_WIDTH, WEFT_HEIGHT, 1.0) });
+        // SAFETY: from `sb_compile`, freed once.
+        unsafe { sb_definition_free(definition) };
+        assert!(
+            !host.0.is_null(),
+            "sb_component_new failed: {}",
+            last_error()
+        );
+
+        let (mut width, mut height) = (0, 0);
+        // SAFETY: `host` is live; both pointers are writable.
+        assert!(unsafe { sb_host_pixel_size(host.0, &raw mut width, &raw mut height) });
+        assert_eq!((width, height), (WEFT_WIDTH, WEFT_HEIGHT));
+
+        let (frame, buf) = render(&host);
+        assert_eq!(frame.redrawn, 1);
+        let first = &buf[..4];
+        assert!(
+            buf.chunks(4).any(|px| px != first),
+            "the screen is one colour"
+        );
+
+        let mut performed: Vec<String> = Vec::new();
+        let name = CString::new("perform").unwrap_or_default();
+        // SAFETY: `host` is live; `performed` outlives every callback below.
+        let ok = unsafe {
+            sb_on_callback(
+                host.0,
+                name.as_ptr(),
+                Some(on_args),
+                (&raw mut performed).cast(),
+            )
+        };
+        assert!(ok, "{}", last_error());
+
+        // SAFETY: `host` is live.
+        unsafe { assert!(sb_host_focus_changed(host.0, true)) }
+        let log: *const Vec<String> = &raw const performed;
+        // The submit button is disabled while the email is empty, so the
+        // column's first callback is the reset link below it. The walk ends
+        // with the password field focused.
+        assert!(click_until_performed(&host, log, WEFT_LEFT, 0..WEFT_HEIGHT));
+        type_ascii(&host, "secret");
+        assert_eq!(get(&host, "password").as_deref(), Some("\"secret\""));
+        type_ascii(&host, "\u{19}"); // Backtab, to the email field.
+        type_ascii(&host, "ada@example.com");
+        assert_eq!(get(&host, "email").as_deref(), Some("\"ada@example.com\""));
+        let (frame, _) = render(&host);
+        assert_eq!(frame.redrawn, 1);
+
+        // Enter in the field submits the form (`accepted`); so does the button.
+        type_ascii(&host, "\n");
+        assert!(click_until_performed(&host, log, WEFT_LEFT, 0..WEFT_HEIGHT));
+        assert!(click_until_performed(
+            &host,
+            log,
+            WEFT_RIGHT,
+            (0..WEFT_HEIGHT).rev()
+        ));
+        assert_eq!(
+            performed,
+            [
+                r#"["nav.reset","reset"]"#,
+                r#"["auth.submit","form"]"#,
+                r#"["auth.submit","form"]"#,
+                r#"["nav.signup","signup"]"#
+            ]
+        );
+    });
+}
+
+#[test]
+fn pixel_size_refuses_null_arguments() {
+    run_on_test_ui_thread(|| {
+        let host = open(FORM_WIDTH, FORM_HEIGHT, 1.0);
+        let mut width = 0;
+        // SAFETY: null host and null out-pointers are what the call must refuse.
+        unsafe {
+            assert!(!sb_host_pixel_size(
+                ptr::null(),
+                &raw mut width,
+                &raw mut width
+            ));
+            assert!(last_error().contains("null host"), "{}", last_error());
+            assert!(!sb_host_pixel_size(host.0, ptr::null_mut(), &raw mut width));
+            assert!(last_error().contains("null size"), "{}", last_error());
         }
     });
 }

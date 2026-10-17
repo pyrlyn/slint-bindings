@@ -5,7 +5,7 @@ header_path := "swift/Sources/CSlintBindings/slint_bindings.h"
 default: check
 
 # Everything CI runs on macOS. Cleanup is last so it does not invalidate the Swift link.
-check: fmt-check clippy nextest header-check pinvoke-check swift-build swift-test tidy
+check: fmt-check clippy nextest header-check pinvoke-check swift-package-check swift-build swift-test tidy
 
 fmt-check:
     cargo fmt --check
@@ -50,7 +50,12 @@ pinvoke-check:
     grep -oE '\bsb_[a-z0-9_]+\(' "$cs" | sed 's/($//' | sort -u > "$tmp/cs"
     diff -u "$tmp/header" "$tmp/cs"
 
-# The static library both SwiftPM products link. Built once per `just` invocation.
+# Fail when the SlintBindings library target links anything through unsafe flags.
+# The app links the Rust library; a library that also did would pull in a second Slint.
+swift-package-check:
+    cd swift && swift package dump-package | jq -e '[.targets[] | select(.name == "SlintBindings") | .settings[] | select(.kind | has("unsafeFlags"))] | length == 0' > /dev/null
+
+# The static library the SwiftPM demo and tests link. Built once per `just` invocation.
 swift-lib:
     cargo rustc -p slint-bindings-ffi --crate-type staticlib
 

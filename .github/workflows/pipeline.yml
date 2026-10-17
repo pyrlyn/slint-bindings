@@ -1,5 +1,5 @@
 # Gated pipeline: pyrlyn/ci's config-driven ci.yml (configured in .github/infra.yml) runs
-# CodeQL, Semgrep and actionlint behind `pipeline / gate`. Language CI stays in ci.yml.
+# CodeQL, Semgrep behind `pipeline / gate`. Rust, macOS and WinUI CI stays in ci.yml.
 # Draft pull requests skip every job, the gate included, until marked ready. Secrets are passed
 # explicitly.
 # Shared workflows: https://github.com/pyrlyn/ci/blob/main/docs/reusable-workflows.md
@@ -24,7 +24,7 @@ permissions:
 
 jobs:
   pipeline:
-    uses: pyrlyn/ci/.github/workflows/ci.yml@31612259553f8163e97d9fc7dbd2bf83b4f03ca2 # main
+    uses: pyrlyn/ci/.github/workflows/ci.yml@9748fe1e5a2007d695e4e1a1d9b16492660dd8bc # main
     # The union every nested job asks for, validated up front even for disabled checks.
     permissions:
       contents: read

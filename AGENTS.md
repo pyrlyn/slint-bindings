@@ -22,12 +22,16 @@ If an `AGENTS.md` or `CLAUDE.md` exists higher in the tree, follow it too; on co
   `windows/SlintBindings.WinUI/NativeMethods.cs` in the same commit; `just header-check`
   fails on drift.
 - **Every `unsafe` block has a `// SAFETY:` comment**; every `unsafe fn` has a `# Safety` section.
-- **Slint is pinned exactly** (`=1.18.x` for `slint`, `slint-build`, `i-slint-core`):
-  `i-slint-core` is internal and must match. Bump all three together, with creator permission.
+- **Slint is pinned exactly** (`=1.18.x` for `slint`, `slint-interpreter`, `i-slint-core`):
+  `i-slint-core` is internal and must match. Bump all three together (and flutter/'s
+  workspace, which the vendored interpreter crate inherits from), with creator permission.
 - **Shared embedding lives in `slint-embed`.** `flutter/` is a copy of
   [slint_dart](https://github.com/listepo/slint_dart). The software platform,
   the Dart FFI event map and the UI-thread guard are `flutter/packages/slint/rust/embed`.
   `slint-dart-core` re-exports them. Do not grow a second platform.
+- **Components are interpreted.** `.slint` is compiled at run time through
+  `flutter/packages/slint_build/interpreter` (`slint-dart-interpreter`: compile and the
+  JSON value bridge); `slint-bindings-core::runtime` only adapts it to the hosts.
 
 ## Commands
 
