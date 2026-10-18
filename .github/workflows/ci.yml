@@ -36,7 +36,8 @@ jobs:
 
   macos:
     if: vars.MACOS_CI_DISABLED != 'true' && (github.event_name != 'pull_request' || !github.event.pull_request.draft)
-    runs-on: macos-26
+    # TEMP: self-hosted xcode-27-local until hosted xcode-27 exists (fork PRs keep the hosted label)
+    runs-on: ${{ (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && 'xcode-27-local' || 'macos-26' }}
     timeout-minutes: 45
     permissions:
       contents: read
