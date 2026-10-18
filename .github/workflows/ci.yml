@@ -15,6 +15,20 @@ concurrency:
 permissions: {}
 
 jobs:
+  # Which runner the macOS jobs use: pyrlyn/ci's macos-runner action reads the MACOS_RUNNER
+  # variable (unset or `hosted` = the hosted label, `xcode-27-local` = the dedicated Mac).
+  macos-runner:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      value: ${{ steps.r.outputs.value }}
+    steps:
+      - id: r
+        uses: pyrlyn/ci/.github/actions/macos-runner@4b5b5470544893cd515b88c751e92728341c6daa # main
+        with:
+          runner: ${{ vars.MACOS_RUNNER }}
+          value: '["macos-26"]'
+
   rust:
     if: github.event_name != 'pull_request' || !github.event.pull_request.draft
     permissions:
@@ -36,8 +50,9 @@ jobs:
 
   macos:
     if: vars.MACOS_CI_DISABLED != 'true' && (github.event_name != 'pull_request' || !github.event.pull_request.draft)
-    # TEMP: self-hosted xcode-27-local until hosted xcode-27 exists (fork PRs keep the hosted label)
-    runs-on: ${{ (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && 'xcode-27-local' || 'macos-26' }}
+    needs: macos-runner
+    # MACOS_RUNNER (pyrlyn/ci macos-runner): unset/hosted = the hosted label, xcode-27-local = the dedicated Mac (fork PRs keep the hosted label)
+    runs-on: ${{ (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && fromJSON(needs.macos-runner.outputs.value)[0] || 'macos-26' }}
     timeout-minutes: 45
     permissions:
       contents: read
