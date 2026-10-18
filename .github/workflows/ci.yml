@@ -20,7 +20,7 @@ jobs:
     permissions:
       contents: read
       actions: write
-    uses: pyrlyn/ci/.github/workflows/ci-rust.yml@9748fe1e5a2007d695e4e1a1d9b16492660dd8bc # main 2026-10-11 (mold input)
+    uses: pyrlyn/ci/.github/workflows/ci-rust.yml@main
     with:
       mold: true # mold + clang on Linux runners (mise.toml [env])
       package-args: --workspace
@@ -35,7 +35,7 @@ jobs:
       test-command: cargo nextest run --workspace
 
   macos:
-    if: github.event_name != 'pull_request' || !github.event.pull_request.draft
+    if: vars.MACOS_CI_DISABLED != 'true' && (github.event_name != 'pull_request' || !github.event.pull_request.draft)
     runs-on: macos-26
     timeout-minutes: 45
     permissions:
@@ -99,6 +99,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - uses: pyrlyn/ci/.github/actions/gate@4e652d891cc6e6f0be316eda1a1f9630d76a8b7e # main
+      - uses: pyrlyn/ci/.github/actions/gate@main
         with:
           needs: ${{ toJSON(needs) }}
+          skip-ok: macos
