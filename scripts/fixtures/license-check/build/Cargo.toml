@@ -1,0 +1,10 @@
+[package]
+name = "slintx-build"
+version = "0.0.0"
+edition = "2024"
+publish = false
+
+[workspace]
+
+[build-dependencies]
+slint-build = { path = "../stubs/slint-build" }

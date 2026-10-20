@@ -1,0 +1,10 @@
+[package]
+name = "slintx-wgpu"
+version = "0.0.0"
+edition = "2024"
+publish = false
+
+[workspace]
+
+[dependencies]
+i-slint-core = { path = "../stubs/i-slint-core" }
