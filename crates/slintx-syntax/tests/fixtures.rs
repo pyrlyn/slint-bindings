@@ -178,6 +178,9 @@ fn nodes_start_and_end_at_significant_tokens() {
     }
 }
 
+/// Native only: it lists the fixture directory, and wasm32-unknown-unknown
+/// has no filesystem. The lists it guards are the same on every target, so
+/// one native run is enough; the fixtures themselves run on wasm32 too.
 #[cfg(not(target_arch = "wasm32"))]
 #[test]
 fn every_fixture_file_is_listed() {
