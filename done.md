@@ -107,6 +107,55 @@ chain and calls `SetSwapChain` on the UI thread. `CompositionScaleChanged`
 resizes it. A failed COM query or adapter keeps the `WriteableBitmap` path.
 The window was not launched, and the frame-time checkpoint was not measured.
 
+### T72. slintx-wgpu: our own Slint renderer on wgpu
+
+The GPU path draws through FemtoVG (`renderer-femtovg-wgpu`), which is Slint's
+renderer code. Replace it with our own renderer, written from scratch on wgpu:
+the build must not contain Slint's GPU renderers (`i-slint-renderer-femtovg`,
+`i-slint-renderer-skia`), and no code is copied from them. Done when
+`crates/slintx-wgpu` draws Slint scenes, tests compare its frames with the
+software renderer's (the original) within a tolerance, the core's GPU host uses
+it, and `cargo tree` shows no FemtoVG or Skia renderer.
+
+Execution:
+
+1. `crates/slintx-wgpu`: `WgpuRenderer` implements `i_slint_core`'s
+   `RendererSealed` (text measuring through the default `sharedparley` methods
+   and a `TextLayoutCache`) and, per frame, `ItemRenderer` + `GlyphRenderer`.
+   Items become a display list of primitives in physical pixels: rounded
+   rectangles and border rings (SDF), box shadows (Gaussian SDF), images and
+   nine-slices (`graphics::fit`, `fit9slice`), glyphs (swash masks in an R8
+   atlas), paths (lyon tessellation). Brushes: solid, linear, radial, conic
+   (a gradient ramp texture). Clips: an intersected rectangle plus the latest
+   corner radii. Opacity multiplies into every primitive. One WGSL pipeline,
+   4× MSAA, premultiplied blending in sRGB-encoded space like the software
+   renderer. `render_to_texture` draws into a caller's texture;
+   `take_snapshot` reads an offscreen frame back.
+   Not in the first cut: rotation and scale transforms
+   (`supports_transformations` is false, as in the software renderer) and
+   layers (children of `Opacity` are faded one by one).
+2. Tests (`crates/slintx-wgpu/tests`): scenes built with `slint!` (rectangles,
+   borders, radii, gradients, clips, shadows, text, images, paths, opacity)
+   and the demo form, each drawn by the software renderer and by slintx-wgpu
+   through `slint_embed`'s platform, compared with `Window::take_snapshot`.
+   The comparison passes when the share of pixels whose largest channel
+   difference exceeds a threshold stays under a budget; a failure writes the
+   two frames and a diff PNG under `target/tmp/slintx-wgpu/`. No GPU adapter is a
+   skip, as in `gpu_smoke.rs`.
+3. `slint-bindings-core/src/gpu.rs` switches to `WgpuRenderer`; the
+   `renderer-femtovg-wgpu` and `unstable-wgpu-30` features go away;
+   `just renderer-check` (part of `just check`) fails when `cargo tree` finds
+   `i-slint-renderer-femtovg` or `i-slint-renderer-skia`.
+4. `toolchain.md`, `README.md`, `AGENTS.md`; `just check` passes.
+
+Found while comparing: Slint 1.18's software renderer draws no box shadows,
+ignores clip radii and samples images nearest-neighbour from the pixel's left
+edge. Shadows and rounded clips are checked against expected pixels instead,
+compared images are `pixelated`, and the image scene's budget covers the
+one-pixel shift of scaled texel edges. The workspace `rust.md` lists the new
+crates. `header-check` was not run (no cbindgen on that machine); the C ABI did
+not change.
+
 ### T19. Drop Intel macOS leftovers from the Flutter copy
 
 `flutter/` still listed Intel targets after the workspace dropped Intel macOS:

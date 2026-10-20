@@ -33,11 +33,19 @@ If an `AGENTS.md` or `CLAUDE.md` exists higher in the tree, follow it too; on co
   `flutter/packages/slint_build/interpreter` (`slint-dart-interpreter`: compile and the
   JSON value bridge); `slint-bindings-core::runtime` only adapts it to the hosts.
 
+- **No Slint GPU renderer in the build.** The GPU path draws with `crates/slintx-wgpu`,
+  written here from scratch. `i-slint-renderer-femtovg` and `i-slint-renderer-skia` must
+  not enter the dependency graph on any shipped target, and none of their code is copied;
+  `just renderer-check` fails if one does. The software renderer stays: it is the CPU
+  path and the reference the slintx-wgpu screenshot tests compare against
+  (`crates/slintx-wgpu/tests/compare.rs`). It draws no box shadows or rounded clips and
+  always samples images nearest-neighbour, so those are checked by expected pixels.
+
 ## Commands
 
 ```sh
 mise install
-just check        # fmt-check, clippy -D warnings, nextest, header-check, swift build, swift test
+just check        # fmt-check, renderer-check, clippy -D warnings, nextest, header-check, swift build, swift test
 just header       # regenerate swift/Sources/CSlintBindings/slint_bindings.h
 just swift-run    # demo app
 ```

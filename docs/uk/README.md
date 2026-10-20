@@ -8,7 +8,7 @@
 У Slint немає офіційної інтеграції зі Swift чи WinUI (див. [research.md](../../research.md)).
 Підтримуваний спосіб вбудовування — власна платформа (`slint::platform`); на ній і зібрано проєкт.
 
-**Статус:** M3. macOS показує кадр через `CAMetalLayer` (FemtoVG на Metal
+**Статус:** M3. macOS показує кадр через `CAMetalLayer` (slintx-wgpu на Metal
 у wgpu), WinUI — через `SwapChainPanel` (той самий рендерер на D3D12). Якщо
 адаптер або поверхня не створюються, хост повертається до CPU-буфера.
 Клавіатура, IME і DLL на кожен RID з M2 на місці. Поріг M3 за часом кадру
@@ -18,7 +18,7 @@
 
 | Шлях | Що це |
 | --- | --- |
-| `crates/slint-bindings-core` | Платформа Slint, якою керує хост: CPU-рендерер у RGBA-буфер викликача і FemtoVG на wgpu в поверхню хоста. Введення, таймери, демо-компонент. |
+| `crates/slint-bindings-core` | Платформа Slint, якою керує хост: CPU-рендерер у RGBA-буфер викликача і slintx-wgpu в поверхню хоста. Введення, таймери, демо-компонент. |
 | `crates/slint-bindings-ffi` | C ABI `sb_*` поверх ядра (статична бібліотека для Swift, DLL для WinUI). Лише пересилає виклики. |
 | `flutter/` | Копія [slint_dart](https://github.com/listepo/slint_dart). Крейт `slint-embed` (`flutter/packages/slint/rust/embed`) — спільна програмна платформа, карта подій Dart FFI і перевірка UI-потоку. |
 | `swift/` | Пакунок SwiftPM: `CSlintBindings` (модуль C над згенерованим заголовком), `SlintBindings` (`SlintHost`, `SlintNSView`, `SlintDemoView`), застосунок `SlintDemo`. |
@@ -31,7 +31,7 @@ SwiftUI / AppKit ─┐                       ┌─ WinUI 3 (C#)
   SlintHost       │         │             │
                   │   slint-bindings-core │
                   │   CPU-буфер або       │
-                  │   FemtoVG на wgpu     │
+                  │   slintx-wgpu         │
 ```
 
 ## Як виходить кадр
