@@ -178,30 +178,12 @@ fn nodes_start_and_end_at_significant_tokens() {
     }
 }
 
-/// Native only: it lists the fixture directory, and wasm32-unknown-unknown
-/// has no filesystem. The lists it guards are the same on every target, so
-/// one native run is enough; the fixtures themselves run on wasm32 too.
-#[cfg(not(target_arch = "wasm32"))]
+/// `build.rs` lists the fixture files, so this also runs on wasm32.
 #[test]
 fn every_fixture_file_is_listed() {
-    let dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures");
-    let names = |dir: std::path::PathBuf| -> Vec<String> {
-        let mut names: Vec<String> = std::fs::read_dir(dir)
-            .into_iter()
-            .flatten()
-            .flatten()
-            .filter_map(|e| {
-                e.file_name()
-                    .to_str()?
-                    .strip_suffix(".slint")
-                    .map(str::to_owned)
-            })
-            .collect();
-        names.sort();
-        names
-    };
+    let listed = |names: &[&str]| names.join(" ");
     let valid: Vec<&str> = VALID.iter().map(|(n, _)| *n).collect();
     let broken: Vec<&str> = BROKEN.iter().map(|(n, _, _)| *n).collect();
-    assert_eq!(names(dir.join("")), valid);
-    assert_eq!(names(dir.join("errors")), broken);
+    assert_eq!(env!("SLINTX_SYNTAX_FIXTURES"), listed(&valid));
+    assert_eq!(env!("SLINTX_SYNTAX_ERROR_FIXTURES"), listed(&broken));
 }
