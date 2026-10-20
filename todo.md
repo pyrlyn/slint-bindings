@@ -5,3 +5,19 @@
 - T14. Accessibility spike
 - T15. iOS host
 - T17. Web build
+- T73. slintx-syntax: a standalone AST parser
+- T74. slintx-conformance: differential harness against Slint
+- T75. Modules, imports and exports
+- T76. Name resolution
+- T77. Type checker
+- T78. Lowering to an IR
+- T79. Expression evaluator
+- T80. Reactive property runtime
+- T81. Component instances and public API
+- T82. Layout engine
+- T83. slintx-wgpu without i-slint-core
+- T84. Visual items on slintx-wgpu
+- T85. wasm32 build (slintx-web)
+- T86. Input and interactive items
+- T87. std-widgets
+- T88. Hosts on slintx
