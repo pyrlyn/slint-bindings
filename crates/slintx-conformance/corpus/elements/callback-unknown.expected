@@ -1,0 +1,2 @@
+verdict: reject
+error callback-unknown.slint:3:17: 'double-tapped' is not a callback in TouchArea

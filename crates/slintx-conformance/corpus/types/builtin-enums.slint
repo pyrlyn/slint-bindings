@@ -1,0 +1,10 @@
+// property-types/builtin-enums: built-in enum values and element defaults.
+// OPEN O28: per-property enum defaults.
+export component Main inherits Window {
+    property <TextWrap> w;
+    property <ImageFit> f;
+    property <FlexboxLayoutWrap> fw;
+    property <EventResult> r: EventResult.accept;
+    t := Text {}
+    property <bool> same: t.wrap == w;
+}

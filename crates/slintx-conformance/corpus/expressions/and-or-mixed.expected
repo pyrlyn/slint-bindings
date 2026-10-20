@@ -1,0 +1,2 @@
+verdict: reject
+error and-or-mixed.slint:3:38: Use parentheses to disambiguate between && and ||

@@ -1,0 +1,2 @@
+verdict: reject
+error impure-in-binding.slint:5:23: Call of impure function 'bump'

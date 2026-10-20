@@ -1,0 +1,8 @@
+// language/structs-and-enums: field defaults (new in 1.18).
+export struct Player {
+    name: string = "unknown",
+    score: int = 100,
+}
+export component Main inherits Window {
+    property <Player> p: { name: "Foo" };
+}

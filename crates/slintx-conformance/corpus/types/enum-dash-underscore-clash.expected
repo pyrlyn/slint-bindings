@@ -1,0 +1,2 @@
+verdict: reject
+error enum-dash-underscore-clash.slint:2:15: Duplicated enum value 'a-b'

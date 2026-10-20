@@ -1,0 +1,7 @@
+// language/two-way-bindings: links that form a cycle.
+// OPEN O39: cycles through `<=>`.
+export component Main inherits Window {
+    property <int> a <=> b;
+    property <int> b <=> c;
+    property <int> c <=> a;
+}

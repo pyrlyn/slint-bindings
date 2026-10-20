@@ -1,0 +1,3 @@
+verdict: reject
+error component-recursive.slint:3:5: Unknown element 'Loop'
+warning component-recursive.slint:2:1: Component is neither used nor exported

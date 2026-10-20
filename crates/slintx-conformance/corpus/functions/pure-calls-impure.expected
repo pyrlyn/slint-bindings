@@ -1,0 +1,2 @@
+verdict: reject
+error pure-calls-impure.slint:5:32: Call of impure function 'bump'

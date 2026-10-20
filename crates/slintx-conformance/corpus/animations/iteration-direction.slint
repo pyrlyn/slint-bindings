@@ -1,0 +1,12 @@
+// language/animations: `iteration-count`, `direction` and `delay` together.
+// OPEN O57: sampling, reverse with delay, zero iterations.
+export component Main inherits Window {
+    in property <bool> on;
+    Rectangle {
+        x: on ? 100px : 0px;
+        animate x { duration: 1s; delay: 100ms; direction: reverse; iteration-count: 0; }
+    }
+    in-out property <angle> turn: on ? 350deg : 10deg;
+    in-out property <color> tint: on ? red : blue;
+    animate turn, tint { duration: 1s; direction: alternate; iteration-count: -1; }
+}

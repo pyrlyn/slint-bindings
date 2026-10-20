@@ -1,0 +1,5 @@
+// language/bindings: a property bound to itself.
+// OPEN O35: binding loops.
+export component Main inherits Window {
+    property <int> a: a + 1;
+}

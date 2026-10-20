@@ -1,0 +1,2 @@
+verdict: accept
+warning types.slint:5:79: Properties of type easing are not supported yet for public API. The property will not be exposed

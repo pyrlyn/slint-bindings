@@ -1,0 +1,2 @@
+verdict: reject
+error enum-value-unknown.slint:3:24: Unknown unqualified identifier 'sideways'

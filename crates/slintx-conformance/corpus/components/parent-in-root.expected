@@ -1,0 +1,3 @@
+verdict: reject
+error parent-in-root.slint:4:12: Cannot access id 'parent'
+error parent-in-root.slint:4:12: Cannot convert float to length. Use an unit, or multiply by 1px to convert explicitly

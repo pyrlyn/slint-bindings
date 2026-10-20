@@ -1,0 +1,6 @@
+// property-types/colors-and-brushes: linear, radial and conic gradients.
+export component Main inherits Window {
+    Rectangle { background: @linear-gradient(45deg, #f00 0%, #00f 100%); }
+    Rectangle { background: @radial-gradient(circle, red 0%, blue 50%, green 100%); }
+    Rectangle { background: @conic-gradient(red 0deg, blue 180deg, red 360deg); }
+}

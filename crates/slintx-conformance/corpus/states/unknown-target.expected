@@ -1,0 +1,2 @@
+verdict: reject
+error unknown-target.slint:5:27: 'nothing' is not a valid element id

@@ -1,0 +1,2 @@
+verdict: reject
+error logical-position.slint:4:15: Unknown type 'LogicalPosition'

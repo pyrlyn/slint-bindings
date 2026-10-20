@@ -1,0 +1,2 @@
+verdict: reject
+error color-literal-bad.slint:3:25: Invalid color literal

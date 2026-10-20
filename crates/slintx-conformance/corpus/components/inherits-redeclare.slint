@@ -1,0 +1,11 @@
+// language/properties: redeclaring an inherited property.
+// OPEN O31: inheritance rules.
+component Base inherits Rectangle {
+    in property <int> size: 1;
+}
+component Derived inherits Base {
+    in property <int> size: 2;
+}
+export component Main inherits Window {
+    Derived {}
+}

@@ -1,0 +1,9 @@
+// language/states-and-transitions: a state setting a root property without an id.
+// OPEN O32: `self`, `parent`, `root` in state bodies.
+export component Main inherits Window {
+    in property <bool> active;
+    out property <int> n;
+    states [
+        on when active: { n: 1; root.background: red; }
+    ]
+}

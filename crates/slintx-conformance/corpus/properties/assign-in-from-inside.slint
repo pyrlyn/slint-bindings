@@ -1,0 +1,10 @@
+// language/properties: assigning an `in` property inside its own component.
+// OPEN O34: who may assign `in`, `out` and private properties.
+export component Main inherits Window {
+    in property <int> input;
+    out property <int> output;
+    property <int> hidden;
+    TouchArea {
+        clicked => { output = 1; hidden = 2; input = 3; }
+    }
+}

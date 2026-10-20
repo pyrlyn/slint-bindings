@@ -1,0 +1,6 @@
+// property-types/arrays-and-models: a float index.
+// OPEN O22: truncate, round or reject.
+export component Main inherits Window {
+    property <[int]> a: [1, 2, 3];
+    out property <int> v: a[1.7];
+}

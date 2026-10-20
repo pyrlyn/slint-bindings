@@ -1,0 +1,6 @@
+// language/operators: precedence and parentheses.
+export component Main inherits Window {
+    property <int> a: 1 + 2 * 3 - -4 / 2;
+    property <bool> b: !(1 < 2) || (3 >= 2 && true);
+    property <int> c: true ? 1 : false ? 2 : 3;
+}

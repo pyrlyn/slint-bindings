@@ -1,0 +1,2 @@
+verdict: reject
+error missing-file.slint:2:22: Cannot find requested import "no-such-file.slint" in the include search path

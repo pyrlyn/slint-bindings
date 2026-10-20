@@ -1,0 +1,7 @@
+// language/repetition-and-conditional-elements: replacing and editing a model.
+// OPEN O46, O60: re-instantiation; model change notification.
+export component Main inherits Window {
+    in-out property <[int]> items: [1, 2, 3];
+    for v in items: Rectangle { init => { debug(v); } }
+    TouchArea { clicked => { items[0] = 9; items.push(4); items = [7]; } }
+}

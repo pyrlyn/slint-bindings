@@ -1,0 +1,11 @@
+// property-types/strings: string properties and methods.
+export component Main inherits Window {
+    property <string> s: "Tschüß";
+    property <bool> e: s.is-empty;
+    property <int> n: s.character-count;
+    property <string> u: s.to-uppercase() + s.to-lowercase();
+    property <bool> w: s.starts-with("T") && s.ends-with("ß");
+    property <float> f: "1.5".to-float();
+    property <bool> fl: "x".is-float();
+    property <string> r: "abc".replace-all("", "-");
+}

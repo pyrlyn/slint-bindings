@@ -1,0 +1,2 @@
+verdict: reject
+error read-private-from-outside.slint:7:28: The property 'hidden' is private. Annotate it with 'in', 'out' or 'in-out' to make it accessible from other components

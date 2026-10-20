@@ -1,0 +1,2 @@
+verdict: accept
+warning image.slint:3:76: The property 'rotation-angle' has been deprecated. Please use 'transform-rotation' instead

@@ -1,0 +1,6 @@
+// language/callbacks: naming arguments at the call site.
+// OPEN O21: call-site named arguments.
+export component Main inherits Window {
+    callback move(dx: length, dy: length);
+    TouchArea { clicked => { move(dx: 1px, dy: 2px); } }
+}

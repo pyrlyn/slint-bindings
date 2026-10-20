@@ -1,0 +1,6 @@
+// property-types/numeric-types: a bare `0` where a length is expected.
+// OPEN O50: does `0` convert to a length.
+export component Main inherits Window {
+    property <length> l: 0;
+    Rectangle { x: 0; }
+}

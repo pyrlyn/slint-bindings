@@ -1,0 +1,11 @@
+// language/properties: rebinding an inherited property in a derived component.
+// OPEN O31: inheritance rules.
+component Base inherits Rectangle {
+    in property <int> size: 1;
+}
+component Derived inherits Base {
+    size: 2;
+}
+export component Main inherits Window {
+    Derived { size: 3; }
+}

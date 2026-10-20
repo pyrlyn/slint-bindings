@@ -1,0 +1,10 @@
+// language/container-components: `@children` places the use-site children.
+component Frame inherits Rectangle {
+    VerticalLayout {
+        Text { text: "head"; }
+        @children
+    }
+}
+export component Main inherits Window {
+    Frame { Text { text: "body"; } }
+}

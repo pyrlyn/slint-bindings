@@ -1,0 +1,2 @@
+verdict: reject
+error unknown-type.slint:3:15: Unknown type 'nothing'

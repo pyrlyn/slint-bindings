@@ -1,0 +1,6 @@
+// language/bindings: a binding re-evaluates when what it reads changes.
+export component Main inherits Window {
+    in property <int> a: 2;
+    out property <int> b: a * 3;
+    out property <int> c: { let x = a + 1; x * 2 }
+}

@@ -1,0 +1,6 @@
+// language/structs-and-enums: a struct, a literal and field access.
+export struct Player { name: string, score: int }
+export component Main inherits Window {
+    property <Player> p: { name: "a", score: 3 };
+    out property <int> s: p.score;
+}

@@ -3664,6 +3664,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "slintx-conformance"
+version = "0.1.0"
+dependencies = [
+ "pollster",
+ "slint-interpreter",
+]
+
+[[package]]
 name = "slintx-syntax"
 version = "0.1.0"
 dependencies = [

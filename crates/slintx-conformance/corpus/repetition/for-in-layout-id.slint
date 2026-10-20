@@ -1,0 +1,5 @@
+// language/repetition-and-conditional-elements: referring to an element id inside a `for` from outside.
+export component Main inherits Window {
+    for i in 2: inner := Rectangle {}
+    property <length> w: inner.width;
+}

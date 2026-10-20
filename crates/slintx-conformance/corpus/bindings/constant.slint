@@ -1,0 +1,6 @@
+// language/evaluation-and-purity: a binding that reads no property.
+// OPEN O36: constant folding.
+export component Main inherits Window {
+    out property <int> c: 2 * 3 + 4;
+    out property <string> s: "a" + 1;
+}

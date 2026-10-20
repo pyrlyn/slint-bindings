@@ -1,0 +1,6 @@
+// language/properties: `changed` handlers.
+export component Main inherits Window {
+    in property <int> a;
+    out property <int> seen;
+    changed a => { seen = a; }
+}

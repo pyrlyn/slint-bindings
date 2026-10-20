@@ -1,0 +1,2 @@
+verdict: accept
+warning main.slint:4:10: Exported component 'Card' doesn't inherit Window. No code will be generated for it

@@ -1,0 +1,11 @@
+// language/functions: a derived component declaring a function of its base.
+// OPEN O31: what is shadowable.
+component Base inherits Rectangle {
+    function f() {}
+}
+component Derived inherits Base {
+    function f() {}
+}
+export component Main inherits Window {
+    Derived {}
+}

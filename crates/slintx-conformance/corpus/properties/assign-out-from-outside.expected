@@ -1,0 +1,2 @@
+verdict: reject
+error assign-out-from-outside.slint:8:30: Assignment on an 'out' property

@@ -1,0 +1,2 @@
+verdict: reject
+error set-out-from-outside.slint:6:12: Cannot assign to 'out' property 'output'
