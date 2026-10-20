@@ -88,6 +88,29 @@ longer swizzles. `just windows-dll` (and the ARM64 triple) produces the DLL.
 `runtimes/<rid>/native`. `just pinvoke-check` fails if `NativeMethods.cs` and
 the header disagree on `sb_*` names. Marshalling stays hand-written.
 
+### T5. CI
+
+GitHub Actions: `macos-26` (arm64) runs `just check`; `windows-latest` runs
+`cargo build -p slint-bindings-ffi`, `cargo nextest run` and
+`dotnet build windows/SlintDemo.WinUI`. Use the shared workflows from
+`pyrlyn/ci` where they fit. Done when both jobs are required checks on `main`.
+
+Result: `.github/workflows/ci.yml` already covered the card, so nothing in it
+changed. Checked on the green `main` run for `9c1b353` (run 39153182955):
+
+- `macos`: `just check` after `cargo install cbindgen` (`header-check`). The
+  runner comes from pyrlyn/ci's `macos-runner` action: `MACOS_RUNNER` unset or
+  `hosted` gives `macos-26`; it is set to the self-hosted `xcode-27-local` for
+  now. `just renderer-check` from PR #32 needs no extra tool.
+- `windows-host`: `just windows-dll` (`cargo rustc -p slint-bindings-ffi
+  --crate-type cdylib`), the C# host tests, then `dotnet build
+  windows/SlintDemo.WinUI` and a WinUI window smoke run.
+- `rust / x86_64-pc-windows-msvc` (pyrlyn/ci `ci-rust.yml`): `cargo nextest run
+  --workspace` on `windows-latest`, 60 tests passed.
+- Required checks: the `protect-main` ruleset requires `gate`, which needs
+  `rust`, `macos` and `windows-host` and fails if any of them fails or is
+  cancelled. The one allowed skip is `macos` under `MACOS_CI_DISABLED=true`.
+
 ### T7. GPU path on macOS (M3)
 
 FemtoVG renders on wgpu's Metal backend into a `CAMetalLayer` sublayer of

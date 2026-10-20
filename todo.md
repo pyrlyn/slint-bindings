@@ -1,4 +1,3 @@
-- T5. CI
 - T9. Packaging (M4)
 - T10. Multiple hosts and popups
 - T13. Typed host APIs
