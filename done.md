@@ -227,6 +227,39 @@ WinUI code without running any of it.
   (`WindowsAppSDKSelfContained`), the smoke run, and the capture as the
   `weft-winui` artifact.
 
+### T10. Multiple hosts and popups
+
+`slint::platform::set_platform` is once per thread, and each component gets its
+own `MinimalSoftwareWindow`. Verify two `SlintNSView`s in one window and two
+windows; make Slint `PopupWindow` and menus render inside the host view (no
+native child windows) and clip correctly. Done with a demo showing two views
+and a combo-box popup in each.
+
+Execution: Slint 1.18 renders a popup as a child window inside its parent's
+buffer when the window adapter cannot make one of its own, which
+`MinimalSoftwareWindow` cannot, so no native windows appear. CPU path only.
+1. Fixture `crates/slint-bindings-core/ui/popups.slint`: a `ComboBox` near the
+   top, one near the bottom edge (its popup must stay inside the view) and a
+   `ContextMenuArea`, with `out` properties for what was picked.
+2. Core (`host.rs`): `focus_changed(false)` closes the view's auto-close popups.
+   Slint closes them on a click elsewhere in the same window only; a click in
+   another host view or in SwiftUI never reaches it.
+3. Core tests: two hosts on one thread stay independent; a popup draws into
+   its host's buffer and no window adapter is created; the bottom popup fits
+   inside the frame; closing it restores the frame pixel for pixel (partial
+   repaint); focus loss closes it; the context menu draws inline.
+4. Swift tests: two `SlintNSView`s in one `NSWindow` and one in each of two
+   windows; opening a popup adds no `NSWindow`.
+5. Demo: a second window with two CPU `SlintView`s of `popups.slint`.
+Verify with `just check` and `just swift-run`.
+
+Result: no native windows needed fixing; Slint 1.18 already draws every popup
+inside the host's buffer and places it inside the view. The one change is in
+`EmbeddedHost::focus_changed`: losing focus closes the view's auto-close
+popups. `GpuHost::focus_changed` still needs the same `close_auto_popups` call
+once the GPU path is replaced (T72). The demo opens a second window,
+"Slint popups", with two CPU views.
+
 ### T12. Weft → Slint renderer (dropped)
 
 Dropped, not done. It would have built `slint-bindings-weft`, a second Weft →
