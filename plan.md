@@ -40,7 +40,7 @@ Not added: `slint_embed::events` is used only by slint_dart and stays there; `i-
 | # | Status | Priority | Complexity | Readiness | Agent |
 | --- | --- | --- | --- | --- | --- |
 | T4 | done | P1 | 3 | 100% | cursor |
-| T5 | todo | P1 | 2 | 0% | |
+| T5 | in progress | P1 | 2 | 80% | Claude / opus-5.5 |
 | T6 | done | P1 | 3 | 100% | cursor |
 | T7 | done | P1 | 4 | 100% | cursor |
 | T8 | done | P1 | 5 | 100% | cursor |
@@ -97,6 +97,12 @@ GitHub Actions: `macos-26` (arm64) runs `just check`; `windows-latest` runs
 `cargo build -p slint-bindings-ffi`, `cargo nextest run` and
 `dotnet build windows/SlintDemo.WinUI`. Use the shared workflows from
 `pyrlyn/ci` where they fit. Done when both jobs are required checks on `main`.
+
+Execution: audit `.github/workflows/ci.yml` against this card, since most of it
+is already there. Check each item on the last green `main` run (macOS
+`just check` with cbindgen, Windows DLL, Windows nextest, WinUI build) and the
+`protect-main` ruleset (required checks). Add only what is missing; close the
+task in `done.md` with what each card item maps to.
 
 ### T6. WinUI host builds and runs (M2)
 
