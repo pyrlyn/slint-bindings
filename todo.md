@@ -6,6 +6,8 @@
 - T15. iOS host
 - T17. Web build
 - T73. slintx-syntax: a standalone AST parser
+- T73.1. slintx-syntax crate: lexer, lossless tree, parser, typed AST
+- T73.2. Licence gate and wasm32 build for slintx crates
 - T74. slintx-conformance: differential harness against Slint
 - T75. Modules, imports and exports
 - T76. Name resolution

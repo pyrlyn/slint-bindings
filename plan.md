@@ -50,8 +50,10 @@ Not added: `slint_embed::events` is used only by slint_dart and stays there; `i-
 | T14 | todo | P2 | 5 | 0% | |
 | T15 | todo | P3 | 3 | 0% | |
 | T17 | todo | P3 | 3 | 0% | |
-| T73 | todo | P0 | 4 | 0% | |
-| T74 | todo | P0 | 3 | 0% | |
+| T73 | in progress | P0 | 4 | 0% | Claude / opus-5.5 |
+| T73.1 | in progress | P0 | 4 | 0% | Claude / opus-5.5 |
+| T73.2 | in progress | P0 | 2 | 0% | Claude / opus-5.5 |
+| T74 | in progress | P0 | 3 | 0% | Claude / opus-5.5 |
 | T75 | todo | P1 | 3 | 0% | |
 | T76 | todo | P1 | 3 | 0% | |
 | T77 | todo | P1 | 5 | 0% | |
@@ -237,6 +239,30 @@ when round-trip tests (tree printed back equals the input, byte for byte) and
 span tests pass on the fixture corpus, broken inputs produce a tree plus
 diagnostics, and the crate builds and its tests run for `wasm32-unknown-unknown`
 on its own.
+
+Execution: split so that parallel sessions touch different files. T73.1 is
+the crate; T73.2 is the gate and the wasm32 build around it. T73 closes when
+both are on `main` and the parser round-trips the T74 corpus.
+
+### T73.1. slintx-syntax crate: lexer, lossless tree, parser, typed AST
+
+`crates/slintx-syntax`: syntax kinds, a hand-written lexer (nested block
+comments, `-` in identifiers, unit suffixes, string interpolation), a rowan
+tree built by a recursive-descent parser with error recovery, typed AST views,
+and diagnostics with byte spans. Own fixtures under
+`crates/slintx-syntax/tests/fixtures/`. Done when round-trip, span and
+error-recovery tests pass on those fixtures and the crate has no dependency on
+`slint`, `slint-*` or `i-slint-*`.
+
+### T73.2. Licence gate and wasm32 build for slintx crates
+
+`justfile`, CI and `toolchain.md` only: a `license-check` recipe in `just
+check` that fails when `slint`, `slint-*` or `i-slint-*` appears in the normal
+(non-dev) dependency graph of any workspace crate named `slintx-*`, proven by a
+test against a throwaway crate that depends on one; and a `wasm-check` recipe
+plus CI job that builds every `slintx-*` crate for `wasm32-unknown-unknown`
+and runs its tests there. Done when both recipes run in CI and pass with no
+`slintx-*` crate yet and with T73.1's crate once it lands.
 
 ### T74. slintx-conformance: differential harness against Slint
 
