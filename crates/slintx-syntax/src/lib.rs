@@ -3,8 +3,10 @@
 //! [`parse`] turns `.slint` source into a lossless [rowan] tree plus
 //! diagnostics. The tree keeps every byte, whitespace and comments included,
 //! so printing it gives back the input; broken input still yields a full tree,
-//! with error nodes where the parser recovered.
+//! with error nodes where the parser recovered. [`ast`] has typed views over
+//! that tree.
 
+pub mod ast;
 mod grammar;
 mod kind;
 mod lexer;
@@ -63,6 +65,12 @@ impl Parse {
 
     pub fn diagnostics(&self) -> &[Diagnostic] {
         &self.diagnostics
+    }
+
+    /// The root as a typed view: [`ast::File`] after [`parse`],
+    /// [`ast::BindingExpression`] after [`parse_binding_expression`].
+    pub fn tree<N: ast::AstNode>(&self) -> Option<N> {
+        N::cast(self.syntax())
     }
 }
 
