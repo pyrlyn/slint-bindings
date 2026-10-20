@@ -47,7 +47,7 @@ Not added: `slint_embed::events` is used only by slint_dart and stays there; `i-
 | T9 | todo | P2 | 3 | 0% | |
 | T10 | todo | P2 | 3 | 0% | |
 | T13 | todo | P2 | 4 | 0% | |
-| T14 | in progress | P2 | 5 | 10% | Claude / opus-5.5 |
+| T14 | in progress | P2 | 5 | 90% | Claude / opus-5.5 |
 | T15 | todo | P3 | 3 | 0% | |
 | T17 | todo | P3 | 3 | 0% | |
 
@@ -200,8 +200,9 @@ properties, `WindowInner` focus and popups) and how `i-slint-backend-winit`'s
    `sb_tick` the way the winit backend does. Platform-neutral, tested with
    nextest on the demo form (tree shape, labels, focus, a click and a
    set-value action reaching the component).
-2. macOS: `accesskit_macos::SubclassingAdapter` on the host's `NSView`, pushed
-   from the host after each render; `sb_host_accessibility_attach` in the FFI
+2. macOS: `accesskit_macos::Adapter` behind the host's `NSView` (the view
+   forwards `accessibilityChildren`, `accessibilityFocusedUIElement` and
+   `accessibilityHitTest:`), pushed from the host after each render; `sb_host_accessibility_attach` in the FFI
    (header regenerated, `NativeMethods.cs` stub), `SlintNSView` attaches.
    Swift test walks `accessibilityChildren()` of the view and finds the
    form's text field and button.
@@ -209,6 +210,32 @@ properties, `WindowInner` focus and popups) and how `i-slint-backend-winit`'s
    VoiceOver, through the AX API); record the steps and the result.
 4. Recommendation (AccessKit per host vs native mirror tree, Windows plan) in
    this card, then `done.md`. Slint's winit backend stays out of the build.
+
+Result: `slint-bindings-core::a11y` builds the AccessKit tree (6 nextest
+tests); `SlintNSView` serves it to VoiceOver through `accesskit_macos`
+(Swift suite `Accessibility`: the heading, the labelled field and the button
+are found with their frames, pressing and setting a value reach the
+component, focus follows Slint). Left: the creator listens to the demo with
+VoiceOver on (Cmd-F5, `just swift-run`, VO-arrows over "Sign in", "Name",
+"Continue"); the agent may not toggle VoiceOver and this environment blocks
+out-of-process AX queries. The code is about 790 lines over the 500-line task
+limit, committed as two commits (core tree; macOS bridge) for two PRs.
+
+Recommendation:
+
+- One platform-neutral AccessKit `TreeUpdate` builder in the core, shared by
+  every host.
+- macOS: `accesskit_macos::Adapter` behind the host view, as built here.
+- Windows (WinUI 3): not `accesskit_windows`, which answers `WM_GETOBJECT`
+  for the whole `HWND` and would hide XAML's own UIA tree. Instead a custom
+  `AutomationPeer` on `SlintPanel` (`OnCreateAutomationPeer`,
+  `GetChildrenCore`) mirroring the core tree through the C ABI (flat node
+  list plus an action call). A follow-up task, with Narrator as the check.
+- Known gaps: full rebuild per redrawn frame; no text runs, caret or
+  selection; structure changes seen only through redraws (Slint's
+  `WindowAdapterInternal` hooks are hidden); `accesskit_macos` panics if
+  AppKit asks for a frame while the view has no window; landmark roles map to
+  generic containers.
 
 ### T15. iOS host
 

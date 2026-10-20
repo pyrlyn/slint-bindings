@@ -20,6 +20,8 @@
 | slint-dart-interpreter | local (path, `flutter/packages/slint_build/interpreter`) | https://github.com/listepo/slint_dart | Shared compile helper and JSON value bridge for properties and callbacks |
 | i-slint-core | local | https://github.com/slint-ui/slint | Feature unification only: image and SVG decoding without a backend |
 | thiserror | local | https://github.com/dtolnay/thiserror | Core error enum |
+| accesskit | local | https://github.com/AccessKit/accesskit | Platform-neutral accessibility tree built from the Slint item tree (T14) |
+| accesskit_macos | local (macOS) | https://github.com/AccessKit/accesskit | VoiceOver adapter behind the host `NSView` (T14) |
 | png | local (dev) | https://github.com/image-rs/image-png | Encode and decode the demo frame snapshots |
 
 ## NuGet
