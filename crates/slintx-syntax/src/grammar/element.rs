@@ -1,5 +1,6 @@
 //! Element bodies: child elements, bindings and callback handlers.
 
+use super::decl::keyword_member;
 use super::expr::{binding_value, expr};
 use super::items::ITEM_KEYWORDS;
 use super::stmt::{code_block, expr_statement, qualified_name};
@@ -53,6 +54,7 @@ fn member(p: &mut Parser) {
         }
         (Some(K::Ident), Some(K::FatArrow)) => callback_connection(p),
         (Some(K::Ident), Some(K::LParen)) if is_connection(p) => callback_connection(p),
+        (Some(K::Ident), _) => keyword_member(p),
         (Some(K::Semicolon), _) => p.error_bump("unexpected `;`: no `;` is needed after `}`"),
         _ => recover_member(p),
     }

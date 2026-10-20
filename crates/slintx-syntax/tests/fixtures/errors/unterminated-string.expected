@@ -1,0 +1,4 @@
+items: Component
+39..56: unterminated string literal
+56..56: expected `;`
+56..56: expected `}`

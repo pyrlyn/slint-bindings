@@ -51,12 +51,12 @@ Not added: `slint_embed::events` is used only by slint_dart and stays there; `i-
 | T15 | todo | P3 | 3 | 0% | |
 | T17 | todo | P3 | 3 | 0% | |
 | T73 | in progress | P0 | 4 | 0% | Claude / opus-5.5 |
-| T73.1 | in progress | P0 | 4 | 70% | Claude / opus-5.5 |
+| T73.1 | in progress | P0 | 4 | 80% | Claude / opus-5.5 |
 | T73.1.1 | in progress | P0 | 3 | 100% | Claude / opus-5.5 |
 | T73.1.2 | in progress | P0 | 3 | 100% | Claude / opus-5.5 |
 | T73.1.3 | in progress | P0 | 3 | 100% | Claude / opus-5.5 |
 | T73.1.4 | in progress | P0 | 3 | 100% | Claude / opus-5.5 |
-| T73.1.5 | in progress | P0 | 3 | 0% | Claude / opus-5.5 |
+| T73.1.5 | in progress | P0 | 3 | 100% | Claude / opus-5.5 |
 | T73.1.6 | in progress | P0 | 2 | 0% | Claude / opus-5.5 |
 | T73.2 | in progress | P0 | 2 | 0% | Claude / opus-5.5 |
 | T74 | in progress | P0 | 3 | 0% | Claude / opus-5.5 |

@@ -1,5 +1,6 @@
 //! The Slint grammar, as recursive descent over [`Parser`].
 
+mod decl;
 mod element;
 mod expr;
 mod items;

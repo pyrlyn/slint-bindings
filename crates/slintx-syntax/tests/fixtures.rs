@@ -24,24 +24,49 @@ macro_rules! error_fixtures {
 }
 
 const VALID: &[(&str, &str)] = fixtures![
+    "animate",
+    "callbacks",
+    "changed",
     "children",
     "component",
+    "conditional",
     "empty",
     "enum",
     "exports",
+    "expressions",
+    "functions",
+    "global",
     "imports",
+    "lexical",
+    "macros",
+    "properties",
+    "repeater",
+    "statements",
+    "states",
+    "strings",
     "struct",
+    "types",
 ];
 
 const BROKEN: &[(&str, &str, &str)] = error_fixtures![
+    "bad-color",
+    "bad-escape",
     "bad-item",
     "bad-member",
+    "chained-comparison",
+    "interpolation",
     "let-colon-equal",
+    "missing-body",
     "missing-semicolon",
+    "mixed-logical",
     "stray-semicolon",
     "struct-semicolon",
+    "unbalanced",
     "unclosed-element",
+    "unexpected-characters",
+    "unknown-macro",
     "unterminated-comment",
+    "unterminated-string",
 ];
 
 /// Top-level item kinds, then one diagnostic per line: what an `.expected`
@@ -107,6 +132,21 @@ fn broken_fixtures_round_trip_with_expected_diagnostics() {
             "{name}: rerun with SLINTX_BLESS=1 to update"
         );
     }
+}
+
+/// Every construct has at least one fixture: together the valid fixtures
+/// contain every node kind except the error node.
+#[test]
+fn valid_fixtures_cover_every_node_kind() {
+    let mut seen = std::collections::BTreeSet::new();
+    for (_, source) in VALID {
+        seen.extend(parse(source).syntax().descendants().map(|n| n.kind()));
+    }
+    let missing: Vec<SyntaxKind> = (0..)
+        .map_while(SyntaxKind::from_raw)
+        .filter(|k| !k.is_token() && *k != SyntaxKind::ErrorNode && !seen.contains(k))
+        .collect();
+    assert!(missing.is_empty(), "no fixture contains {missing:?}");
 }
 
 /// Span test: trivia sits between nodes, never at a node's edge, so a node's
