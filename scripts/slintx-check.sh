@@ -22,10 +22,12 @@ manifest="${2:-Cargo.toml}"
 # Crates a check skips for now. Each entry names the task that removes it.
 # license: slintx-wgpu (T72) implements i-slint-core's renderer traits until T83.
 # wasm: slintx-wgpu's tests need a native GPU adapter; its wasm32 path comes with T85.
+# wasm: slintx-conformance (T74) is a native-only harness: a native Slint oracle and a corpus
+# read from disk. Not a removal task, it never ships for wasm32.
 # shellcheck disable=SC2034 # read through ${!list} in checked()
 exempt_license=" slintx-wgpu "
 # shellcheck disable=SC2034
-exempt_wasm=" slintx-wgpu "
+exempt_wasm=" slintx-wgpu slintx-conformance "
 
 # Prints the slintx-* crates the current mode does not skip.
 checked() {

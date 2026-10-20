@@ -274,7 +274,8 @@ Execution plan:
    Node, failing a crate with no wasm32 `wasm-bindgen-test` dev-dependency
    (the runner would pass it untested). No `slintx-*` crate: both print that
    and exit 0. `slintx-wgpu` (T72) is exempt from `license` until T83 and from
-   `wasm` until T85.
+   `wasm` until T85; `slintx-conformance` (T74, a native-only harness) from
+   `wasm` for good.
 2. `scripts/slintx-check-test.sh` with offline path-only fixture workspaces in
    `scripts/fixtures/license-check/` (stub crates named `slint`,
    `i-slint-core`, `slint-build`): none, clean (dev-only or non-slintx use) and
