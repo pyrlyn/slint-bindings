@@ -1,0 +1,2 @@
+verdict: reject
+error popup-as-root.slint:2:32: PopupWindow cannot be the top level

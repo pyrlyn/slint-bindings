@@ -1,0 +1,7 @@
+// language/states-and-transitions: a state setting a property of an unknown element.
+export component Main inherits Window {
+    in property <bool> active;
+    states [
+        on when active: { nothing.x: 10px; }
+    ]
+}

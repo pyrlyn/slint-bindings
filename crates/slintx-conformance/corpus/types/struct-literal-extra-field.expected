@@ -1,0 +1,2 @@
+verdict: accept
+warning struct-literal-extra-field.slint:4:21: Conversion to P ignores the extra field 'zzz'

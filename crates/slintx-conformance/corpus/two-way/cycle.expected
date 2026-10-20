@@ -1,0 +1,4 @@
+verdict: reject
+error cycle.slint:6:22: The binding for the property 'c' is part of a binding loop (root.a -> root.c -> root.b -> root.a)
+error cycle.slint:5:22: The binding for the property 'b' is part of a binding loop (root.a -> root.c -> root.b -> root.a)
+error cycle.slint:4:22: The binding for the property 'a' is part of a binding loop (root.a -> root.c -> root.b -> root.a)

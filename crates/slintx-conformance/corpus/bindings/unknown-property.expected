@@ -1,0 +1,2 @@
+verdict: reject
+error unknown-property.slint:3:17: Unknown property nothing in Rectangle

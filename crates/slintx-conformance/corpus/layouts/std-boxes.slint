@@ -1,0 +1,8 @@
+// std-widgets/layouts: VerticalBox, HorizontalBox and GridBox.
+import { VerticalBox, HorizontalBox, GridBox } from "std-widgets.slint";
+export component Main inherits Window {
+    VerticalBox {
+        HorizontalBox { Rectangle {} }
+        GridBox { Row { Rectangle {} } }
+    }
+}

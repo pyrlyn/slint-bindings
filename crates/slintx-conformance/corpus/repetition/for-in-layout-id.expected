@@ -1,0 +1,2 @@
+verdict: reject
+error for-in-layout-id.slint:4:26: Cannot access id 'inner'

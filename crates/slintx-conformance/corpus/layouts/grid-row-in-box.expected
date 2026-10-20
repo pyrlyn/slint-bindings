@@ -1,0 +1,2 @@
+verdict: reject
+error grid-row-in-box.slint:3:22: Row can only be within a GridLayout element

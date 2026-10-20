@@ -1,0 +1,2 @@
+verdict: reject
+error inherits-unknown.slint:2:32: Unknown element 'Nothing'

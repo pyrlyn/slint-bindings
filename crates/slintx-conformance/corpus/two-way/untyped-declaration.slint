@@ -1,0 +1,6 @@
+// language/two-way-bindings: `property x <=> y;` takes the type of y.
+export component Main inherits Window {
+    property <int> a: 1;
+    property b <=> a;
+    property <int> c: b + 1;
+}

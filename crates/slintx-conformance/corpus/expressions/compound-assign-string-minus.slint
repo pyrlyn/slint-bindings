@@ -1,0 +1,5 @@
+// language/statements: `-=` on a string.
+export component Main inherits Window {
+    in-out property <string> s;
+    TouchArea { clicked => { s -= "x"; } }
+}

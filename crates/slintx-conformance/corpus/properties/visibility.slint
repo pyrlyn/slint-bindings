@@ -1,0 +1,11 @@
+// language/properties: `in`, `out`, `in-out` and private.
+component Card inherits Rectangle {
+    in property <int> input: 1;
+    out property <int> output: input * 2;
+    in-out property <int> both;
+    property <int> hidden: 3;
+}
+export component Main inherits Window {
+    card := Card { input: 5; both: 6; }
+    property <int> seen: card.output + card.both;
+}

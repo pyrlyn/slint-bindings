@@ -1,0 +1,2 @@
+verdict: reject
+error cubic-bezier-arity.slint:3:37: Not enough arguments

@@ -1,0 +1,2 @@
+verdict: reject
+error for-in-root.slint:2:23: Expected '{' or keyword 'inherits'

@@ -1,0 +1,5 @@
+// language/callbacks: calling with an argument of the wrong type.
+export component Main inherits Window {
+    callback ping(int);
+    TouchArea { clicked => { ping("x"); } }
+}

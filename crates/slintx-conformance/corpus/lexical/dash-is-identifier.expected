@@ -1,0 +1,2 @@
+verdict: reject
+error dash-is-identifier.slint:6:23: Unknown unqualified identifier 'a-b'. Use space before the '-' if you meant a subtraction

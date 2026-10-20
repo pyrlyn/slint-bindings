@@ -1,0 +1,2 @@
+verdict: reject
+error inherits-redeclare.slint:7:23: Cannot override property 'size' declared in 'Base'

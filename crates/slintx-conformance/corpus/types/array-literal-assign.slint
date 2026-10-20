@@ -1,0 +1,5 @@
+// property-types/arrays-and-models: writing into an array literal.
+// OPEN O22: mutating a constant array.
+export component Main inherits Window {
+    TouchArea { clicked => { [1, 2][0] = 5; } }
+}

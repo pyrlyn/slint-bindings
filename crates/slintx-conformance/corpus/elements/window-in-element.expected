@@ -1,0 +1,2 @@
+verdict: accept
+warning window-in-element.slint:3:5: Window elements as children do not create separate windows (this may change in the future)\nConsider using a PopupWindow instead

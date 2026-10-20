@@ -1,0 +1,4 @@
+verdict: reject
+error identifier-leading-dash.slint:3:20: Syntax error: expected Identifier
+error identifier-leading-dash.slint:3:20: Syntax error: expected ';'
+error identifier-leading-dash.slint:3:20: Parse error

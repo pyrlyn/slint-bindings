@@ -1,0 +1,2 @@
+verdict: reject
+error main.slint:2:22: No exported type called 'Nope' found in "lib.slint"

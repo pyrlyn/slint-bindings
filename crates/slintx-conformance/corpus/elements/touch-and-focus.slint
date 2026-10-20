@@ -1,0 +1,11 @@
+// gestures/toucharea, keyboard-input/focusscope: input elements and their callbacks.
+export component Main inherits Window {
+    TouchArea {
+        clicked => {}
+        pointer-event(e) => { debug(e.kind); }
+        scroll-event(e) => { return accept; }
+    }
+    FocusScope {
+        key-pressed(e) => { return e.text == Key.Escape ? accept : reject; }
+    }
+}

@@ -53,7 +53,7 @@ Not added: `slint_embed::events` is used only by slint_dart and stays there; `i-
 | T73 | in progress | P0 | 4 | 0% | Claude / opus-5.5 |
 | T73.1 | in progress | P0 | 4 | 0% | Claude / opus-5.5 |
 | T73.2 | in progress | P0 | 2 | 0% | Claude / opus-5.5 |
-| T74 | in progress | P0 | 3 | 0% | Claude / opus-5.5 |
+| T74 | in progress | P0 | 3 | 60% | Claude / opus-5.5 |
 | T75 | todo | P1 | 3 | 0% | |
 | T76 | todo | P1 | 3 | 0% | |
 | T77 | todo | P1 | 5 | 0% | |
@@ -275,6 +275,31 @@ penpotx emitter outputs; every OPEN item in `research.md` §8.4 gets a case.
 Slint is the oracle only and never a dependency of a shipped crate. Done when
 the harness runs in `just check` with the parser-level comparison live and the
 later comparisons stubbed behind the stages that do not exist yet.
+
+Execution:
+
+1. `crates/slintx-conformance`, `publish = false`, no normal dependencies.
+   `slint-interpreter` (workspace pin) and `pollster` are dev-dependencies
+   for non-wasm targets only, so T73.2's gate (normal graph) needs no
+   exception and its wasm32 build sees a Slint-free crate with no tests.
+2. `corpus/<group>/*.slint`: one construct per file, valid and invalid, a
+   header comment naming the docs page and the `research.md` §8.4 OPEN item
+   it pins. A directory holding `main.slint` is one multi-file case.
+3. Each case has a checked-in `<name>.expected` beside it: Slint's verdict and
+   every diagnostic (level, file, line, column, message). Stage 1
+   (`tests/stage1_slint.rs`) compiles each case with Slint and fails on any
+   drift; `SLINTX_BLESS=1` rewrites the files. A small own format, not
+   `insta`, because later stages read the expectations back as data.
+4. Stage 2 (`tests/stage2_slintx.rs`): a `Frontend` trait in `src/lib.rs`,
+   stubbed until T73.1 lands; then every case Slint accepts must parse with
+   no syntax errors and round-trip byte for byte. Values, geometry and pixels
+   stay documented stubs.
+5. `just check` picks the tests up through `cargo nextest`; no recipe change.
+
+State: stage 1 is live on 229 cases in 16 groups; `corpus/OPEN.md` numbers
+the 60 OPEN items of §8.4.1 and §8.4.2 and a test checks each has a case.
+Left: plug `slintx-syntax` into stage 2 once T73.1 is on `main`, and add
+penpotx emitter outputs to the corpus.
 
 ### T75. Modules, imports and exports
 

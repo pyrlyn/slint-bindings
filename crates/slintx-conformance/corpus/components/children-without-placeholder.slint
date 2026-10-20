@@ -1,0 +1,7 @@
+// language/container-components: children given to a component with no `@children`.
+component Leaf inherits Rectangle {
+    Text {}
+}
+export component Main inherits Window {
+    Leaf { Rectangle {} }
+}

@@ -1,0 +1,3 @@
+verdict: reject
+error math-constants.slint:5:34: 'E' is not a member of the namespace Math
+error math-constants.slint:4:35: 'PI' is not a member of the namespace Math

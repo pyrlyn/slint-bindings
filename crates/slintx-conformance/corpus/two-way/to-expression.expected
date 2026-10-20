@@ -1,0 +1,2 @@
+verdict: reject
+error to-expression.slint:3:26: The expression in a two way binding must be a property reference

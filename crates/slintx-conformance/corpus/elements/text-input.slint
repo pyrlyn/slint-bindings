@@ -1,0 +1,8 @@
+// keyboard-input/textinput: TextInput with the 1.18 `input-method-hints`.
+export component Main inherits Window {
+    TextInput {
+        text: "x"; input-type: password; read-only: false;
+        input-method-hints: { capitalization: CapitalizationMode.none, auto-correct: false };
+        accepted => {}
+    }
+}

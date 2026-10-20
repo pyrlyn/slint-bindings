@@ -1,0 +1,6 @@
+// language/evaluation-and-purity: a pure callback used in a binding.
+export component Main inherits Window {
+    pure callback compute(int) -> int;
+    compute(x) => { x + 1 }
+    property <int> r: compute(1);
+}

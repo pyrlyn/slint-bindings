@@ -1,0 +1,9 @@
+// language/statements: `+=`, `-=`, `*=`, `/=` on strings, lengths and plain numbers.
+// OPEN O18: `-=`, `*=`, `/=` beyond length-like types.
+export component Main inherits Window {
+    in-out property <string> s;
+    in-out property <length> l;
+    in-out property <int> i;
+    in-out property <float> f;
+    TouchArea { clicked => { s += "x"; l -= 1px; l *= 2; i *= 3; i /= 2; f -= 0.5; } }
+}

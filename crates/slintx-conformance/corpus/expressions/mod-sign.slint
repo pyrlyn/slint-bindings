@@ -1,0 +1,7 @@
+// global-functions/math: `mod` with negative operands.
+// OPEN O14: Euclidean or truncated.
+export component Main inherits Window {
+    out property <int> a: mod(-7, 3);
+    out property <int> b: Math.mod(7, -3);
+    out property <float> c: (-7.5).mod(2);
+}

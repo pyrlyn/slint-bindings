@@ -1,0 +1,7 @@
+// language/properties: binding an `out` property at the use site.
+component Card inherits Rectangle {
+    out property <int> output: 1;
+}
+export component Main inherits Window {
+    Card { output: 2; }
+}

@@ -1,0 +1,2 @@
+verdict: reject
+error changed-unknown.slint:3:13: Property 'nothing' does not exist

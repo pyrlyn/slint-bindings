@@ -1,0 +1,2 @@
+verdict: reject
+error type-mismatch.slint:3:23: Cannot convert string to int

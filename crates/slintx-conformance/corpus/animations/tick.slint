@@ -1,0 +1,4 @@
+// global-functions/builtinfunctions: `animation-tick()` in a binding.
+export component Main inherits Window {
+    Rectangle { x: mod(animation-tick() / 10ms, 100) * 1px; }
+}

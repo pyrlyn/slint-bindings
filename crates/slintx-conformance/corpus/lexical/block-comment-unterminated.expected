@@ -1,0 +1,2 @@
+verdict: reject
+error block-comment-unterminated.slint:4:1: Parse error: expected a top-level item such as a component, a struct, or a global

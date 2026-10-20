@@ -1,0 +1,2 @@
+verdict: reject
+error unknown-property.slint:3:25: 'nothing' is not a property that can be animated

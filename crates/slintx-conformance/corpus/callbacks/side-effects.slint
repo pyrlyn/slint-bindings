@@ -1,0 +1,8 @@
+// language/evaluation-and-purity: built-ins that change state, in a handler.
+// OPEN O40: which built-ins are side-effecting.
+export component Main inherits Window {
+    property <[int]> items;
+    popup := PopupWindow {}
+    fs := FocusScope {}
+    TouchArea { clicked => { debug("x"); items.push(1); popup.show(); fs.focus(); } }
+}

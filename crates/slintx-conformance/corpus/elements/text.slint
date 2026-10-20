@@ -1,0 +1,8 @@
+// elements/text: Text with font, wrapping and the 1.18 `max-lines`.
+export component Main inherits Window {
+    Text {
+        text: "hello"; font-size: 14px; font-weight: 700; font-italic: true;
+        color: black; wrap: word-wrap; overflow: elide; max-lines: 2;
+        horizontal-alignment: center; vertical-alignment: center;
+    }
+}

@@ -16,7 +16,8 @@
 | Package | Where | Source | Why here |
 | --- | --- | --- | --- |
 | slint | local | https://github.com/slint-ui/slint | UI runtime; software renderer and custom platform API |
-| slint-interpreter | local | https://github.com/slint-ui/slint | Compiles `.slint` at run time (`sb_compile`) |
+| slint-interpreter | local | https://github.com/slint-ui/slint | Compiles `.slint` at run time (`sb_compile`); the oracle in `slintx-conformance`'s tests (dev only) |
+| pollster | local | https://github.com/zesterer/pollster | Blocks on wgpu adapter and device requests (`slint-bindings-core`) and on Slint's async compiler API (`slintx-conformance` tests, dev only) |
 | slint-dart-interpreter | local (path, `flutter/packages/slint_build/interpreter`) | https://github.com/listepo/slint_dart | Shared compile helper and JSON value bridge for properties and callbacks |
 | i-slint-core | local | https://github.com/slint-ui/slint | Feature unification only: image and SVG decoding without a backend |
 | thiserror | local | https://github.com/dtolnay/thiserror | Core error enum |

@@ -1,0 +1,2 @@
+verdict: reject
+error unknown-member.slint:6:29: 'Theme' does not have a property 'nothing'

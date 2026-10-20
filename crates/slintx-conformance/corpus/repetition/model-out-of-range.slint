@@ -1,0 +1,6 @@
+// property-types/arrays-and-models: reading past the end of a model in a repeater.
+// OPEN O47: out-of-range index.
+export component Main inherits Window {
+    property <[int]> items: [1, 2];
+    for v[i] in items: Rectangle { x: items[i + 5] * 1px; }
+}
