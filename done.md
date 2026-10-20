@@ -63,6 +63,21 @@ at 1× and 2×, and the form after the name is set to "Ada".
 `SB_UPDATE_SNAPSHOTS=1` rewrites the PNGs when that picture is meant to change.
 `just check` passes.
 
+### T4. macOS keyboard, IME and focus
+
+Adopt `NSTextInputClient` in `SlintNSView` so composition (CJK, dead keys,
+emoji picker) reaches Slint as preedit and commit text; complete the AppKit →
+Slint key map (function keys, Home/End, Page Up/Down, modifiers as separate
+key events) with table-driven tests; make Tab move focus out of the Slint view
+into SwiftUI when Slint has no next focus item. Done when a Japanese input
+method commits text into the demo field and the key-map tests cover every
+`slint::platform::Key`.
+
+Execution: the AppKit → Slint map lives in `slint-bindings-core` (one table,
+tested on every `Key`). `SlintNSView` adopts `NSTextInputClient`: marked text
+is a preedit, `insertText` commits, and a rejected Tab or Backtab calls
+`selectNextKeyView` / `selectPreviousKeyView`.
+
 ### T6. WinUI host builds and runs (M2)
 
 The WinUI host compiles in CI. Virtual keys, IME composition and the per-RID
