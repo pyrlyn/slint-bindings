@@ -20,6 +20,8 @@ use std::ptr;
 
 #[cfg(any(target_os = "macos", target_os = "windows"))]
 use slint_bindings_core::GpuHost;
+#[cfg(target_os = "macos")]
+use slint_bindings_core::a11y::{MacAccessibility, Notifications};
 use slint_bindings_core::runtime::{self, ComponentDefinition, ComponentInstance, Instance};
 use slint_bindings_core::{
     AppKitKey, EmbeddedHost, Error, PointerButton, VirtualKeyEvent, appkit_key_text,
@@ -42,6 +44,9 @@ pub struct SbHost {
     // Declared first so the bridge's handle drops before the host's window.
     component: Instance,
     host: Backend,
+    /// VoiceOver adapter once the view attached ([`sb_host_accessibility_attach`]).
+    #[cfg(target_os = "macos")]
+    accessibility: RefCell<Option<MacAccessibility>>,
 }
 
 enum Backend {
@@ -65,6 +70,8 @@ impl SbHost {
         Ok(Self {
             component,
             host: Backend::Cpu(host),
+            #[cfg(target_os = "macos")]
+            accessibility: RefCell::default(),
         })
     }
 
@@ -91,6 +98,8 @@ impl SbHost {
         Ok(Self {
             component,
             host: Backend::Gpu(host),
+            #[cfg(target_os = "macos")]
+            accessibility: RefCell::default(),
         })
     }
 
@@ -109,6 +118,63 @@ impl SbHost {
     pub fn into_raw(self) -> *mut SbHost {
         Box::into_raw(Box::new(self))
     }
+
+    /// Lets the screen reader see what the frame just changed.
+    fn accessibility_frame_done(&self, redrawn: bool) {
+        #[cfg(target_os = "macos")]
+        self.accessibility_notify(|a, c| a.frame_done(c, redrawn));
+        #[cfg(not(target_os = "macos"))]
+        let _ = redrawn;
+    }
+
+    fn accessibility_focus_changed(&self, focused: bool) {
+        #[cfg(target_os = "macos")]
+        self.accessibility_notify(|a, _| a.view_focus_changed(focused));
+        #[cfg(not(target_os = "macos"))]
+        let _ = focused;
+    }
+
+    /// Skipped while AppKit is inside one of the `sb_host_accessibility_*`
+    /// requests: the next frame sends the change.
+    #[cfg(target_os = "macos")]
+    fn accessibility_notify(
+        &self,
+        f: impl FnOnce(&mut MacAccessibility, &ComponentInstance) -> Notifications,
+    ) {
+        let notes = match self.accessibility.try_borrow_mut() {
+            Ok(mut slot) => slot.as_mut().map(|a| f(a, self.component())),
+            Err(_) => None,
+        };
+        // Raised after the borrow ends: VoiceOver may call straight back in.
+        if let Some(notes) = notes {
+            notes.raise();
+        }
+    }
+
+    #[cfg(target_os = "macos")]
+    fn accessibility_request(&self, request: Request) -> Result<*mut c_void, Error> {
+        let mut slot = self
+            .accessibility
+            .try_borrow_mut()
+            .map_err(|_| Error::InvalidArgument("accessibility is busy with another request"))?;
+        let a = slot.as_mut().ok_or(Error::InvalidArgument(
+            "call sb_host_accessibility_attach first",
+        ))?;
+        let c = self.component();
+        Ok(match request {
+            Request::Children => a.children(c),
+            Request::Focus => a.focus(c),
+            Request::HitTest(x, y) => a.hit_test(c, x, y),
+        })
+    }
+}
+
+/// The three `NSAccessibility` questions a host view forwards.
+#[cfg_attr(not(target_os = "macos"), allow(dead_code))]
+enum Request {
+    Children,
+    Focus,
+    HitTest(f64, f64),
 }
 
 macro_rules! forward {
@@ -481,6 +547,7 @@ pub unsafe extern "C" fn sb_host_gpu_render(host: *mut SbHost) -> SbFrame {
                 return Err(Error::InvalidArgument("a null host was passed"));
             };
             let frame = h.host.render_gpu()?;
+            h.accessibility_frame_done(frame.redrawn);
             Ok(SbFrame {
                 redrawn: u8::from(frame.redrawn),
                 animating: u8::from(frame.animating),
@@ -584,6 +651,7 @@ pub unsafe extern "C" fn sb_host_render(host: *mut SbHost, buf: *mut u8, len: us
         // SAFETY: the caller guarantees `buf` is valid for `len` writable bytes.
         let out = unsafe { std::slice::from_raw_parts_mut(buf, len) };
         let frame = h.host.render(out)?;
+        h.accessibility_frame_done(frame.redrawn);
         Ok(SbFrame {
             redrawn: frame.redrawn.into(),
             animating: frame.animating.into(),
@@ -619,6 +687,7 @@ pub unsafe extern "C" fn sb_host_render_bgra(
         // SAFETY: the caller guarantees `buf` is valid for `len` writable bytes.
         let out = unsafe { std::slice::from_raw_parts_mut(buf, len) };
         let frame = h.host.render_bgra(out)?;
+        h.accessibility_frame_done(frame.redrawn);
         Ok(SbFrame {
             redrawn: frame.redrawn.into(),
             animating: frame.animating.into(),
@@ -732,7 +801,109 @@ pub unsafe extern "C" fn sb_host_pointer_scrolled(
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn sb_host_focus_changed(host: *const SbHost, focused: bool) -> bool {
     // SAFETY: forwarded caller contract.
-    unsafe { with_host(host, |h| h.host.focus_changed(focused)) }
+    unsafe {
+        with_host(host, |h| {
+            h.host.focus_changed(focused)?;
+            h.accessibility_focus_changed(focused);
+            Ok(())
+        })
+    }
+}
+
+/// Exposes the component to VoiceOver through `view`, the `NSView` showing it.
+/// The view forwards `accessibilityChildren`, `accessibilityFocusedUIElement`
+/// and `accessibilityHitTest:` to the `sb_host_accessibility_*` calls below.
+/// Fails on every OS other than macOS and when already attached.
+///
+/// # Safety
+/// `host` must be null or live; `view` null or a live `NSView` (held weakly).
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn sb_host_accessibility_attach(
+    host: *const SbHost,
+    view: *mut c_void,
+) -> bool {
+    // SAFETY: forwarded caller contract.
+    unsafe {
+        with_host(host, |h| {
+            if view.is_null() {
+                return Err(Error::InvalidArgument("a null view was passed"));
+            }
+            #[cfg(target_os = "macos")]
+            {
+                let mut slot = h.accessibility.borrow_mut();
+                if slot.is_some() {
+                    return Err(Error::InvalidArgument("accessibility is already attached"));
+                }
+                // SAFETY: the caller passes a live `NSView`; the adapter holds it weakly.
+                *slot = Some(MacAccessibility::new(view, false));
+                Ok(())
+            }
+            #[cfg(not(target_os = "macos"))]
+            {
+                let _ = h;
+                Err(Error::InvalidArgument(
+                    "accessibility is only available on macOS",
+                ))
+            }
+        })
+    }
+}
+
+/// The view's `accessibilityChildren`: an autoreleased `NSArray`, or null on failure.
+///
+/// # Safety
+/// `host` must be null or live.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn sb_host_accessibility_children(host: *const SbHost) -> *mut c_void {
+    // SAFETY: forwarded caller contract.
+    unsafe { accessibility_request(host, Request::Children) }
+}
+
+/// The view's `accessibilityFocusedUIElement`: autoreleased, or null when
+/// nothing inside the view has focus or on failure.
+///
+/// # Safety
+/// `host` must be null or live.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn sb_host_accessibility_focus(host: *const SbHost) -> *mut c_void {
+    // SAFETY: forwarded caller contract.
+    unsafe { accessibility_request(host, Request::Focus) }
+}
+
+/// The view's `accessibilityHitTest:` at screen point (`x`, `y`): autoreleased, or null on failure.
+///
+/// # Safety
+/// `host` must be null or live.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn sb_host_accessibility_hit_test(
+    host: *const SbHost,
+    x: f64,
+    y: f64,
+) -> *mut c_void {
+    // SAFETY: forwarded caller contract.
+    unsafe { accessibility_request(host, Request::HitTest(x, y)) }
+}
+
+/// # Safety
+/// `host` must be null or live.
+unsafe fn accessibility_request(host: *const SbHost, request: Request) -> *mut c_void {
+    guard(ptr::null_mut(), || {
+        // SAFETY: forwarded caller contract.
+        let Some(h) = (unsafe { host_ref(host) }) else {
+            return Err(Error::InvalidArgument("a null host was passed"));
+        };
+        #[cfg(target_os = "macos")]
+        {
+            h.accessibility_request(request)
+        }
+        #[cfg(not(target_os = "macos"))]
+        {
+            let _ = (h, request);
+            Err(Error::InvalidArgument(
+                "accessibility is only available on macOS",
+            ))
+        }
+    })
 }
 
 /// A key went down; `text` is UTF-8 (the typed character or a Slint key code).

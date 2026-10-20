@@ -35,6 +35,7 @@ public final class SlintNSView: NSView {
     ) {
         super.init(frame: frameRect)
         install(prefersGpu: prefersGpu, makeHost: makeHost)
+        attachAccessibility()
     }
 
     /// Shows a host made elsewhere. A GPU host needs the layer at creation, so
@@ -90,6 +91,39 @@ public final class SlintNSView: NSView {
 
     @available(*, unavailable)
     required init?(coder: NSCoder) { nil }
+
+    // MARK: Accessibility
+
+    /// VoiceOver reads the Slint items, not the view: AccessKit answers for it.
+    private func attachAccessibility() {
+        do {
+            try host?.attachAccessibility(to: self)
+        } catch let error as SlintError {
+            lastError = error
+        } catch {
+            lastError = SlintError(description: "\(error)")
+        }
+    }
+
+    public override func accessibilityChildren() -> [Any]? {
+        host?.accessibilityChildren() ?? super.accessibilityChildren()
+    }
+
+    public override nonisolated var accessibilityFocusedUIElement: Any? {
+        Self.onMain { self.host?.accessibilityFocusedElement() } ?? super.accessibilityFocusedUIElement
+    }
+
+    public override nonisolated func accessibilityHitTest(_ point: NSPoint) -> Any? {
+        Self.onMain { self.host?.accessibilityHitTest(point) } ?? super.accessibilityHitTest(point)
+    }
+
+    /// AppKit asks these on the main thread, but the SDK does not mark them
+    /// main-actor, and AccessKit's elements are not `Sendable`.
+    private nonisolated static func onMain(_ body: @MainActor () -> Any?) -> Any? {
+        nonisolated(unsafe) var element: Any?
+        MainActor.assumeIsolated { element = body() }
+        return element
+    }
 
     // Slint's origin is the top-left corner, so a flipped view needs no y conversion.
     public override var isFlipped: Bool { true }

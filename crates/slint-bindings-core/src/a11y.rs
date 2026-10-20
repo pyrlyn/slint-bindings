@@ -10,6 +10,9 @@
 //! The tree is rebuilt whole. AccessKit diffs updates by node id, so stable ids
 //! are what keeps screen readers from seeing a new tree every frame.
 
+#[cfg(target_os = "macos")]
+mod macos;
+
 use std::collections::HashMap;
 use std::pin::Pin;
 use std::ptr::NonNull;
@@ -28,6 +31,9 @@ use i_slint_core::items::{AccessibleRole, InputType, ItemRc, WindowItem};
 use i_slint_core::lengths::LogicalPoint;
 use i_slint_core::properties::PropertyTracker;
 use i_slint_core::window::{PopupWindowLocation, WindowInner};
+
+#[cfg(target_os = "macos")]
+pub use macos::{MacAccessibility, Notifications};
 
 /// Id of the root while the window has no component yet.
 const EMPTY_ROOT: NodeId = NodeId(0);

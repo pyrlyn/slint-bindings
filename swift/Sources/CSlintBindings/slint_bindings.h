@@ -266,6 +266,42 @@ bool sb_host_pointer_scrolled(const struct SbHost *host, float x, float y, float
 bool sb_host_focus_changed(const struct SbHost *host, bool focused);
 
 /**
+ * Exposes the component to VoiceOver through `view`, the `NSView` showing it.
+ * The view forwards `accessibilityChildren`, `accessibilityFocusedUIElement`
+ * and `accessibilityHitTest:` to the `sb_host_accessibility_*` calls below.
+ * Fails on every OS other than macOS and when already attached.
+ *
+ * # Safety
+ * `host` must be null or live; `view` null or a live `NSView` (held weakly).
+ */
+bool sb_host_accessibility_attach(const struct SbHost *host, void *view);
+
+/**
+ * The view's `accessibilityChildren`: an autoreleased `NSArray`, or null on failure.
+ *
+ * # Safety
+ * `host` must be null or live.
+ */
+void *sb_host_accessibility_children(const struct SbHost *host);
+
+/**
+ * The view's `accessibilityFocusedUIElement`: autoreleased, or null when
+ * nothing inside the view has focus or on failure.
+ *
+ * # Safety
+ * `host` must be null or live.
+ */
+void *sb_host_accessibility_focus(const struct SbHost *host);
+
+/**
+ * The view's `accessibilityHitTest:` at screen point (`x`, `y`): autoreleased, or null on failure.
+ *
+ * # Safety
+ * `host` must be null or live.
+ */
+void *sb_host_accessibility_hit_test(const struct SbHost *host, double x, double y);
+
+/**
  * A key went down; `text` is UTF-8 (the typed character or a Slint key code).
  *
  * Returns true when Slint accepted the key. Returns false when the scene
