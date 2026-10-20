@@ -1,6 +1,8 @@
 //! The Slint grammar, as recursive descent over [`Parser`].
 
+mod element;
 mod expr;
+mod items;
 mod macros;
 mod stmt;
 
@@ -10,7 +12,7 @@ use crate::parser::Parser;
 pub(crate) fn file(p: &mut Parser) {
     p.start_root(K::File);
     while !p.at_end() {
-        p.bump();
+        items::item(p);
     }
     p.finish_root();
 }

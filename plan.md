@@ -51,12 +51,13 @@ Not added: `slint_embed::events` is used only by slint_dart and stays there; `i-
 | T15 | todo | P3 | 3 | 0% | |
 | T17 | todo | P3 | 3 | 0% | |
 | T73 | in progress | P0 | 4 | 0% | Claude / opus-5.5 |
-| T73.1 | in progress | P0 | 4 | 60% | Claude / opus-5.5 |
+| T73.1 | in progress | P0 | 4 | 70% | Claude / opus-5.5 |
 | T73.1.1 | in progress | P0 | 3 | 100% | Claude / opus-5.5 |
 | T73.1.2 | in progress | P0 | 3 | 100% | Claude / opus-5.5 |
 | T73.1.3 | in progress | P0 | 3 | 100% | Claude / opus-5.5 |
-| T73.1.4 | in progress | P0 | 3 | 0% | Claude / opus-5.5 |
-| T73.1.5 | in progress | P0 | 2 | 0% | Claude / opus-5.5 |
+| T73.1.4 | in progress | P0 | 3 | 100% | Claude / opus-5.5 |
+| T73.1.5 | in progress | P0 | 3 | 0% | Claude / opus-5.5 |
+| T73.1.6 | in progress | P0 | 2 | 0% | Claude / opus-5.5 |
 | T73.2 | in progress | P0 | 2 | 0% | Claude / opus-5.5 |
 | T74 | in progress | P0 | 3 | 0% | Claude / opus-5.5 |
 | T75 | todo | P1 | 3 | 0% | |
@@ -260,8 +261,8 @@ error-recovery tests pass on those fixtures and the crate has no dependency on
 `slint`, `slint-*` or `i-slint-*`.
 
 Split at claim time: the whole crate is about 2300 lines of code, so it goes
-in five commits of at most 500 lines each (T73.1.1–T73.1.5), stacked on this
-branch. Each commit builds, passes its own tests and adds fixtures.
+in six commits of at most 500 lines each (T73.1.1–T73.1.6), stacked on this
+branch; T73.1.4 was split in two when its code passed 500 lines. Each commit builds, passes its own tests and adds fixtures.
 
 Execution plan:
 
@@ -272,13 +273,15 @@ Execution plan:
    nesting limit), `src/grammar/expr.rs`, `parse_binding_expression`.
 3. T73.1.3 — `src/grammar/macros.rs` (strings, escapes, interpolation, `@`
    macros) and `src/grammar/stmt.rs` (types, code blocks, statements).
-4. T73.1.4 — `src/grammar/items.rs`: top-level items and element members.
-5. T73.1.5 — `src/ast.rs`: typed views, one per node kind.
-6. Tests in `tests/`: every fixture in `tests/fixtures/*.slint` round-trips
+4. T73.1.4 — `src/grammar/items.rs` (top-level items) and
+   `src/grammar/element.rs` (child elements, bindings, handlers).
+5. T73.1.5 — `src/grammar/decl.rs`: declarations in element bodies.
+6. T73.1.6 — `src/ast.rs`: typed views, one per node kind.
+7. Tests in `tests/`: every fixture in `tests/fixtures/*.slint` round-trips
    byte for byte and parses with no diagnostics; every `tests/fixtures/errors/`
    file round-trips and yields the diagnostics in its `.expected` file (message
    and byte range); span tests check node ranges against substrings.
-7. Verify: `cargo fmt --check`, `cargo clippy -p slintx-syntax --all-targets
+8. Verify: `cargo fmt --check`, `cargo clippy -p slintx-syntax --all-targets
    -- -D warnings`, `cargo nextest run -p slintx-syntax`, `cargo build -p
    slintx-syntax --target wasm32-unknown-unknown`, `cargo tree -p
    slintx-syntax` shows no Slint crate.
@@ -306,15 +309,22 @@ String templates and escape checks; the `@tr`, `@image-url`, gradient,
 `return`, `if`/`else`, assignments). Done when their tests round-trip with no
 diagnostics and broken input recovers.
 
-### T73.1.4. slintx-syntax: items, elements and declarations
+### T73.1.4. slintx-syntax: items and element bodies
 
 Imports, exports, components with `inherits`, globals, structs with field
-defaults, enums, elements with ids, property/callback/function declarations,
-bindings, two-way bindings, handlers, `changed`, `states`, transitions,
-`animate`, `for`, `if` and `@children`. Done when one fixture per construct
-round-trips with no diagnostics and broken items recover.
+defaults, enums, elements with ids, bindings, two-way bindings, callback
+handlers and `@children`. Done when one fixture per construct round-trips with
+no diagnostics and broken items recover.
 
-### T73.1.5. slintx-syntax: typed AST views
+### T73.1.5. slintx-syntax: declarations in element bodies
+
+Property, callback and function declarations with visibility and purity,
+`changed`, `states` with transitions, `animate`, `for` and `if`, plus the
+fixtures that need them. Done when one fixture per construct round-trips with
+no diagnostics, the valid fixtures cover every node kind and broken
+declarations recover.
+
+### T73.1.6. slintx-syntax: typed AST views
 
 One typed view per node kind with accessors, plus span tests through the
 views. Done when every fixture can be walked through the typed AST.

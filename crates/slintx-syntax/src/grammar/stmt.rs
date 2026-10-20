@@ -54,7 +54,11 @@ pub(crate) fn qualified_name(p: &mut Parser) {
 
 pub(crate) fn code_block(p: &mut Parser) {
     p.start(K::CodeBlock);
-    p.expect(K::LBrace, "`{`");
+    // Without `{` this is no block: parsing statements would eat the rest.
+    if !p.expect(K::LBrace, "`{`") {
+        p.finish();
+        return;
+    }
     if p.enter() {
         while !p.at(K::RBrace) && !p.at_end() {
             statement(p);

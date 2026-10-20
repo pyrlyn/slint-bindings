@@ -1,7 +1,7 @@
 //! Parser core: a cursor over the lexer's tokens that feeds a rowan builder.
 //! The grammar lives in `grammar`; this file knows nothing about Slint.
 
-use rowan::{Checkpoint, GreenNode, GreenNodeBuilder};
+use rowan::{Checkpoint, GreenNode, GreenNodeBuilder, GreenToken, NodeOrToken};
 
 use crate::lexer::Token;
 use crate::{Diagnostic, SyntaxKind};
@@ -33,7 +33,12 @@ impl<'a> Parser<'a> {
     }
 
     pub fn finish_tree(self) -> (GreenNode, Vec<Diagnostic>) {
-        (self.builder.finish(), self.diagnostics)
+        let root = self.builder.finish();
+        let children: Vec<_> = root
+            .children()
+            .flat_map(|child| hoist(child.to_owned()))
+            .collect();
+        (GreenNode::new(root.kind(), children), self.diagnostics)
     }
 
     /// The root takes all trivia, leading and trailing, so it spans the
@@ -130,16 +135,36 @@ impl<'a> Parser<'a> {
 
     /// Reports at the current token, or at the end of the input.
     pub fn error(&mut self, message: impl Into<String>) {
+        // The lexer already reported this token; a parse error on top of it
+        // repeats the same mistake.
+        if self.at(SyntaxKind::Error) {
+            return;
+        }
         let range = self
             .significant(0)
             .map_or(self.src.len()..self.src.len(), |t| t.start..t.end);
-        self.diagnostics.push(Diagnostic::new(message, range));
+        let diagnostic = Diagnostic::new(message, range);
+        // Nested constructs left unclosed each report the same missing closer
+        // at the same token; one is enough.
+        if self.diagnostics.last() != Some(&diagnostic) {
+            self.diagnostics.push(diagnostic);
+        }
     }
 
     pub fn expect(&mut self, kind: SyntaxKind, what: &str) -> bool {
         let found = self.eat(kind);
         if !found {
             self.error(format!("expected {what}"));
+        }
+        found
+    }
+
+    pub fn expect_keyword(&mut self, keyword: &str) -> bool {
+        let found = self.at_keyword(keyword);
+        if found {
+            self.bump();
+        } else {
+            self.error(format!("expected `{keyword}`"));
         }
         found
     }
@@ -198,4 +223,34 @@ pub(crate) fn same_name(a: &str, b: &str) -> bool {
         .enumerate()
         .map(normalize)
         .eq(b.chars().enumerate().map(normalize))
+}
+
+type GreenElement = NodeOrToken<GreenNode, GreenToken>;
+
+/// Moves trivia off the edges of `element` and its descendants, returning
+/// the leading trivia, the node, then the trailing trivia. Trivia is flushed
+/// eagerly while parsing, so a node that ends early on an error (or stays
+/// empty) can otherwise keep the whitespace that precedes the next token.
+fn hoist(element: GreenElement) -> Vec<GreenElement> {
+    let node = match element {
+        NodeOrToken::Node(node) => node,
+        token => return vec![token],
+    };
+    let mut inner: Vec<GreenElement> = node.children().flat_map(|c| hoist(c.to_owned())).collect();
+    let is_trivia = |e: &GreenElement| {
+        e.as_token()
+            .is_some_and(|t| SyntaxKind::from_raw(t.kind().0).is_some_and(SyntaxKind::is_trivia))
+    };
+    let lead = inner.iter().take_while(|e| is_trivia(e)).count();
+    let trail = inner[lead..]
+        .iter()
+        .rev()
+        .take_while(|e| is_trivia(e))
+        .count();
+    let trailing = inner.split_off(inner.len() - trail);
+    let leading: Vec<GreenElement> = inner.drain(..lead).collect();
+    let mut out = leading;
+    out.push(NodeOrToken::Node(GreenNode::new(node.kind(), inner)));
+    out.extend(trailing);
+    out
 }
