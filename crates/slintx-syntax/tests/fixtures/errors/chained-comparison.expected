@@ -1,0 +1,3 @@
+items: Component
+43..44: comparison operators cannot be chained; add parentheses
+78..80: comparison operators cannot be chained; add parentheses

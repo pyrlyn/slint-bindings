@@ -1,0 +1,5 @@
+items: Component ErrorNode Component
+41..42: expected an expression
+41..42: expected `)`
+72..73: expected `]`
+101..102: expected an item: import, export, component, global, struct or enum

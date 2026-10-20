@@ -1,0 +1,8 @@
+﻿// BOM, CRLF and nested comments.
+/* outer /* inner */ still outer */
+component Lexical {
+    property <int> größe: 1; /// not a doc comment
+    property <int> kebab-case_mixed: größe;
+    property <int> spaced: kebab-case_mixed - größe;
+    property <length> w: 10.5px;
+}

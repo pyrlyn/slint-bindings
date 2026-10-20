@@ -1,0 +1,17 @@
+component Exprs {
+    property <int> a: 1 + 2 * 3 - -4 / 2;
+    property <bool> b: ((a == 3) || (a != 4)) && false;
+    property <bool> c: a > 1 && a < 10 && a >= 2 && a <= 9;
+    property <int> d: a > 5 ? 1 : a > 2 ? 2 : 3;
+    property <float> e: Math.max(1, 2).abs() + (-10).abs() + 2.5.round();
+    property <length> f: self.width - 10px;
+    property <color> g: #ff8800cc.darker(20%);
+    property <string> h: [1, 2, 3][1] + "x";
+    property <bool> i: !b;
+    property <length> j: 1cm + 2mm + 3in + 4pt + 5phx * 1px / 1phx;
+    property <angle> k: 0.25turn + 90deg + 1rad;
+    property <duration> l: 1s + 250ms;
+    property <length> m: 1.5rem;
+    property <brush> n: Colors.aquamarine;
+    property <int> o: if-value;
+}

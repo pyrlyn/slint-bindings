@@ -1,0 +1,10 @@
+component List inherits VerticalLayout {
+    in property <[{ name: string, done: bool }]> items;
+    for item[index] in items : row := HorizontalLayout {
+        Text { text: index + ": " + item.name; }
+        CheckBox { checked <=> item.done; }
+    }
+    for i in 3 : Rectangle { height: 10px * i; }
+    for [n] in [1, 2] : Text { text: n; }
+    for x in items: Text {}
+}

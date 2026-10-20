@@ -1,0 +1,2 @@
+items: Struct Component
+21..22: struct fields are separated by `,`, not `;`

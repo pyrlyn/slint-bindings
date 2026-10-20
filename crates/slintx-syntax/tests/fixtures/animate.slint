@@ -1,0 +1,13 @@
+component Fade inherits Rectangle {
+    in property <bool> shown;
+    opacity: shown ? 1 : 0;
+    animate opacity {
+        duration: 250ms;
+        delay: 10ms;
+        easing: cubic-bezier(0.2, 0.8, 0.2, 1);
+        iteration-count: 1;
+        direction: alternate;
+        enabled: shown;
+    }
+    animate x, y { duration: 1s; easing: spring(0.3); }
+}

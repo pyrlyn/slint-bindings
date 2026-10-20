@@ -1,0 +1,2 @@
+items: Component
+25..26: unexpected `;`: no `;` is needed after `}`
