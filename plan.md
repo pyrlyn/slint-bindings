@@ -47,7 +47,7 @@ Not added: `slint_embed::events` is used only by slint_dart and stays there; `i-
 | T9 | todo | P2 | 3 | 0% | |
 | T10 | todo | P2 | 3 | 0% | |
 | T13 | todo | P2 | 4 | 0% | |
-| T14 | todo | P2 | 5 | 0% | |
+| T14 | in progress | P2 | 5 | 10% | Claude / opus-5.5 |
 | T15 | todo | P3 | 3 | 0% | |
 | T17 | todo | P3 | 3 | 0% | |
 
@@ -187,6 +187,28 @@ item tree through AccessKit adapters inside the host view
 (`accesskit_macos` subclassing the `NSView`, `accesskit_windows` for UIA on the
 panel's window), or a native mirror tree. Done with a recommendation and a
 VoiceOver demo reading the form.
+
+Execution: research first (`research.md`, "Accessibility"): what Slint 1.18.1
+gives a custom platform (`i_slint_core::accessibility`, `ItemRc` accessible
+properties, `WindowInner` focus and popups) and how `i-slint-backend-winit`'s
+`accesskit.rs` maps them; current AccessKit crates. Then:
+
+1. `slint-bindings-core::a11y`: build an `accesskit::TreeUpdate` from a
+   component's window (role, label, value, bounds in view coordinates,
+   focus, actions) and turn an `accesskit::ActionRequest` into a Slint action
+   (focus, default, set value, increment, decrement), deferred to the next
+   `sb_tick` the way the winit backend does. Platform-neutral, tested with
+   nextest on the demo form (tree shape, labels, focus, a click and a
+   set-value action reaching the component).
+2. macOS: `accesskit_macos::SubclassingAdapter` on the host's `NSView`, pushed
+   from the host after each render; `sb_host_accessibility_attach` in the FFI
+   (header regenerated, `NativeMethods.cs` stub), `SlintNSView` attaches.
+   Swift test walks `accessibilityChildren()` of the view and finds the
+   form's text field and button.
+3. Demo: run `just swift-run`, read the form with VoiceOver (or, without
+   VoiceOver, through the AX API); record the steps and the result.
+4. Recommendation (AccessKit per host vs native mirror tree, Windows plan) in
+   this card, then `done.md`. Slint's winit backend stays out of the build.
 
 ### T15. iOS host
 
