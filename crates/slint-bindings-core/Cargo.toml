@@ -15,6 +15,7 @@ i-slint-core = { workspace = true }
 slint-interpreter = { workspace = true }
 slint-dart-interpreter = { workspace = true }
 thiserror = { workspace = true }
+accesskit = { workspace = true }
 
 # FemtoVG's wgpu renderer is the public GPU API (Slint has no public Skia
 # renderer). It stays off the Linux build: Skia is a multi-gigabyte compile,
