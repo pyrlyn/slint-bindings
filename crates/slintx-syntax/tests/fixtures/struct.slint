@@ -1,0 +1,12 @@
+struct Empty {}
+struct Point { x: length, y: length, }
+@rust-attr(derive(serde::Serialize, serde::Deserialize))
+@rust-attr(derive(Hash))
+export struct Settings {
+    name: string = "default",
+    volume: float = 0.5,
+    retries: int = 3 * 2,
+    tags: [string],
+    origin: Point,
+    nested: { a: int, b: [bool] },
+}

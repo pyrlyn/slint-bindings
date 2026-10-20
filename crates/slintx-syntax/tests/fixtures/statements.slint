@@ -1,0 +1,27 @@
+component Statements {
+    property <int> total;
+    property <[int]> list: [1, 2];
+    callback run(int) -> int;
+    run(n) => {
+        let doubled = n * 2;
+        let typed: int = doubled + 1;
+        ;
+        if n > 10 {
+            return typed;
+        } else if (n > 5) {
+            total += n;
+        } else {
+            total = 0;
+        }
+        list[0] = n;
+        list.push(n);
+        total -= 1;
+        total *= 2;
+        total /= 2;
+        typed
+    }
+    property <int> block-binding: {
+        if total > 0 { return 1; }
+        0
+    }
+}

@@ -1,0 +1,12 @@
+export global Logic {
+    in-out property <int> the-value: 42;
+    callback notify(string);
+    pure callback compute(int) -> int;
+    public pure function magic() -> int { 42 }
+}
+
+component UsesLogic {
+    in-out property the-value <=> Logic.the-value;
+    Text { text: Logic.the-value; }
+    TouchArea { clicked => { Logic.notify("hi"); } }
+}

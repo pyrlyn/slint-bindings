@@ -1,0 +1,18 @@
+[package]
+name = "slintx-syntax"
+description = "Lossless parser for the Slint language: lexer, rowan syntax tree with error recovery, and a typed AST."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+[dependencies]
+rowan = { workspace = true }
+
+[target.'cfg(target_arch = "wasm32")'.dev-dependencies]
+wasm-bindgen-test = { workspace = true }
+
+[lints]
+workspace = true

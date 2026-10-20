@@ -1,0 +1,11 @@
+export component Main inherits Window {}
+export struct Pair { a: int, b: int }
+export enum Mode { light, dark }
+export global Settings {}
+
+component Helper {}
+component Other {}
+
+export { Helper, Other as PublicOther, };
+export { Card, Badge as Tag } from "./widgets.slint";
+export * from "./more.slint";

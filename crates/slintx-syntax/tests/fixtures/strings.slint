@@ -1,0 +1,11 @@
+component Strings {
+    property <string> plain: "plain";
+    property <string> escapes: "quote \" backslash \\ newline \n unicode \u{1F600} \u{e9}";
+    property <string> template: "Hello \{root.name}, you have \{count + 1} items";
+    property <string> nested: "outer \{ "inner \{count}" } \{ {a: 1}.a }";
+    property <string> multi: "line one
+line two";
+    property <string> empty: "";
+    property <string> name: "World";
+    property <int> count;
+}
