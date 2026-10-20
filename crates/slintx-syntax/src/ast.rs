@@ -456,6 +456,8 @@ impl KeyPart {
 mod tests {
     use super::VIEWS;
     use crate::SyntaxKind;
+    #[cfg(target_arch = "wasm32")]
+    use wasm_bindgen_test::wasm_bindgen_test as test;
 
     #[test]
     fn every_node_kind_has_a_view() {

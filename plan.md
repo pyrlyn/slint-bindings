@@ -283,7 +283,8 @@ Execution plan:
    and byte range); span tests check node ranges against substrings.
 8. Verify: `cargo fmt --check`, `cargo clippy -p slintx-syntax --all-targets
    -- -D warnings`, `cargo nextest run -p slintx-syntax`, `cargo build -p
-   slintx-syntax --target wasm32-unknown-unknown`, `cargo tree -p
+   slintx-syntax --target wasm32-unknown-unknown`, the tests on wasm32 through
+   `wasm-bindgen-test-runner` (T73.2's wasm-check), `cargo tree -p
    slintx-syntax` shows no Slint crate.
 
 ### T73.1.1. slintx-syntax: kinds, lexer and lossless tree API

@@ -1,4 +1,7 @@
 use slintx_syntax::{SyntaxKind as K, lex, parse};
+// The wasm32 runner only sees `#[wasm_bindgen_test]`; natively `#[test]` stays.
+#[cfg(target_arch = "wasm32")]
+use wasm_bindgen_test::wasm_bindgen_test as test;
 
 /// Significant tokens with their text; trivia dropped.
 fn tokens(source: &str) -> Vec<(K, &str)> {

@@ -5,6 +5,9 @@ use std::collections::HashSet;
 
 use slintx_syntax::ast::{self, AstNode, Expr, Item, Member, Statement, Type};
 use slintx_syntax::{SyntaxKind, SyntaxNode, SyntaxToken, parse, parse_binding_expression};
+// The wasm32 runner only sees `#[wasm_bindgen_test]`; natively `#[test]` stays.
+#[cfg(target_arch = "wasm32")]
+use wasm_bindgen_test::wasm_bindgen_test as test;
 
 macro_rules! fixtures {
     ($($name:literal),* $(,)?) => {

@@ -2,6 +2,9 @@ mod common;
 
 use common::{messages, sexpr};
 use slintx_syntax::parse_binding_expression;
+// The wasm32 runner only sees `#[wasm_bindgen_test]`; natively `#[test]` stays.
+#[cfg(target_arch = "wasm32")]
+use wasm_bindgen_test::wasm_bindgen_test as test;
 
 /// Parses a binding value; asserts it round-trips and has no diagnostics.
 fn tree(source: &str) -> String {

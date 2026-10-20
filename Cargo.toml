@@ -33,6 +33,7 @@ slint-dart-interpreter = { path = "flutter/packages/slint_build/interpreter" }
 i-slint-core = { version = "=1.18.1", default-features = false, features = ["image-decoders", "svg"] }
 thiserror = "2.0.21"
 rowan = "0.17.0"
+wasm-bindgen-test = "0.3.79"
 # Dev-dependency of the FFI e2e: the demo frame is stored as a PNG snapshot.
 png = "0.18.1"
 

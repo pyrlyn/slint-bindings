@@ -22,6 +22,7 @@
 | thiserror | local | https://github.com/dtolnay/thiserror | Core error enum |
 | png | local (dev) | https://github.com/image-rs/image-png | Encode and decode the demo frame snapshots |
 | rowan | local | https://github.com/rust-analyzer/rowan | Lossless syntax tree of `slintx-syntax` |
+| wasm-bindgen-test | local | https://github.com/wasm-bindgen/wasm-bindgen | Runs the `slintx-syntax` tests on `wasm32-unknown-unknown` |
 
 ## NuGet
 

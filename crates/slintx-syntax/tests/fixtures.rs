@@ -6,6 +6,9 @@
 mod common;
 
 use slintx_syntax::{SyntaxKind, parse};
+// The wasm32 runner only sees `#[wasm_bindgen_test]`; natively `#[test]` stays.
+#[cfg(target_arch = "wasm32")]
+use wasm_bindgen_test::wasm_bindgen_test as test;
 
 macro_rules! fixtures {
     ($($name:literal),* $(,)?) => {
