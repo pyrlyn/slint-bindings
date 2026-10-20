@@ -7,10 +7,11 @@
 - T17. Web build
 - T73. slintx-syntax: a standalone AST parser
 - T73.1. slintx-syntax crate: lexer, lossless tree, parser, typed AST
-- T73.1.1. slintx-syntax: kinds, lexer, tree plumbing and public API
-- T73.1.2. slintx-syntax: expressions, statements and macros
-- T73.1.3. slintx-syntax: items, elements and declarations
-- T73.1.4. slintx-syntax: typed AST views
+- T73.1.1. slintx-syntax: kinds, lexer and lossless tree API
+- T73.1.2. slintx-syntax: parser core and expressions
+- T73.1.3. slintx-syntax: strings, macros, types and statements
+- T73.1.4. slintx-syntax: items, elements and declarations
+- T73.1.5. slintx-syntax: typed AST views
 - T73.2. Licence gate and wasm32 build for slintx crates
 - T74. slintx-conformance: differential harness against Slint
 - T75. Modules, imports and exports

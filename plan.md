@@ -51,11 +51,12 @@ Not added: `slint_embed::events` is used only by slint_dart and stays there; `i-
 | T15 | todo | P3 | 3 | 0% | |
 | T17 | todo | P3 | 3 | 0% | |
 | T73 | in progress | P0 | 4 | 0% | Claude / opus-5.5 |
-| T73.1 | in progress | P0 | 4 | 25% | Claude / opus-5.5 |
+| T73.1 | in progress | P0 | 4 | 40% | Claude / opus-5.5 |
 | T73.1.1 | in progress | P0 | 3 | 100% | Claude / opus-5.5 |
-| T73.1.2 | in progress | P0 | 3 | 0% | Claude / opus-5.5 |
+| T73.1.2 | in progress | P0 | 3 | 100% | Claude / opus-5.5 |
 | T73.1.3 | in progress | P0 | 3 | 0% | Claude / opus-5.5 |
-| T73.1.4 | in progress | P0 | 2 | 0% | Claude / opus-5.5 |
+| T73.1.4 | in progress | P0 | 3 | 0% | Claude / opus-5.5 |
+| T73.1.5 | in progress | P0 | 2 | 0% | Claude / opus-5.5 |
 | T73.2 | in progress | P0 | 2 | 0% | Claude / opus-5.5 |
 | T74 | in progress | P0 | 3 | 0% | Claude / opus-5.5 |
 | T75 | todo | P1 | 3 | 0% | |
@@ -258,55 +259,62 @@ and diagnostics with byte spans. Own fixtures under
 error-recovery tests pass on those fixtures and the crate has no dependency on
 `slint`, `slint-*` or `i-slint-*`.
 
-Split at claim time: the whole crate is about 1900 lines of code, so it goes
-in four commits of at most 500 lines each (T73.1.1–T73.1.4), stacked on this
+Split at claim time: the whole crate is about 2300 lines of code, so it goes
+in five commits of at most 500 lines each (T73.1.1–T73.1.5), stacked on this
 branch. Each commit builds, passes its own tests and adds fixtures.
 
 Execution plan:
 
 1. T73.1.1 — `Cargo.toml` (rowan from `[workspace.dependencies]`, workspace
-   lints), `src/kind.rs`, `src/lexer.rs`, `src/lib.rs` (`parse`,
-   `Parse { green, diagnostics }`, `Diagnostic { message, range }`), and the
-   parser core (`src/parser.rs`: token cursor, trivia attachment, error
-   nodes).
-2. T73.1.2 — `src/grammar/expr.rs`: expressions, statements, macros.
-3. T73.1.3 — `src/grammar/items.rs`: top-level items, element members, types.
-4. T73.1.4 — `src/ast.rs`: typed views, one per node kind.
-5. Tests in `tests/`: every fixture in `tests/fixtures/*.slint` round-trips
+   lints), `src/kind.rs`, `src/lexer.rs`, `src/lib.rs` (`parse`, `lex`,
+   `Parse`, `Diagnostic { message, range }`).
+2. T73.1.2 — `src/parser.rs` (token cursor, trivia attachment, error nodes,
+   nesting limit), `src/grammar/expr.rs`, `parse_binding_expression`.
+3. T73.1.3 — `src/grammar/macros.rs` (strings, escapes, interpolation, `@`
+   macros) and `src/grammar/stmt.rs` (types, code blocks, statements).
+4. T73.1.4 — `src/grammar/items.rs`: top-level items and element members.
+5. T73.1.5 — `src/ast.rs`: typed views, one per node kind.
+6. Tests in `tests/`: every fixture in `tests/fixtures/*.slint` round-trips
    byte for byte and parses with no diagnostics; every `tests/fixtures/errors/`
    file round-trips and yields the diagnostics in its `.expected` file (message
    and byte range); span tests check node ranges against substrings.
-6. Verify: `cargo fmt --check`, `cargo clippy -p slintx-syntax --all-targets
+7. Verify: `cargo fmt --check`, `cargo clippy -p slintx-syntax --all-targets
    -- -D warnings`, `cargo nextest run -p slintx-syntax`, `cargo build -p
    slintx-syntax --target wasm32-unknown-unknown`, `cargo tree -p
    slintx-syntax` shows no Slint crate.
 
-### T73.1.1. slintx-syntax: kinds, lexer, tree plumbing and public API
+### T73.1.1. slintx-syntax: kinds, lexer and lossless tree API
 
 Token and node kinds, the hand-written lexer (BOM, nested block comments,
 identifiers with `-`, numbers with unit suffixes and `%`, `#` colors, strings
 with escapes and `\{expr}` interpolation, `@`, punctuation), the rowan
-language, the parser core with trivia attachment and error nodes, and the
-public `parse` API. Done when lexer tests pass and any input prints back byte
-for byte.
+language and the public `parse` and `lex` API. Done when lexer tests pass and
+any input prints back byte for byte.
 
-### T73.1.2. slintx-syntax: expressions, statements and macros
+### T73.1.2. slintx-syntax: parser core and expressions
 
-Expressions with Slint's precedence and the non-associativity diagnostics,
-code blocks and statements (`let`, `return`, `if`/`else`, assignments), and the
-`@tr`, `@image-url`, gradient, `@markdown` and `@keys` macros. Done when the
-expression fixtures round-trip with no diagnostics and broken expressions
-recover.
+The parser core (trivia attachment, error nodes, nesting limit against stack
+overflow on untrusted input) and expressions with Slint's precedence and the
+non-associativity diagnostics, postfix chains, array and object literals.
+Done when expression tests round-trip with no diagnostics and broken
+expressions recover.
 
-### T73.1.3. slintx-syntax: items, elements and declarations
+### T73.1.3. slintx-syntax: strings, macros, types and statements
+
+String templates and escape checks; the `@tr`, `@image-url`, gradient,
+`@markdown` and `@keys` macros; types; code blocks and statements (`let`,
+`return`, `if`/`else`, assignments). Done when their tests round-trip with no
+diagnostics and broken input recovers.
+
+### T73.1.4. slintx-syntax: items, elements and declarations
 
 Imports, exports, components with `inherits`, globals, structs with field
 defaults, enums, elements with ids, property/callback/function declarations,
 bindings, two-way bindings, handlers, `changed`, `states`, transitions,
-`animate`, `for`, `if`, `@children` and types. Done when one fixture per
-construct round-trips with no diagnostics and broken items recover.
+`animate`, `for`, `if` and `@children`. Done when one fixture per construct
+round-trips with no diagnostics and broken items recover.
 
-### T73.1.4. slintx-syntax: typed AST views
+### T73.1.5. slintx-syntax: typed AST views
 
 One typed view per node kind with accessors, plus span tests through the
 views. Done when every fixture can be walked through the typed AST.

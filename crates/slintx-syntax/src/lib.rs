@@ -5,14 +5,16 @@
 //! so printing it gives back the input; broken input still yields a full tree,
 //! with error nodes where the parser recovered.
 
+mod grammar;
 mod kind;
 mod lexer;
+mod parser;
 
 use std::fmt;
 use std::ops::Range;
 
 pub use kind::{SlintLanguage, SyntaxKind};
-pub use rowan::{TextRange, TextSize};
+pub use rowan::{NodeOrToken, TextRange, TextSize};
 
 pub type SyntaxNode = rowan::SyntaxNode<SlintLanguage>;
 pub type SyntaxToken = rowan::SyntaxToken<SlintLanguage>;
@@ -67,27 +69,33 @@ impl Parse {
 /// Parses a whole `.slint` file. Never fails: errors become error nodes in
 /// the tree and entries in [`Parse::diagnostics`].
 pub fn parse(source: &str) -> Parse {
+    run(source, grammar::file, SyntaxKind::File)
+}
+
+/// Parses what follows `name:` in a binding on its own: an expression or a
+/// `{ ... }` code block. The root is a `BindingExpression` node.
+pub fn parse_binding_expression(source: &str) -> Parse {
+    run(source, grammar::binding_root, SyntaxKind::BindingExpression)
+}
+
+fn run(source: &str, entry: fn(&mut parser::Parser), root: SyntaxKind) -> Parse {
     if u32::try_from(source.len()).is_err() {
         // rowan offsets are u32; such a file cannot be represented at all.
         let mut builder = rowan::GreenNodeBuilder::new();
-        builder.start_node(SyntaxKind::File.into());
+        builder.start_node(root.into());
         builder.finish_node();
         return Parse {
             green: builder.finish(),
             diagnostics: vec![Diagnostic::new("source is larger than 4 GiB", 0..0)],
         };
     }
-    let (tokens, diagnostics) = lexer::lex(source);
-    let mut builder = rowan::GreenNodeBuilder::new();
-    builder.start_node(SyntaxKind::File.into());
-    for token in &tokens {
-        builder.token(token.kind.into(), &source[token.start..token.end]);
-    }
-    builder.finish_node();
-    Parse {
-        green: builder.finish(),
-        diagnostics,
-    }
+    let (tokens, mut diagnostics) = lexer::lex(source);
+    let mut parser = parser::Parser::new(source, &tokens);
+    entry(&mut parser);
+    let (green, parse_diagnostics) = parser.finish_tree();
+    diagnostics.extend(parse_diagnostics);
+    diagnostics.sort_by_key(|d| d.range.start());
+    Parse { green, diagnostics }
 }
 
 /// Splits source into tokens, trivia included, with their byte ranges.
