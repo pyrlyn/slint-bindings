@@ -1,6 +1,8 @@
 //! The Slint grammar, as recursive descent over [`Parser`].
 
 mod expr;
+mod macros;
+mod stmt;
 
 use crate::SyntaxKind as K;
 use crate::parser::Parser;

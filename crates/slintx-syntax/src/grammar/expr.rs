@@ -1,11 +1,21 @@
 //! Expressions: operators by precedence, postfix chains and literals.
 
+use super::macros::{macro_call, string_literal, string_template};
+use super::stmt::code_block;
 use crate::SyntaxKind as K;
 use crate::parser::Parser;
 
-/// What follows `name:` in a binding.
-pub(crate) fn binding_value(p: &mut Parser) {
-    expr(p);
+/// What follows `name:` in a binding: a code block, or an expression. A
+/// `{` opens an object literal only when `name:` follows it. Returns whether
+/// it was a block, since a block needs no `;` after it.
+pub(crate) fn binding_value(p: &mut Parser) -> bool {
+    let block = p.at(K::LBrace) && !(p.nth(1) == Some(K::Ident) && p.nth(2) == Some(K::Colon));
+    if block {
+        code_block(p);
+    } else {
+        expr(p);
+    }
+    block
 }
 
 /// Ternary, the loosest level; right-associative.
@@ -122,10 +132,11 @@ fn postfix(p: &mut Parser) {
 }
 
 /// Returns false, after a diagnostic, when no expression starts here.
-fn primary(p: &mut Parser) -> bool {
+pub(crate) fn primary(p: &mut Parser) -> bool {
     match p.nth(0) {
         Some(K::Number | K::Color) => node(p, K::Literal),
-        Some(K::String) => node(p, K::Literal),
+        Some(K::String) => string_literal(p),
+        Some(K::StringStart) => string_template(p),
         Some(K::Ident) => node(p, K::NameRef),
         Some(K::LParen) => {
             p.start(K::ParenExpr);
@@ -136,6 +147,7 @@ fn primary(p: &mut Parser) -> bool {
         }
         Some(K::LBracket) => array_literal(p),
         Some(K::LBrace) => object_literal(p),
+        Some(K::At) => macro_call(p),
         // Leave closing tokens to the construct that owns them.
         None | Some(K::Semicolon | K::RBrace | K::RParen | K::RBracket | K::Comma | K::Colon) => {
             p.error("expected an expression");
@@ -149,7 +161,7 @@ fn primary(p: &mut Parser) -> bool {
     true
 }
 
-fn node(p: &mut Parser, kind: K) {
+pub(crate) fn node(p: &mut Parser, kind: K) {
     p.start(kind);
     p.bump();
     p.finish();

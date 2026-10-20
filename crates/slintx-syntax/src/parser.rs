@@ -67,6 +67,22 @@ impl<'a> Parser<'a> {
         self.nth(0).is_none()
     }
 
+    pub fn nth_text(&self, n: usize) -> &'a str {
+        self.significant(n)
+            .map_or("", |t| &self.src[t.start..t.end])
+    }
+
+    /// Slint has no reserved words: a keyword is an identifier with that
+    /// text where the grammar expects it. `_` and `-` are the same letter
+    /// after the first, so `in_out` is `in-out`.
+    pub fn nth_keyword(&self, n: usize, keyword: &str) -> bool {
+        self.nth(n) == Some(SyntaxKind::Ident) && same_name(self.nth_text(n), keyword)
+    }
+
+    pub fn at_keyword(&self, keyword: &str) -> bool {
+        self.nth_keyword(0, keyword)
+    }
+
     // Trivia goes to whichever node is open when the next real token or node
     // starts, so nodes begin at their first significant token.
     fn flush_trivia(&mut self) {
@@ -163,4 +179,23 @@ impl<'a> Parser<'a> {
     pub fn leave(&mut self) {
         self.depth -= 1;
     }
+
+    pub fn push_diagnostic(&mut self, diagnostic: Diagnostic) {
+        self.diagnostics.push(diagnostic);
+    }
+
+    /// Byte offset of the current significant token.
+    pub fn offset(&self) -> usize {
+        self.significant(0).map_or(self.src.len(), |t| t.start)
+    }
+}
+
+/// Compares identifiers the way Slint does: `_` after the first character
+/// equals `-`.
+pub(crate) fn same_name(a: &str, b: &str) -> bool {
+    let normalize = |(i, c): (usize, char)| if i > 0 && c == '_' { '-' } else { c };
+    a.chars()
+        .enumerate()
+        .map(normalize)
+        .eq(b.chars().enumerate().map(normalize))
 }
