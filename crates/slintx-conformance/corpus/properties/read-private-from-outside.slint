@@ -1,0 +1,8 @@
+// language/properties: reading a private property from outside.
+component Card inherits Rectangle {
+    property <int> hidden: 1;
+}
+export component Main inherits Window {
+    card := Card {}
+    property <int> v: card.hidden;
+}

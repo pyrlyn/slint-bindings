@@ -1,0 +1,2 @@
+verdict: reject
+error position-in-layout.slint:3:39: The property 'x' cannot be set for elements placed in this layout, because the layout is already setting it

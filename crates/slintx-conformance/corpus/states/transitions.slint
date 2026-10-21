@@ -1,0 +1,12 @@
+// language/states-and-transitions: `in` and `out` transitions.
+export component Main inherits Window {
+    in property <bool> active;
+    r := Rectangle { background: gray; }
+    states [
+        on when active: {
+            r.background: blue;
+            in { animate r.background { duration: 100ms; } }
+            out { animate r.background { duration: 200ms; } }
+        }
+    ]
+}

@@ -1,0 +1,9 @@
+// language/properties: several `changed` handlers dirtied by one change.
+// OPEN O44: handler order, passes and the first run.
+export component Main inherits Window {
+    in property <int> a;
+    property <int> b: a * 2;
+    out property <string> log;
+    changed b => { log += "b"; }
+    changed a => { log += "a"; }
+}

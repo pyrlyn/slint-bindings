@@ -1,0 +1,10 @@
+// common: geometry, opacity, visibility and dynamic `z` on built-in elements.
+export component Main inherits Window {
+    in property <int> layer;
+    Rectangle {
+        x: 1px; y: 2px; width: 10px; height: 10px; z: layer;
+        opacity: 0.5; visible: true; clip: true;
+        background: red; border-width: 1px; border-color: blue; border-radius: 2px;
+        border-top-left-radius: 4px; drop-shadow-blur: 2px; drop-shadow-color: black;
+    }
+}

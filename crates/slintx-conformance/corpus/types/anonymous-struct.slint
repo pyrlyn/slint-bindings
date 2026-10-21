@@ -1,0 +1,5 @@
+// language/structs-and-enums: anonymous struct types with a trailing comma.
+export component Main inherits Window {
+    property <{a: int, b: string, }> p: { a: 1, b: "x" };
+    property <{a: int, b: string}> q: p;
+}

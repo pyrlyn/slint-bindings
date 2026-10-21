@@ -1,0 +1,8 @@
+// window/popupwindow: PopupWindow with a close policy.
+export component Main inherits Window {
+    p := PopupWindow {
+        close-policy: close-on-click-outside;
+        Rectangle { width: 10px; height: 10px; }
+    }
+    TouchArea { clicked => { p.show(); } }
+}

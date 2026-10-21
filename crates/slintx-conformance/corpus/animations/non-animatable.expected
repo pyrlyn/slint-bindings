@@ -1,0 +1,2 @@
+verdict: reject
+error non-animatable.slint:4:13: 's' is not a property that can be animated

@@ -1,0 +1,6 @@
+// language/imports: structs, enums and globals import like components.
+import { Theme, Point2, Mode } from "lib.slint";
+export component Main inherits Window {
+    property <Point2> p: { x: Theme.gap };
+    property <Mode> m: Mode.dark;
+}

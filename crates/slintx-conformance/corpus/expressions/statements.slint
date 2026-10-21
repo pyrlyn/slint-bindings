@@ -1,0 +1,10 @@
+// language/statements: `let`, assignment, `if`/`else if`, `return` in handlers.
+export component Main inherits Window {
+    in-out property <int> n;
+    callback go(int) -> int;
+    go(x) => {
+        let y = x * 2;
+        if y > 10 { return 1; } else if y > 5 { n = y; } else { n += 1; }
+        return n;
+    }
+}

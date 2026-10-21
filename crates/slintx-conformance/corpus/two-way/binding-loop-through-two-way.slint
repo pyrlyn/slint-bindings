@@ -1,0 +1,6 @@
+// language/two-way-bindings: a loop that only closes through `<=>` (new in 1.18).
+// OPEN O35: binding loops.
+export component Main inherits Window {
+    property <int> a <=> b;
+    property <int> b: a + 1;
+}

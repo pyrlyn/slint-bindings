@@ -1,0 +1,10 @@
+// language/states-and-transitions: going straight from state a to state b.
+// OPEN O52, O53: which transition applies; retargeting mid-transition.
+export component Main inherits Window {
+    in property <int> mode;
+    r := Rectangle { x: 0px; }
+    states [
+        a when mode == 1: { r.x: 10px; out { animate r.x { duration: 100ms; } } }
+        b when mode == 2: { r.x: 20px; in { animate r.x { duration: 300ms; } } }
+    ]
+}

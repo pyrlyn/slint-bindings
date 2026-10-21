@@ -1,0 +1,8 @@
+// language/evaluation-and-purity: a re-evaluation that yields the same value.
+// OPEN O37: evaluation order, notification on equal values.
+export component Main inherits Window {
+    in property <int> a;
+    property <bool> positive: a > 0;
+    out property <int> runs;
+    changed positive => { runs += 1; }
+}

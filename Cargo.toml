@@ -32,6 +32,8 @@ slint-dart-interpreter = { path = "flutter/packages/slint_build/interpreter" }
 # it moves in lockstep with `slint` (exact pins on all three).
 i-slint-core = { version = "=1.18.1", default-features = false, features = ["image-decoders", "svg"] }
 thiserror = "2.0.21"
+rowan = "0.17.0"
+wasm-bindgen-test = "0.3.79"
 # T14: the accessibility tree schema (platform-neutral) and its AppKit adapter.
 # Not through Slint's winit backend, which would bring winit and its renderers.
 accesskit = "0.25.1"

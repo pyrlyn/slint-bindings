@@ -1,0 +1,7 @@
+// language/callbacks: declare, handle and invoke.
+export component Main inherits Window {
+    callback hello(int, string) -> int;
+    hello(n, s) => { return n + s.character-count; }
+    callback named(count: int);
+    TouchArea { clicked => { debug(hello(1, "ab")); } }
+}

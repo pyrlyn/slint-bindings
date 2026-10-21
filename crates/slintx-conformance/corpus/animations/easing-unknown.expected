@@ -1,0 +1,2 @@
+verdict: reject
+error easing-unknown.slint:3:37: Unknown unqualified identifier 'ease-in-wobble'. Use space before the '-' if you meant a subtraction

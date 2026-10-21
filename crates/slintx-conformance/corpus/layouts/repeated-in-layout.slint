@@ -1,0 +1,8 @@
+// layouts/overview: `for` and `if` inside layouts.
+export component Main inherits Window {
+    in property <bool> extra;
+    VerticalLayout {
+        for i in 3: Rectangle { height: 10px; }
+        if extra: Rectangle { height: 5px; }
+    }
+}

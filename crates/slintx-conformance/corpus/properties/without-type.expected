@@ -1,0 +1,2 @@
+verdict: reject
+error without-type.slint:3:14: Missing type. The syntax to declare a property is `property <type> name;`. Only two way bindings can omit the type

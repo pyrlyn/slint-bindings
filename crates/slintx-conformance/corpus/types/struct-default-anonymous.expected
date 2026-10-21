@@ -1,0 +1,2 @@
+verdict: reject
+error struct-default-anonymous.slint:3:25: Field default values are only supported in named struct declarations

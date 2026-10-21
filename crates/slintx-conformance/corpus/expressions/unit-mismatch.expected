@@ -1,0 +1,2 @@
+verdict: reject
+error unit-mismatch.slint:3:32: Cannot convert duration to length

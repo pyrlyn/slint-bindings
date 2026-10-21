@@ -1,0 +1,7 @@
+// language/functions: functions with arguments and return values.
+export component Main inherits Window {
+    function double(x: int) -> int { return x * 2; }
+    pure function triple(x: int) -> int { x * 3 }
+    public pure function quad(x: int) -> int { double(double(x)) }
+    out property <int> r: triple(2) + quad(1);
+}

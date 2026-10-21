@@ -1,0 +1,7 @@
+// property-types/arrays-and-models: length, index, push, remove, insert.
+export component Main inherits Window {
+    in-out property <[int]> a: [1, 2, 3];
+    out property <int> n: a.length;
+    out property <int> first: a[0];
+    TouchArea { clicked => { a.push(4); a.remove(0); a.insert(1, 9); a[2] = 5; } }
+}

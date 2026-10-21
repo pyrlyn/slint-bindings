@@ -1,0 +1,8 @@
+// std-widgets/views/listview: many rows in a ListView.
+// OPEN O48: lazy instantiation.
+import { ListView } from "std-widgets.slint";
+export component Main inherits Window {
+    ListView {
+        for i in 10000: Text { text: i; }
+    }
+}

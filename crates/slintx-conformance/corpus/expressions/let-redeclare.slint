@@ -1,0 +1,4 @@
+// language/statements: shadowing a `let` in the same block.
+export component Main inherits Window {
+    out property <int> v: { let a = 1; let a = 2; a }
+}

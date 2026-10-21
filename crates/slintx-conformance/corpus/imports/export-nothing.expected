@@ -1,0 +1,2 @@
+verdict: accept
+warning export-nothing.slint:2:1: Component is implicitly marked for export. This is deprecated and it should be explicitly exported

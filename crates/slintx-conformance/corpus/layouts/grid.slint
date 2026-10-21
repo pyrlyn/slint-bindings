@@ -1,0 +1,8 @@
+// layouts/gridlayout: `Row`, `col`, `row`, `colspan` and `rowspan`.
+export component Main inherits Window {
+    GridLayout {
+        spacing: 2px;
+        Row { Rectangle {} Rectangle { colspan: 2; } }
+        Rectangle { row: 2; col: 1; rowspan: 2; }
+    }
+}

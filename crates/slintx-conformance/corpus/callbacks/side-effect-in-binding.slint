@@ -1,0 +1,6 @@
+// language/evaluation-and-purity: a model push inside a binding.
+// OPEN O40: purity of built-ins.
+export component Main inherits Window {
+    property <[int]> items;
+    property <int> n: { items.push(1); 1 }
+}

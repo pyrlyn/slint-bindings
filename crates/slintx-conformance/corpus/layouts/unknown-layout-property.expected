@@ -1,0 +1,2 @@
+verdict: reject
+error unknown-layout-property.slint:3:24: Unknown property gap in HorizontalLayout

@@ -1,0 +1,7 @@
+// language/repetition-and-conditional-elements: `for` over an array with an index.
+export component Main inherits Window {
+    property <[{name: string}]> items: [{name: "a"}, {name: "b"}];
+    VerticalLayout {
+        for item[i] in items: Text { text: i + item.name; }
+    }
+}

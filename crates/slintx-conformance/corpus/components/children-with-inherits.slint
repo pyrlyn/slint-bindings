@@ -1,0 +1,11 @@
+// language/container-components: `@children` in a base, children added by a derived component.
+// OPEN O49: `@children` with `inherits`.
+component Frame inherits Rectangle {
+    @children
+}
+component Panel inherits Frame {
+    Text { text: "added by Panel"; width: parent.width; }
+}
+export component Main inherits Window {
+    Panel { Text { text: "use site"; } }
+}

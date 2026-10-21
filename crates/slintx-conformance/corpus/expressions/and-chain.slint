@@ -1,0 +1,6 @@
+// language/operators: a chain of one logical operator.
+// OPEN O11: same-operator chains.
+export component Main inherits Window {
+    property <bool> v: true && false && true;
+    property <bool> w: true || false || true;
+}

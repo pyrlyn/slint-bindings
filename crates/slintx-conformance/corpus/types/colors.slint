@@ -1,0 +1,9 @@
+// property-types/colors-and-brushes: color functions and methods.
+export component Main inherits Window {
+    property <color> a: rgb(255, 0, 0);
+    property <color> b: rgba(100%, 50%, 0%, 0.5);
+    property <color> c: hsv(480, 0.5, 1);
+    property <color> d: oklch(0.5, 50%, 180deg, 1);
+    property <brush> e: a.brighter(20%).darker(0.1).mix(b, 0.3).transparentize(0.5).with-alpha(1);
+    property <float> h: a.to-hsv().hue + a.to-oklch().lightness;
+}

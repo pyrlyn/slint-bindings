@@ -1,0 +1,2 @@
+verdict: reject
+error self-loop.slint:4:23: The binding for the property 'a' is part of a binding loop (root.a -> root.a)

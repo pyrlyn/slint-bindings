@@ -1,0 +1,2 @@
+verdict: reject
+error percent-non-size.slint:4:20: Automatic conversion from percentage to length is only possible for the following properties: width, height, preferred-width, preferred-height

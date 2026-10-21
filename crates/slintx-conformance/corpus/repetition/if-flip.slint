@@ -1,0 +1,7 @@
+// language/repetition-and-conditional-elements: a condition flipped twice in one handler.
+// OPEN O47: instantiate then destroy within one frame.
+export component Main inherits Window {
+    in-out property <bool> show;
+    if show: Rectangle { init => { debug("made"); } }
+    TouchArea { clicked => { show = true; show = false; } }
+}

@@ -1,0 +1,2 @@
+verdict: reject
+error bare-number-length.slint:3:26: Cannot convert float to length. Use an unit, or multiply by 1px to convert explicitly

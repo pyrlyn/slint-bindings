@@ -1,0 +1,3 @@
+verdict: accept
+warning legacy-syntax.slint:2:6: ':=' to declare a component is deprecated. The new syntax declare components with 'component MyComponent {'. Read the documentation for more info
+warning legacy-syntax.slint:2:1: Component is implicitly marked for export. This is deprecated and it should be explicitly exported

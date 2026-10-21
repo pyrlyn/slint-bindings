@@ -1,0 +1,8 @@
+component Watcher {
+    in property <string> text;
+    property <int> edits;
+    changed text => {
+        edits += 1;
+    }
+    changed edits => debug(edits);
+}

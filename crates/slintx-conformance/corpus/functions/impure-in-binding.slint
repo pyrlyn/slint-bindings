@@ -1,0 +1,6 @@
+// language/evaluation-and-purity: a binding calling a function that assigns.
+export component Main inherits Window {
+    property <int> counter;
+    function bump() -> int { counter += 1; return counter; }
+    property <int> r: bump();
+}

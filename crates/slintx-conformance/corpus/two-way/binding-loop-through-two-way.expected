@@ -1,0 +1,3 @@
+verdict: reject
+error binding-loop-through-two-way.slint:5:23: The binding for the property 'b' is part of a binding loop (root.a -> root.b -> root.a)
+error binding-loop-through-two-way.slint:4:22: The binding for the property 'a' is part of a binding loop (root.a -> root.b -> root.a)

@@ -1,0 +1,10 @@
+// language/callbacks: `init` on a component and at its use site.
+// OPEN O20, O42, O43: init order and whether both handlers run.
+component Inner inherits Rectangle {
+    init => { debug("inner"); }
+}
+export component Main inherits Window {
+    init => { debug("main"); }
+    Inner { init => { debug("use site"); } }
+    Inner {}
+}

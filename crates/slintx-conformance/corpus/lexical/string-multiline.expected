@@ -1,0 +1,2 @@
+verdict: reject
+error string-multiline.slint:4:26: Newline in string literal
