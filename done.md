@@ -63,6 +63,21 @@ at 1× and 2×, and the form after the name is set to "Ada".
 `SB_UPDATE_SNAPSHOTS=1` rewrites the PNGs when that picture is meant to change.
 `just check` passes.
 
+### T4. macOS keyboard, IME and focus
+
+Adopt `NSTextInputClient` in `SlintNSView` so composition (CJK, dead keys,
+emoji picker) reaches Slint as preedit and commit text; complete the AppKit →
+Slint key map (function keys, Home/End, Page Up/Down, modifiers as separate
+key events) with table-driven tests; make Tab move focus out of the Slint view
+into SwiftUI when Slint has no next focus item. Done when a Japanese input
+method commits text into the demo field and the key-map tests cover every
+`slint::platform::Key`.
+
+Execution: the AppKit → Slint map lives in `slint-bindings-core` (one table,
+tested on every `Key`). `SlintNSView` adopts `NSTextInputClient`: marked text
+is a preedit, `insertText` commits, and a rejected Tab or Backtab calls
+`selectNextKeyView` / `selectPreviousKeyView`.
+
 ### T6. WinUI host builds and runs (M2)
 
 The WinUI host compiles in CI. Virtual keys, IME composition and the per-RID
@@ -275,6 +290,39 @@ WinUI code without running any of it.
 - CI `windows-host`: the host tests, a self-contained build
   (`WindowsAppSDKSelfContained`), the smoke run, and the capture as the
   `weft-winui` artifact.
+
+### T10. Multiple hosts and popups
+
+`slint::platform::set_platform` is once per thread, and each component gets its
+own `MinimalSoftwareWindow`. Verify two `SlintNSView`s in one window and two
+windows; make Slint `PopupWindow` and menus render inside the host view (no
+native child windows) and clip correctly. Done with a demo showing two views
+and a combo-box popup in each.
+
+Execution: Slint 1.18 renders a popup as a child window inside its parent's
+buffer when the window adapter cannot make one of its own, which
+`MinimalSoftwareWindow` cannot, so no native windows appear. CPU path only.
+1. Fixture `crates/slint-bindings-core/ui/popups.slint`: a `ComboBox` near the
+   top, one near the bottom edge (its popup must stay inside the view) and a
+   `ContextMenuArea`, with `out` properties for what was picked.
+2. Core (`host.rs`): `focus_changed(false)` closes the view's auto-close popups.
+   Slint closes them on a click elsewhere in the same window only; a click in
+   another host view or in SwiftUI never reaches it.
+3. Core tests: two hosts on one thread stay independent; a popup draws into
+   its host's buffer and no window adapter is created; the bottom popup fits
+   inside the frame; closing it restores the frame pixel for pixel (partial
+   repaint); focus loss closes it; the context menu draws inline.
+4. Swift tests: two `SlintNSView`s in one `NSWindow` and one in each of two
+   windows; opening a popup adds no `NSWindow`.
+5. Demo: a second window with two CPU `SlintView`s of `popups.slint`.
+Verify with `just check` and `just swift-run`.
+
+Result: no native windows needed fixing; Slint 1.18 already draws every popup
+inside the host's buffer and places it inside the view. The one change is in
+`EmbeddedHost::focus_changed`: losing focus closes the view's auto-close
+popups. `GpuHost::focus_changed` still needs the same `close_auto_popups` call
+once the GPU path is replaced (T72). The demo opens a second window,
+"Slint popups", with two CPU views.
 
 ### T12. Weft → Slint renderer (dropped)
 
