@@ -1,0 +1,2 @@
+verdict: reject
+error duplicate.slint:4:23: Cannot override property 'a'

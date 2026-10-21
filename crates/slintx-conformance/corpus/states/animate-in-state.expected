@@ -1,0 +1,5 @@
+verdict: reject
+error animate-in-state.slint:6:46: Syntax error: expected ':'
+error animate-in-state.slint:6:46: Syntax error: expected ']'
+error animate-in-state.slint:6:47: Parse error
+error animate-in-state.slint:7:5: Parse error: expected a top-level item such as a component, a struct, or a global

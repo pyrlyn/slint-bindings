@@ -1,0 +1,2 @@
+verdict: reject
+error assign-in-from-inside.slint:8:46: Assignment on an 'in' property

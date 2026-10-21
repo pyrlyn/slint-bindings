@@ -1,0 +1,2 @@
+verdict: reject
+error children.slint:3:5: A global component cannot have sub elements

@@ -1,0 +1,2 @@
+verdict: reject
+error unknown-element.slint:3:5: Unknown element 'Nothing'

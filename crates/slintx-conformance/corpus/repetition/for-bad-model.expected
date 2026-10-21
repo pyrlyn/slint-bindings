@@ -1,0 +1,2 @@
+verdict: reject
+error for-bad-model.slint:3:14: Cannot convert string to model

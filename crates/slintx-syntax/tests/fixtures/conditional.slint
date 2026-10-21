@@ -1,0 +1,6 @@
+component Maybe {
+    in property <bool> show;
+    if show : Text { text: "visible"; }
+    if !show && root.width > 10px : badge := Rectangle {}
+    if (show) : Rectangle {}
+}

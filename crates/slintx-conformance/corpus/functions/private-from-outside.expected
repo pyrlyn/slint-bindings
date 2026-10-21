@@ -1,0 +1,2 @@
+verdict: reject
+error private-from-outside.slint:7:35: The function 'hidden' is private. Annotate it with 'public' to make it accessible from other components

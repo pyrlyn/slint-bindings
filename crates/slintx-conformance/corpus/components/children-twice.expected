@@ -1,0 +1,2 @@
+verdict: reject
+error children-twice.slint:4:5: The @children placeholder can only appear once in an element

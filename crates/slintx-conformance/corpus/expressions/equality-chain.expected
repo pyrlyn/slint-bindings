@@ -1,0 +1,2 @@
+verdict: reject
+error equality-chain.slint:3:31: Use parentheses to disambiguate equality expression on the same level

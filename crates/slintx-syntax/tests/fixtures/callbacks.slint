@@ -1,0 +1,24 @@
+component Callbacks {
+    callback clicked;
+    callback hovered();
+    callback moved(length, y: length,);
+    callback compute(int, int) -> int;
+    pure callback format(value: float) -> string;
+    callback alias <=> area.clicked;
+    pure callback global-alias <=> Logic.notify;
+    clicked => { debug("clicked"); }
+    moved(x, y) => { self.last-x = x; }
+    compute(a, b) => a + b;
+    hovered() => {}
+    init => {
+        debug("ready");
+    }
+    area := TouchArea {
+        clicked => root.clicked();
+        pointer-event(event) => {
+            if event.kind == PointerEventKind.down {
+                root.hovered();
+            }
+        }
+    }
+}

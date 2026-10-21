@@ -1,0 +1,9 @@
+// language/geometry: size of an element with children but no base; out-of-range values.
+// OPEN O51: width default, negative sizes, opacity clamp.
+component Box {
+    Rectangle { width: 30px; height: 20px; }
+}
+export component Main inherits Window {
+    Box {}
+    Rectangle { width: -5px; opacity: 2; }
+}

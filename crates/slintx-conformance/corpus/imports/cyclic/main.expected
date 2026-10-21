@@ -1,0 +1,2 @@
+verdict: reject
+error b.slint:1:19: Recursive import of "a.slint"

@@ -1,0 +1,9 @@
+// language/two-way-bindings: a linked property that also has its own binding.
+// OPEN O39: precedence of `: expr` against `<=>`.
+component Field inherits Rectangle {
+    in-out property <int> value: 5;
+}
+export component Main inherits Window {
+    property <int> mine: 7;
+    Field { value <=> mine; }
+}

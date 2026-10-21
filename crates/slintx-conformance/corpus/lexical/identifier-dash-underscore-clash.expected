@@ -1,0 +1,2 @@
+verdict: reject
+error identifier-dash-underscore-clash.slint:4:20: Cannot override property 'foo-bar'

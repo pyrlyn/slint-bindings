@@ -1,0 +1,8 @@
+// language/functions: calling a public function from outside.
+component Card inherits Rectangle {
+    public function shown() {}
+}
+export component Main inherits Window {
+    card := Card {}
+    TouchArea { clicked => { card.shown(); } }
+}

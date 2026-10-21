@@ -1,0 +1,8 @@
+// language/callbacks: a handler that invokes its own callback and assigns `self`.
+// OPEN O41: reentrancy and assignments to `self`.
+export component Main inherits Window {
+    callback count(int);
+    out property <int> total;
+    count(n) => { total += 1; if n > 0 { count(n - 1); } }
+    TouchArea { clicked => { self.enabled = false; count(3); } }
+}

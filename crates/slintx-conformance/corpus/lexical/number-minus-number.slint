@@ -1,0 +1,7 @@
+// language/lexical-structure: `1-2` after a number token.
+// OPEN O2: the number-then-identifier case.
+export component Main inherits Window {
+    property <int> c: 1-2;
+    property <int> d: 3-a;
+    property <int> a: 1;
+}

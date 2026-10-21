@@ -1,0 +1,2 @@
+verdict: reject
+error named-color-unknown.slint:3:32: 'notacolor' is not a member of the namespace Colors

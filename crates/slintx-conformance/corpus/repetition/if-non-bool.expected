@@ -1,0 +1,2 @@
+verdict: reject
+error if-non-bool.slint:3:8: Cannot convert float to bool

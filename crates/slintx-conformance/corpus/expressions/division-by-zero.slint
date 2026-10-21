@@ -1,0 +1,9 @@
+// language/operators: division by zero.
+// OPEN O12: int and float.
+export component Main inherits Window {
+    property <int> zero: 0;
+    out property <int> i: 1 / zero;
+    out property <float> f: 1.0 / zero;
+    out property <length> l: 10px / zero;
+    out property <int> c: 1 / 0;
+}

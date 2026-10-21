@@ -1,0 +1,6 @@
+// language/statements: `if` yielding a value as the last statement of a block.
+// OPEN O19: `if` as an expression.
+export component Main inherits Window {
+    in property <bool> c;
+    out property <int> v: { if c { 1 } else { 2 } }
+}

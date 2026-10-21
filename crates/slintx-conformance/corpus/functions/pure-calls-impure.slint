@@ -1,0 +1,6 @@
+// language/evaluation-and-purity: a pure function calling an impure one.
+export component Main inherits Window {
+    property <int> counter;
+    function bump() { counter += 1; }
+    pure function f() -> int { bump(); return 1; }
+}

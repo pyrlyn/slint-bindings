@@ -1,0 +1,7 @@
+// language/globals: a component property linked to a global property.
+global Store {
+    in-out property <int> count;
+}
+export component Main inherits Window {
+    in-out property <int> count <=> Store.count;
+}

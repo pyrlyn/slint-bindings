@@ -1,0 +1,18 @@
+component Props {
+    property <int> count;
+    property<int> tight: 1;
+    in property <string> label: "hi";
+    out property <bool> done: count > 3;
+    in-out property <length> size: 10px;
+    in_out property <float> legacy-spelling;
+    private property <color> tint: { return red; }
+    property <[int]> numbers: [1, 2, 3];
+    property <{ name: string, age: int }> person: { name: "Ann", age: 30 };
+    property <Foo.Bar> qualified;
+    in-out property <brush> fill <=> rect.background;
+    in property linked <=> rect.border-color;
+    rect := Rectangle {
+        width: parent.width * 50%;
+        x <=> root.offset;
+    }
+}

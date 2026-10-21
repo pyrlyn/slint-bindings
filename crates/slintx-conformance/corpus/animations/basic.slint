@@ -1,0 +1,9 @@
+// language/animations: `animate` with duration, easing and delay.
+export component Main inherits Window {
+    in property <bool> wide;
+    Rectangle {
+        width: wide ? 100px : 10px;
+        background: wide ? red : blue;
+        animate width, background { duration: 250ms; easing: ease-in-out; delay: 10ms; }
+    }
+}

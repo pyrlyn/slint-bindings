@@ -1,0 +1,6 @@
+// language/functions: a function that calls itself.
+// OPEN O41: recursion.
+export component Main inherits Window {
+    pure function fact(n: int) -> int { if n <= 1 { return 1; } return n * fact(n - 1); }
+    out property <int> r: fact(5);
+}

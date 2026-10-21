@@ -1,0 +1,2 @@
+verdict: reject
+error duplicate-binding.slint:4:5: Duplicated property binding

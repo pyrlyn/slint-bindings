@@ -1,0 +1,9 @@
+// language/structs-and-enums: an enum, its default and short names.
+export enum Suit { clubs, diamonds, hearts }
+export struct Card { suit: Suit, value: int }
+export component Main inherits Window {
+    property <Suit> s;
+    property <Suit> t: Suit.hearts;
+    property <Card> c: { suit: diamonds, value: 1 };
+    property <bool> b: s == clubs;
+}

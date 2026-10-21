@@ -1,0 +1,2 @@
+verdict: reject
+error reentrancy.slint:6:5: The binding for the property 'count' is part of a binding loop (root.count -> root.count)

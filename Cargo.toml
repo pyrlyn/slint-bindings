@@ -32,6 +32,8 @@ slint-dart-interpreter = { path = "flutter/packages/slint_build/interpreter" }
 # it moves in lockstep with `slint` (exact pins on all three).
 i-slint-core = { version = "=1.18.1", default-features = false, features = ["image-decoders", "svg"] }
 thiserror = "2.0.21"
+rowan = "0.17.0"
+wasm-bindgen-test = "0.3.79"
 slintx-wgpu = { path = "crates/slintx-wgpu" }
 # slintx-wgpu: the GPU API it draws with, glyph rasterizing, path tessellation
 # and plain-data vertex buffers. wgpu, swash, bytemuck and pollster keep the

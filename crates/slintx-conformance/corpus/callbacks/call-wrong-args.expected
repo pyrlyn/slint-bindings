@@ -1,0 +1,2 @@
+verdict: reject
+error call-wrong-args.slint:4:35: Cannot convert string to int

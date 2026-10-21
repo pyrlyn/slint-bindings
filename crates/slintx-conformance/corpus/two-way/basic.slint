@@ -1,0 +1,8 @@
+// language/two-way-bindings: `<=>` links two properties.
+component Field inherits Rectangle {
+    in-out property <string> text;
+}
+export component Main inherits Window {
+    in-out property <string> value <=> f.text;
+    f := Field {}
+}

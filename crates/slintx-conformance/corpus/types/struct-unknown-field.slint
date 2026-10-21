@@ -1,0 +1,6 @@
+// language/structs-and-enums: reading a field the struct does not have.
+struct P { a: int }
+export component Main inherits Window {
+    property <P> p;
+    property <int> v: p.b;
+}

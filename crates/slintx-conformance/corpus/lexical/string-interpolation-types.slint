@@ -1,0 +1,7 @@
+// language/expressions: interpolating values that are not numbers or strings.
+// OPEN O16: which types convert to string.
+export component Main inherits Window {
+    property <string> b: "\{true}";
+    property <string> l: "\{10px}";
+    property <string> c: "\{#ff0000}";
+}

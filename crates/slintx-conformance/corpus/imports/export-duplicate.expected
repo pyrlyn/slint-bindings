@@ -1,0 +1,4 @@
+verdict: reject
+error export-duplicate.slint:4:15: Duplicated export 'A'
+error export-duplicate.slint:2:18: Duplicated export 'A'
+warning export-duplicate.slint:2:8: Component is neither used nor exported

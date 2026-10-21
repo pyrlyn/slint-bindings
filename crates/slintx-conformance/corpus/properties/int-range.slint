@@ -1,0 +1,6 @@
+// property-types/numeric-types: an int literal beyond 32 bits.
+// OPEN O7: int width and overflow.
+export component Main inherits Window {
+    property <int> big: 2147483648;
+    property <int> huge: 9007199254740993;
+}

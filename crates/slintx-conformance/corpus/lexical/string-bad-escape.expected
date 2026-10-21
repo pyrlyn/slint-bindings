@@ -1,0 +1,2 @@
+verdict: reject
+error string-bad-escape.slint:3:27: Unknown escape sequence. Use '\\\\' to escape a literal backslash

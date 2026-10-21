@@ -1,0 +1,10 @@
+// language/globals: a global singleton read from a component.
+global Theme {
+    in-out property <color> accent: #336699;
+    callback changed-theme();
+    public pure function scaled(x: length) -> length { x * 2 }
+}
+export component Main inherits Window {
+    background: Theme.accent;
+    width: Theme.scaled(10px);
+}

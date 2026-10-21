@@ -1,0 +1,5 @@
+// language/structs-and-enums: a literal naming a field the target lacks is ignored.
+struct P { a: int }
+export component Main inherits Window {
+    property <P> p: { a: 1, zzz: 2 };
+}

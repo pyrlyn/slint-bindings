@@ -1,0 +1,2 @@
+verdict: reject
+error array-length-assign.slint:4:30: Assignment needs to be done on a property

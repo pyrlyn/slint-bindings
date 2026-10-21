@@ -1,0 +1,2 @@
+verdict: reject
+error handler-arity.slint:4:5: 'ping' only has 1 arguments, but 2 were provided

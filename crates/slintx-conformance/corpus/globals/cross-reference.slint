@@ -1,0 +1,12 @@
+// language/globals: globals that read each other.
+// OPEN O45: global initialization order.
+global A {
+    out property <int> x: B.y + 1;
+}
+global B {
+    out property <int> y: 2;
+    out property <int> z: A.x * 2;
+}
+export component Main inherits Window {
+    property <int> r: B.z;
+}

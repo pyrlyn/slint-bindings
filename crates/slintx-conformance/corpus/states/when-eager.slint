@@ -1,0 +1,11 @@
+// language/states-and-transitions: a state no one reads, with a changed handler.
+// OPEN O54: is `when` evaluated eagerly, and in which order.
+export component Main inherits Window {
+    in property <int> n;
+    out property <int> log;
+    property <int> v: 0;
+    changed v => { log += 1; }
+    states [
+        big when n > 5: { v: 1; }
+    ]
+}

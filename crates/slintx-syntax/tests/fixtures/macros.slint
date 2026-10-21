@@ -1,0 +1,17 @@
+component Macros {
+    property <string> greeting: @tr("Hello, {}", name);
+    property <string> items: @tr("I have {n} item" | "I have {n} items" % count);
+    property <string> contextual: @tr("ToolTip" => "ToolTip for {}", name);
+    property <string> both: @tr("Menu" => "{0} has {n} point" | "{0} has {n} points" % count, name);
+    property <image> icon: @image-url("icons/a.svg");
+    property <image> sliced: @image-url("frame.png", nine-slice(10 20 10 20));
+    property <brush> linear: @linear-gradient(90deg, #3f87a6 0%, #ebf8e1 50%, #f69d3c 100%);
+    property <brush> radial: @radial-gradient(circle, #f00 0%, #0f0 50%, #00f 100%);
+    property <brush> radial-at: @radial-gradient(circle 60px at 25px 25px, red 0%, blue 100%);
+    property <brush> conic: @conic-gradient(from 90deg at 10px 10px, red 0deg, blue 360deg);
+    property <styled-text> md: @markdown("**bold** and " "*\{name}*");
+    property <keys> undo: @keys(Control + Z);
+    property <keys> euro: @keys(Control + Shift? + Alt? + "€");
+    property <string> name;
+    property <int> count;
+}

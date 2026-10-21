@@ -1,0 +1,11 @@
+// layouts/horizontallayout, layouts/verticallayout: spacing, padding, alignment, stretch.
+export component Main inherits Window {
+    VerticalLayout {
+        spacing: 4px; padding: 8px; alignment: start;
+        HorizontalLayout {
+            padding-left: 2px; alignment: space-between;
+            Rectangle { horizontal-stretch: 2; min-width: 10px; }
+            Rectangle { horizontal-stretch: 1; max-width: 50px; preferred-width: 20px; }
+        }
+    }
+}

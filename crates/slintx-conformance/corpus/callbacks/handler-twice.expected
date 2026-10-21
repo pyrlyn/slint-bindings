@@ -1,0 +1,2 @@
+verdict: reject
+error handler-twice.slint:5:5: Duplicated callback

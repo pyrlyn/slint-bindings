@@ -1,0 +1,2 @@
+verdict: reject
+error trig-without-unit.slint:3:29: Cannot convert float to angle. Use an unit, or multiply by 1deg to convert explicitly
