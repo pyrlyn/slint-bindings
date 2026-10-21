@@ -451,7 +451,14 @@ impl<C: ComponentHandle> EmbeddedHost<C> {
     }
 
     /// The host view gained or lost keyboard focus.
+    ///
+    /// Losing it closes the view's popups, the way a native popup closes when
+    /// the user clicks elsewhere. Slint closes them only for a click inside
+    /// the same window, and a click in another view never reaches this one.
     pub fn focus_changed(&self, focused: bool) -> Result<(), Error> {
+        if !focused {
+            close_auto_popups(&self.window);
+        }
         self.send(WindowEvent::WindowActiveChanged(focused))
     }
 
@@ -479,6 +486,22 @@ pub(crate) fn dispatch_window(window: &slint::Window, event: WindowEvent) -> Res
 pub(crate) fn send_window(window: &slint::Window, event: WindowEvent) -> Result<(), Error> {
     let _accepted = dispatch_window(window, event)?;
     Ok(())
+}
+
+/// Closes every popup in `window` except those that asked never to be closed
+/// from outside (`close-policy: no-auto-close`).
+pub(crate) fn close_auto_popups(window: &slint::Window) {
+    let inner = i_slint_core::window::WindowInner::from_pub(window);
+    let open: Vec<_> = inner
+        .active_popups()
+        .iter()
+        .filter(|popup| popup.close_policy != i_slint_core::items::PopupClosePolicy::NoAutoClose)
+        .map(|popup| popup.popup_id)
+        .collect();
+    // Topmost first, so each closed popup hands focus back to the one below.
+    for id in open.into_iter().rev() {
+        inner.close_popup(id);
+    }
 }
 
 /// Moves focus to the next or previous item inside `window`.
@@ -584,6 +607,9 @@ fn write_frame_bgra(out: &mut [u8], pixels: &[PremultipliedRgbaColor]) {
         *slot = [px.blue, px.green, px.red, px.alpha];
     }
 }
+
+#[cfg(test)]
+mod popup_tests;
 
 #[cfg(test)]
 mod tests {

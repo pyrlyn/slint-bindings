@@ -24,7 +24,7 @@ dotnet build windows/SlintDemo.WinUI -p:Platform=x64
 ## Путь отрисовки
 
 - **GPU:** `SwapChainPanel`. Rust создаёт цепочку DXGI (wgpu
-  `SurfaceTargetUnsafe::SwapChainPanel`, FemtoVG) и вызывает
+  `SurfaceTargetUnsafe::SwapChainPanel`, slintx-wgpu) и вызывает
   `ISwapChainPanelNative::SetSwapChain` в UI-потоке. `CompositionScaleChanged`
   меняет размер.
 - **Запасной CPU:** кадры → `WriteableBitmap` → `Image`, если указатель панели

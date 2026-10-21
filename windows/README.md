@@ -38,7 +38,7 @@ panel.HostFactory = swapChain => SlintHost.Adopt(MakeNativeHost(swapChain));
 ## Rendering path
 
 - **GPU:** `SwapChainPanel`. Rust creates the DXGI swap chain (wgpu
-  `SurfaceTargetUnsafe::SwapChainPanel`, FemtoVG) and calls
+  `SurfaceTargetUnsafe::SwapChainPanel`, slintx-wgpu) and calls
   `ISwapChainPanelNative::SetSwapChain` on the UI thread. `CompositionScaleChanged`
   resizes it.
 - **CPU fallback:** frames → `WriteableBitmap` → `Image`, used when the panel

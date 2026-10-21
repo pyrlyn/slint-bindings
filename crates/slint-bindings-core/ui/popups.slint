@@ -1,0 +1,70 @@
+// Popups inside an embedded view: two combo boxes and a context menu.
+// The lower combo box sits on the bottom edge, so its popup has to be moved
+// up to stay inside the view. Rectangles are fixed so headless tests can hit
+// them. Centers, logical px, origin top-left:
+//   top combo box (80, 32), bottom combo box (80, 184), menu area (240, 100).
+import { ComboBox } from "std-widgets.slint";
+
+export component Popups inherits Window {
+    in property <string> label: "Popups";
+    out property <string> fruit: top.current-value;
+    out property <string> size: bottom.current-value;
+    out property <string> action;
+
+    preferred-width: 320px;
+    preferred-height: 200px;
+    background: #f7f7f8;
+
+    top := ComboBox {
+        x: 16px;
+        y: 16px;
+        width: 128px;
+        height: 32px;
+        model: ["Apple", "Banana", "Cherry", "Damson"];
+    }
+
+    Text {
+        x: 160px;
+        y: 24px;
+        text: root.label;
+    }
+
+    bottom := ComboBox {
+        x: 16px;
+        y: 168px;
+        width: 128px;
+        height: 32px;
+        model: ["Small", "Medium", "Large"];
+    }
+
+    ContextMenuArea {
+        x: 176px;
+        y: 60px;
+        width: 128px;
+        height: 80px;
+
+        Menu {
+            MenuItem {
+                title: "Copy";
+                activated => {
+                    root.action = "copy";
+                }
+            }
+            MenuItem {
+                title: "Paste";
+                activated => {
+                    root.action = "paste";
+                }
+            }
+        }
+
+        Rectangle {
+            background: #e4e4e8;
+            border-radius: 4px;
+
+            Text {
+                text: root.action == "" ? "Right-click" : root.action;
+            }
+        }
+    }
+}
