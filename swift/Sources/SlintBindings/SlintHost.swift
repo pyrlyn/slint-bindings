@@ -213,6 +213,33 @@ public final class SlintHost {
         _ = sb_host_focus_changed(handle, focused)
     }
 
+    // Accessibility. The view showing this host forwards its NSAccessibility
+    // entry points here; the elements are AccessKit's, built from Slint's item tree.
+
+    /// Exposes the component to VoiceOver through `view` (an `NSView`, held weakly). Once per host.
+    public func attachAccessibility(to view: AnyObject) throws {
+        guard sb_host_accessibility_attach(handle, Unmanaged.passUnretained(view).toOpaque()) else {
+            throw SlintError.last()
+        }
+    }
+
+    /// The view's `accessibilityChildren`; nil before `attachAccessibility` or on failure.
+    public func accessibilityChildren() -> [Any]? {
+        guard let array = sb_host_accessibility_children(handle) else { return nil }
+        return Unmanaged<NSArray>.fromOpaque(array).takeUnretainedValue() as? [Any]
+    }
+
+    /// The element inside the view that has keyboard focus, if any.
+    public func accessibilityFocusedElement() -> Any? {
+        sb_host_accessibility_focus(handle).map { Unmanaged<AnyObject>.fromOpaque($0).takeUnretainedValue() }
+    }
+
+    /// The element at `point`, in screen coordinates.
+    public func accessibilityHitTest(_ point: CGPoint) -> Any? {
+        sb_host_accessibility_hit_test(handle, point.x, point.y)
+            .map { Unmanaged<AnyObject>.fromOpaque($0).takeUnretainedValue() }
+    }
+
     // Properties and callbacks, as JSON values: `"text"`, `42`, `true`,
     // `"#ff0000"`, `"Enum.value"`, arrays for models, objects for structs.
 

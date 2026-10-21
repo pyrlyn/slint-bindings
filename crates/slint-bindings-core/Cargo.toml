@@ -24,6 +24,9 @@ accesskit = { workspace = true }
 slint = { workspace = true, features = ["renderer-femtovg-wgpu", "unstable-wgpu-30"] }
 pollster = "0.4.0"
 
+[target.'cfg(target_os = "macos")'.dependencies]
+accesskit_macos = { workspace = true }
+
 [lints]
 workspace = true
 
