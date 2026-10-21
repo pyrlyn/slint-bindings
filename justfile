@@ -5,7 +5,24 @@ header_path := "swift/Sources/CSlintBindings/slint_bindings.h"
 default: check
 
 # Everything CI runs on macOS. Cleanup is last so it does not invalidate the Swift link.
-check: fmt-check clippy nextest header-check pinvoke-check swift-package-check swift-build swift-test tidy
+check: fmt-check renderer-check clippy nextest header-check pinvoke-check swift-package-check swift-build swift-test tidy
+
+# Fail when Slint's own GPU renderers (FemtoVG, Skia) enter the build on any
+# target we ship; the GPU path draws with slintx-wgpu.
+renderer-check:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    status=0
+    for triple in aarch64-apple-darwin x86_64-pc-windows-msvc aarch64-pc-windows-msvc x86_64-unknown-linux-gnu; do
+        for crate in i-slint-renderer-femtovg i-slint-renderer-skia; do
+            if cargo tree -q --workspace --target "$triple" -e normal,build -i "$crate" 2>/dev/null | grep -q .; then
+                echo "$crate is in the $triple build:"
+                cargo tree -q --workspace --target "$triple" -e normal,build -i "$crate"
+                status=1
+            fi
+        done
+    done
+    exit "$status"
 
 fmt-check:
     cargo fmt --check

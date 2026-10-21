@@ -1,21 +1,19 @@
-//! FemtoVG on wgpu, presented into a host surface.
+//! slintx-wgpu, presented into a host surface.
 //!
 //! macOS passes a `CAMetalLayer`. Windows passes an `ISwapChainPanel`. The
 //! software platform stays installed; [`slint_embed::platform::set_next_window`]
 //! swaps in this adapter for the one component being created, so a CPU host
 //! in the same process still gets a [`MinimalSoftwareWindow`](slint::platform::software_renderer::MinimalSoftwareWindow).
 //!
-//! Skia is not used. `i-slint-renderer-skia` compiles all of Skia, and Slint
-//! does not re-export a public Skia renderer. FemtoVG's wgpu renderer is the
-//! public one (`renderer-femtovg-wgpu` + `unstable-wgpu-30`).
+//! Slint's own GPU renderers (FemtoVG, Skia) are kept out of the build: their
+//! licensing does not fit this project. `just renderer-check` enforces it.
 
 use std::cell::{Cell, RefCell};
 use std::rc::Rc;
 
-use slint::platform::femtovg_renderer::FemtoVGWGPURenderer;
 use slint::platform::{WindowAdapter, WindowEvent};
-use slint::wgpu_30::wgpu;
 use slint::{ComponentHandle, LogicalPosition, PhysicalSize, SharedString};
+use slintx_wgpu::{WgpuRenderer, wgpu};
 
 use crate::host::{
     check_scale, dispatch_composition_window, dispatch_window, move_focus_inside, send_window,
@@ -86,7 +84,7 @@ struct Attached {
 /// One GPU window. The host presents by calling [`GpuWindow::render`].
 struct GpuWindow {
     window: slint::Window,
-    renderer: FemtoVGWGPURenderer,
+    renderer: WgpuRenderer,
     session: Rc<GpuSession>,
     size: Cell<PhysicalSize>,
     attached: RefCell<Option<Attached>>,
@@ -94,20 +92,16 @@ struct GpuWindow {
 }
 
 impl GpuWindow {
-    fn new(session: Rc<GpuSession>) -> Result<Rc<Self>, Error> {
-        let renderer = FemtoVGWGPURenderer::new(
-            session.instance.clone(),
-            session.device.clone(),
-            session.queue.clone(),
-        )?;
-        Ok(Rc::new_cyclic(|weak| Self {
+    fn new(session: Rc<GpuSession>) -> Rc<Self> {
+        let renderer = WgpuRenderer::new(session.device.clone(), session.queue.clone());
+        Rc::new_cyclic(|weak| Self {
             window: slint::Window::new(weak.clone()),
             renderer,
             session,
             size: Cell::new(PhysicalSize::new(1, 1)),
             attached: RefCell::new(None),
             needs_redraw: Cell::new(true),
-        }))
+        })
     }
 
     fn slint_window(&self) -> &slint::Window {
@@ -215,7 +209,7 @@ impl GpuWindow {
     }
 
     fn present_frame(&self, retried: bool) -> Result<Frame, Error> {
-        // Take the texture, then drop the surface borrow before FemtoVG runs.
+        // Take the texture, then drop the surface borrow before the renderer runs.
         // Rendering queries the window adapter; holding the surface RefCell
         // across that call would panic if the adapter touched it.
         let taken = {
@@ -373,7 +367,7 @@ impl<C: ComponentHandle> GpuHost<C> {
         check_scale(scale)?;
         platform::ensure_installed()?;
         let session = GpuSession::shared()?;
-        let window = GpuWindow::new(session)?;
+        let window = GpuWindow::new(session);
         let staged = window.clone();
         slint_embed::platform::set_next_window(Box::new(move || Ok(staged)));
         let component = match make() {

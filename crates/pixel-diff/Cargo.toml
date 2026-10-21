@@ -1,0 +1,15 @@
+[package]
+name = "pixel-diff"
+description = "RGBA8 frames for screenshot tests: PNG encode and decode, per-pixel comparison with a threshold, diff images."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+[dependencies]
+png = { workspace = true }
+
+[lints]
+workspace = true

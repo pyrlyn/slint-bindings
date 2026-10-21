@@ -18,9 +18,16 @@
 | slint | local | https://github.com/slint-ui/slint | UI runtime; software renderer and custom platform API |
 | slint-interpreter | local | https://github.com/slint-ui/slint | Compiles `.slint` at run time (`sb_compile`) |
 | slint-dart-interpreter | local (path, `flutter/packages/slint_build/interpreter`) | https://github.com/listepo/slint_dart | Shared compile helper and JSON value bridge for properties and callbacks |
-| i-slint-core | local | https://github.com/slint-ui/slint | Feature unification only: image and SVG decoding without a backend |
+| i-slint-core | local | https://github.com/slint-ui/slint | Image and SVG decoding without a backend; the renderer traits and shared parley text layout slintx-wgpu implements |
 | thiserror | local | https://github.com/dtolnay/thiserror | Core error enum |
-| png | local (dev) | https://github.com/image-rs/image-png | Encode and decode the demo frame snapshots |
+| slintx-wgpu | local (path, `crates/slintx-wgpu`) | this repository | Our Slint renderer on wgpu; the only GPU renderer in the build |
+| wgpu | local | https://github.com/gfx-rs/wgpu | GPU API slintx-wgpu draws with; Metal and D3D12 surfaces in the core |
+| swash | local | https://github.com/dfrg/swash | Glyph rasterizing in slintx-wgpu |
+| lyon_tessellation | local | https://github.com/nical/lyon | Path fill and stroke tessellation in slintx-wgpu |
+| bytemuck | local | https://github.com/Lokathor/bytemuck | Plain-data vertex and storage buffers in slintx-wgpu |
+| pollster | local | https://github.com/zesterer/pollster | Blocks on wgpu's adapter and device futures |
+| pixel-diff | local (dev, path, `crates/pixel-diff`) | this repository | PNG snapshots and pixel comparison in the screenshot tests |
+| png | local (via pixel-diff) | https://github.com/image-rs/image-png | Encode and decode the frame snapshots |
 
 ## NuGet
 
