@@ -1,0 +1,6 @@
+// language/type-conversions: color to brush is implicit, brush to color is not.
+// OPEN O10: brush to color.
+export component Main inherits Window {
+    property <brush> b: #f00;
+    property <color> c: b;
+}

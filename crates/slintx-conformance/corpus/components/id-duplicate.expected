@@ -1,0 +1,3 @@
+verdict: reject
+error id-duplicate.slint:3:10: duplicated element id 'a'
+error id-duplicate.slint:4:10: duplicated element id 'a'

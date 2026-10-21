@@ -1,0 +1,8 @@
+// language/states-and-transitions: `animate` directly inside a state body.
+export component Main inherits Window {
+    in property <bool> active;
+    r := Rectangle {}
+    states [
+        on when active: { r.x: 10px; animate r.x { duration: 100ms; } }
+    ]
+}

@@ -1,0 +1,3 @@
+verdict: reject
+warning lib.slint:1:1: Component is neither used nor exported
+error main.slint:2:24: No exported type called 'Hidden' found in "lib.slint"

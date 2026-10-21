@@ -1,0 +1,2 @@
+verdict: reject
+error struct-unknown-field.slint:5:25: Cannot access the field 'b'

@@ -1,0 +1,2 @@
+verdict: reject
+error animate-plus-transition.slint:9:51: The property 'x' cannot have transition because it already has an animation

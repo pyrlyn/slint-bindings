@@ -1,0 +1,8 @@
+// language/repetition-and-conditional-elements: negative and float models.
+// OPEN O47: negative, float and NaN models.
+export component Main inherits Window {
+    in property <int> n: -2;
+    in property <float> f: 2.7;
+    for i in n: Rectangle {}
+    for j in f: Rectangle {}
+}

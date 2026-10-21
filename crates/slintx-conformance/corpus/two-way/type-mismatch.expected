@@ -1,0 +1,2 @@
+verdict: reject
+error type-mismatch.slint:4:25: The property 'b' does not have the same type as the bound expression: string != int

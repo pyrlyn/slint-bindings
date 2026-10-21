@@ -1,0 +1,11 @@
+component Functions {
+    property <int> base: 2;
+    function reset() { base = 2; }
+    pure function double(x: int) -> int { return x * 2; }
+    public function bump(by: int,) { base += by; }
+    protected pure function triple(x: int) -> int { x * 3 }
+    public pure function area(w: length, h: length) -> float { w * h / 1px / 1px }
+    Rectangle {
+        function local() -> bool { true }
+    }
+}

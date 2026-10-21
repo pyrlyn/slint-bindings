@@ -1,0 +1,2 @@
+verdict: accept
+warning init-call.slint:3:30: Calling 'init' explicitly does nothing and is deprecated

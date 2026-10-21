@@ -1,0 +1,3 @@
+verdict: reject
+error array-element-mismatch.slint:3:25: Cannot convert string to int
+error array-element-mismatch.slint:3:25: Cannot convert string to int

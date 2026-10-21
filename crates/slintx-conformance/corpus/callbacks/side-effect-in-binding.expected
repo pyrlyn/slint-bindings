@@ -1,0 +1,2 @@
+verdict: reject
+error side-effect-in-binding.slint:5:31: Call of impure function

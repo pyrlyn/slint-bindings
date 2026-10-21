@@ -1,0 +1,7 @@
+// language/bindings: a size depending on its own layout result.
+// OPEN O35: binding loops at run time.
+export component Main inherits Window {
+    VerticalLayout {
+        r := Rectangle { min-height: r.height; }
+    }
+}

@@ -1,0 +1,8 @@
+// language/animations: animation fields bound to properties.
+// OPEN O55, O58: fields re-read mid-animation; queries during an animation.
+export component Main inherits Window {
+    in property <duration> speed: 200ms;
+    in property <bool> on;
+    out property <length> seen: r.x;
+    r := Rectangle { x: on ? 50px : 0px; animate x { duration: speed; } }
+}

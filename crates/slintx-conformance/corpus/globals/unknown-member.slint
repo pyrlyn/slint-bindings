@@ -1,0 +1,7 @@
+// language/globals: reading a property the global does not have.
+global Theme {
+    out property <int> gap: 4;
+}
+export component Main inherits Window {
+    property <int> v: Theme.nothing;
+}

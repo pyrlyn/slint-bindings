@@ -1,0 +1,2 @@
+verdict: accept
+warning flickable.slint:3:40: The property 'viewport-height' has been deprecated. Please use 'content-height' instead

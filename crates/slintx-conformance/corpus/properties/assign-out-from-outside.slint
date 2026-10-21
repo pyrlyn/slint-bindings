@@ -1,0 +1,9 @@
+// language/properties: assigning an `out` property from a parent handler.
+// OPEN O34: assignability of `out`.
+component Card inherits Rectangle {
+    out property <int> output;
+}
+export component Main inherits Window {
+    card := Card {}
+    TouchArea { clicked => { card.output = 1; } }
+}

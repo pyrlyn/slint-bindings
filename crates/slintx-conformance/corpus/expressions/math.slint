@@ -1,0 +1,9 @@
+// global-functions/math: functions as `Math.f`, bare `f` and postfix `x.f()`.
+export component Main inherits Window {
+    property <float> a: Math.abs(-1) + abs(-2) + (-3).abs();
+    property <length> b: clamp(5px, 0px, 3px) + min(1px, 2px) + max(1px, 2px);
+    property <int> c: ceil(1.2) + floor(1.8) + round(4.5);
+    property <float> d: sqrt(4) + pow(2, 3) + exp(0) + ln(1) + log(8, 2) + sign(0);
+    property <float> e: sin(90deg) + cos(0rad) + tan(45deg);
+    property <angle> f: asin(1) + acos(1) + atan(1) + atan2(1, 1);
+}

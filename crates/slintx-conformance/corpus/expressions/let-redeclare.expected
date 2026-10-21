@@ -1,0 +1,2 @@
+verdict: reject
+error let-redeclare.slint:3:40: Redeclaration of local variables is not allowed

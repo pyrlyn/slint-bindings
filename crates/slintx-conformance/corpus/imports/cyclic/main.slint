@@ -1,0 +1,6 @@
+// language/imports: two files importing each other.
+// OPEN O6: cyclic imports.
+import { A } from "a.slint";
+export component Main inherits Window {
+    A {}
+}

@@ -1,0 +1,21 @@
+component Base {}
+
+component Card inherits Rectangle {
+    background: #eee;
+    title := Text {
+        text: "Title";
+        color: black;
+    }
+    HorizontalLayout {
+        spacing: 4px;
+        Image { source: @image-url("icon.png"); }
+        body-text := Text { text: title.text; }
+    }
+}
+
+export component App inherits Window {
+    width: 400px;
+    height: 300px;
+    Card {}
+    Base {}
+}

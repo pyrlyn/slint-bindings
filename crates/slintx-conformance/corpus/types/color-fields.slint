@@ -1,0 +1,8 @@
+// property-types/colors-and-brushes: `.red` and friends.
+// OPEN O24: int or float.
+export component Main inherits Window {
+    property <color> c: #102030;
+    property <int> r: c.red;
+    property <float> g: c.green / 2;
+    property <string> s: c.blue;
+}

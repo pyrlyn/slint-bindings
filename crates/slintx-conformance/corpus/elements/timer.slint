@@ -1,0 +1,11 @@
+// timer: a Timer element.
+// OPEN O59: first tick, 0 ms interval, restart, missed ticks.
+export component Main inherits Window {
+    in-out property <bool> run: true;
+    out property <int> ticks;
+    t := Timer {
+        interval: 0ms;
+        running: run;
+        triggered => { ticks += 1; if ticks > 3 { run = false; t.restart(); } }
+    }
+}

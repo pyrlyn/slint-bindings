@@ -1,0 +1,2 @@
+verdict: reject
+error unknown-identifier.slint:3:23: Unknown unqualified identifier 'nothing'

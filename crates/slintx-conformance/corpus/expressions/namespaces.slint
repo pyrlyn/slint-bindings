@@ -1,0 +1,9 @@
+// global-functions/builtinfunctions: built-in namespaces and constants.
+export component Main inherits Window {
+    property <float> w: FontWeight.semi-bold;
+    property <easing> e: Easing.ease-out-bounce;
+    property <string> sep: Platform.decimal-separator;
+    property <bool> mock: Platform.uses-mock-data;
+    property <string> k: Key.Return;
+    TouchArea { mouse-cursor: MouseCursor.grab; }
+}

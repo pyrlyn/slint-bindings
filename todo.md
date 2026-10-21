@@ -3,3 +3,27 @@
 - T14. Accessibility spike
 - T15. iOS host
 - T17. Web build
+- T73. slintx-syntax: a standalone AST parser
+- T73.1. slintx-syntax crate: lexer, lossless tree, parser, typed AST
+- T73.1.1. slintx-syntax: kinds, lexer and lossless tree API
+- T73.1.2. slintx-syntax: parser core and expressions
+- T73.1.3. slintx-syntax: strings, macros, types and statements
+- T73.1.4. slintx-syntax: items and element bodies
+- T73.1.5. slintx-syntax: declarations in element bodies
+- T73.1.6. slintx-syntax: typed AST views
+- T73.2. Licence gate and wasm32 build for slintx crates
+- T74. slintx-conformance: differential harness against Slint
+- T75. Modules, imports and exports
+- T76. Name resolution
+- T77. Type checker
+- T78. Lowering to an IR
+- T79. Expression evaluator
+- T80. Reactive property runtime
+- T81. Component instances and public API
+- T82. Layout engine
+- T83. slintx-wgpu without i-slint-core
+- T84. Visual items on slintx-wgpu
+- T85. wasm32 build (slintx-web)
+- T86. Input and interactive items
+- T87. std-widgets
+- T88. Hosts on slintx

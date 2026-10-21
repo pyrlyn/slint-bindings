@@ -16,7 +16,8 @@
 | Package | Where | Source | Why here |
 | --- | --- | --- | --- |
 | slint | local | https://github.com/slint-ui/slint | UI runtime; software renderer and custom platform API |
-| slint-interpreter | local | https://github.com/slint-ui/slint | Compiles `.slint` at run time (`sb_compile`) |
+| slint-interpreter | local | https://github.com/slint-ui/slint | Compiles `.slint` at run time (`sb_compile`); the oracle in `slintx-conformance`'s tests (dev only) |
+| pollster | local | https://github.com/zesterer/pollster | Blocks on wgpu adapter and device requests (`slint-bindings-core`, `slintx-wgpu`) and on Slint's async compiler API (`slintx-conformance` tests, dev only) |
 | slint-dart-interpreter | local (path, `flutter/packages/slint_build/interpreter`) | https://github.com/listepo/slint_dart | Shared compile helper and JSON value bridge for properties and callbacks |
 | i-slint-core | local | https://github.com/slint-ui/slint | Image and SVG decoding without a backend; the renderer traits and shared parley text layout slintx-wgpu implements |
 | thiserror | local | https://github.com/dtolnay/thiserror | Core error enum |
@@ -25,9 +26,10 @@
 | swash | local | https://github.com/dfrg/swash | Glyph rasterizing in slintx-wgpu |
 | lyon_tessellation | local | https://github.com/nical/lyon | Path fill and stroke tessellation in slintx-wgpu |
 | bytemuck | local | https://github.com/Lokathor/bytemuck | Plain-data vertex and storage buffers in slintx-wgpu |
-| pollster | local | https://github.com/zesterer/pollster | Blocks on wgpu's adapter and device futures |
 | pixel-diff | local (dev, path, `crates/pixel-diff`) | this repository | PNG snapshots and pixel comparison in the screenshot tests |
 | png | local (via pixel-diff) | https://github.com/image-rs/image-png | Encode and decode the frame snapshots |
+| rowan | local | https://github.com/rust-analyzer/rowan | Lossless syntax tree of `slintx-syntax` |
+| wasm-bindgen-test | local | https://github.com/wasm-bindgen/wasm-bindgen | Runs the `slintx-syntax` tests on `wasm32-unknown-unknown` |
 
 ## NuGet
 

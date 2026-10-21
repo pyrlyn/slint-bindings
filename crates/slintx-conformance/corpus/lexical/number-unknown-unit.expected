@@ -1,0 +1,2 @@
+verdict: reject
+error number-unknown-unit.slint:4:26: Invalid unit 'foo'. Valid units are: %, phx, px, cm, mm, in, pt, rem, s, ms, deg, grad, turn, rad

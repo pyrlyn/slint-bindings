@@ -1,0 +1,2 @@
+items: Component
+41..43: `:=` cannot declare a local variable; use `let`

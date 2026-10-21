@@ -1,0 +1,9 @@
+// language/globals: an exported global for the host.
+export global Api {
+    in-out property <string> name;
+    callback submit();
+}
+export component Main inherits Window {
+    Text { text: Api.name; }
+    TouchArea { clicked => { Api.submit(); } }
+}

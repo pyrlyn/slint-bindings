@@ -1,0 +1,6 @@
+// language/lexical-structure: `_` after the first char equals `-`.
+export component Main inherits Window {
+    property <int> foo_bar: 1;
+    property <int> _baz_qux: foo-bar + 1;
+    property <int> c: _baz-qux;
+}

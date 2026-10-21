@@ -1,0 +1,9 @@
+// language/operators: overflow, NaN, float equality and unit products.
+// OPEN O13: int overflow, NaN, `px*px`.
+export component Main inherits Window {
+    property <int> big: 2147483647;
+    out property <int> over: big + 1;
+    out property <bool> nan: sqrt(-1) == sqrt(-1);
+    out property <bool> eq: 0.1 + 0.2 == 0.3;
+    out property <length> area: (2px * 3px) / 1px;
+}

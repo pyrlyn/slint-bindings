@@ -1,0 +1,6 @@
+verdict: reject
+error named-arguments.slint:5:37: Syntax error: expected ')'
+error named-arguments.slint:5:37: Syntax error: expected '}'
+error named-arguments.slint:5:37: Parse error
+error named-arguments.slint:5:51: Syntax error: expected ';'
+error named-arguments.slint:6:1: Parse error: expected a top-level item such as a component, a struct, or a global

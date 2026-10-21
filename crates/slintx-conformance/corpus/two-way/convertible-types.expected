@@ -1,0 +1,2 @@
+verdict: reject
+error convertible-types.slint:5:24: The property 'b' does not have the same type as the bound expression: float != int

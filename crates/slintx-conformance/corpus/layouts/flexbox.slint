@@ -1,0 +1,9 @@
+// layouts/flexboxlayout: FlexboxLayout with per-item properties (new in 1.18).
+export component Main inherits Window {
+    in property <FlexboxLayoutDirection> dir: row;
+    FlexboxLayout {
+        flex-direction: dir; flex-wrap: wrap; spacing: 8px;
+        Rectangle { width: 60px; height: 50px; layout-order: 2; cross-axis-self-alignment: center; }
+        Rectangle { width: 60px; height: 50px; layout-order: 1; }
+    }
+}

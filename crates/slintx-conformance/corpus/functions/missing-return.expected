@@ -1,0 +1,2 @@
+verdict: reject
+error missing-return.slint:3:5: Cannot convert string to int

@@ -1,0 +1,2 @@
+verdict: reject
+error root-id-reserved.slint:3:5: 'root' is a reserved id

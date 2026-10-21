@@ -1,0 +1,3 @@
+items: Component
+38..44: invalid color literal: expected #rgb, #rgba, #rrggbb or #rrggbbaa
+70..74: invalid color literal: expected #rgb, #rgba, #rrggbb or #rrggbbaa

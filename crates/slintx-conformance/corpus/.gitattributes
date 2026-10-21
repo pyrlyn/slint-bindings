@@ -1,0 +1,2 @@
+# The corpus tests lexing byte for byte (BOM, CRLF, bare CR): no conversion.
+* -text

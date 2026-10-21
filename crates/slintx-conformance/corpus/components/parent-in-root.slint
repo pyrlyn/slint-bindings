@@ -1,0 +1,8 @@
+// language/name-resolution: `parent` in a component's root element.
+// OPEN O32: what `parent` is for the root.
+component Card inherits Rectangle {
+    width: parent.width / 2;
+}
+export component Main inherits Window {
+    Card {}
+}

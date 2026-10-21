@@ -1,0 +1,2 @@
+verdict: reject
+error unknown-field.slint:3:29: Unknown property speed in PropertyAnimation

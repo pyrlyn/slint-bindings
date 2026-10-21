@@ -1,0 +1,5 @@
+// language/animations: the `spring` easing (new in 1.18).
+export component Main inherits Window {
+    in property <bool> wide;
+    Rectangle { width: wide ? 100px : 10px; animate width { easing: spring(0.4); } }
+}

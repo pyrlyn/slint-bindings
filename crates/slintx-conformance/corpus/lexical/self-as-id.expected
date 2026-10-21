@@ -1,0 +1,2 @@
+verdict: reject
+error self-as-id.slint:3:5: 'self' is a reserved id

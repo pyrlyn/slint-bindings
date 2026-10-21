@@ -1,0 +1,27 @@
+component Toggle inherits Rectangle {
+    in property <bool> on;
+    background: gray;
+    indicator := Rectangle {}
+    states [
+        active when root.on && !area.pressed : {
+            background: green;
+            indicator.x: 20px;
+            in {
+                animate background { duration: 200ms; }
+            }
+            out {
+                animate background, indicator.x { duration: 100ms; easing: ease-out; }
+            }
+        }
+        pressed when area.pressed : {
+            background: darkgray;
+            in-out {
+                animate * { duration: 50ms; }
+            }
+        }
+        disabled : {
+            opacity: 50%;
+        }
+    ]
+    area := TouchArea {}
+}

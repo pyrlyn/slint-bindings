@@ -1,0 +1,2 @@
+verdict: reject
+error enum-empty.slint:2:1: Enums must have at least one value

@@ -1,0 +1,6 @@
+// language/two-way-bindings: types that convert but are not identical.
+// OPEN O39: conversions across `<=>`.
+export component Main inherits Window {
+    property <int> a;
+    property <float> b <=> a;
+}

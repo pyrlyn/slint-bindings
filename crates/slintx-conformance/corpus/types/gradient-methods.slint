@@ -1,0 +1,9 @@
+// property-types/colors-and-brushes: color methods on a gradient brush.
+// OPEN O25, O26: gradients; brush comparison and default.
+export component Main inherits Window {
+    property <brush> g: @linear-gradient(90deg, red 0%, blue 100%);
+    property <brush> d: g.darker(0.2);
+    property <brush> none;
+    property <bool> eq: g == d;
+    property <bool> empty: none == transparent;
+}
