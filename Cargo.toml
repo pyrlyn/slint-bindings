@@ -36,8 +36,19 @@ thiserror = "2.0.21"
 # Not through Slint's winit backend, which would bring winit and its renderers.
 accesskit = "0.25.1"
 accesskit_macos = "0.27.1"
-# Dev-dependency of the FFI e2e: the demo frame is stored as a PNG snapshot.
+slintx-wgpu = { path = "crates/slintx-wgpu" }
+# slintx-wgpu: the GPU API it draws with, glyph rasterizing, path tessellation
+# and plain-data vertex buffers. wgpu, swash, bytemuck and pollster keep the
+# versions Slint already locked; lyon_tessellation is the one new crate.
+wgpu = "30.0.1"
+swash = "0.2.10"
+lyon_tessellation = "1.0.23"
+bytemuck = { version = "1.25.2", features = ["derive"] }
+pollster = "0.4.0"
+# Screenshot tests: the demo frame is stored as a PNG snapshot (FFI e2e), and
+# slintx-wgpu frames are compared with the software renderer's.
 png = "0.18.1"
+pixel-diff = { path = "crates/pixel-diff" }
 
 [workspace.lints.rust]
 unsafe_op_in_unsafe_fn = "deny"

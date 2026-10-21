@@ -76,15 +76,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "android-build"
-version = "0.1.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f9fc9904ad2ad097c3c1cfe2eacaaf0fc24710936fa9ed941cb310b7c6ed2ab7"
-dependencies = [
- "windows-sys 0.52.0",
-]
-
-[[package]]
 name = "android-properties"
 version = "0.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -807,21 +798,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "drm"
-version = "0.15.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7a41816e58f47f49acfd956651055ddcf137c4882c2098c30c448817af21183a"
-dependencies = [
- "bitflags 2.13.2",
- "bytemuck",
- "bytemuck_derive",
- "drm-ffi",
- "drm-fourcc",
- "libc",
- "rustix 1.1.5",
-]
-
-[[package]]
 name = "drm-ffi"
 version = "0.9.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -947,27 +923,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "femtovg"
-version = "0.27.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "31eebf3ab1b76359ccd5f850c07a7c6b2722c64d9127c40e02358e83f3ff9b1a"
-dependencies = [
- "bitflags 2.13.2",
- "bytemuck",
- "fnv",
- "glow 0.18.0",
- "imgref",
- "itertools 0.15.0",
- "log",
- "rgb",
- "slotmap",
- "swash",
- "wasm-bindgen",
- "web-sys",
- "wgpu",
-]
-
-[[package]]
 name = "field-offset"
 version = "0.3.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1022,10 +977,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "98de4bbd547a563b716d8dfa9aad1cb19bfab00f4fa09a6a4ed21dbcf44ce9c4"
 
 [[package]]
-name = "fnv"
-version = "1.0.7"
+name = "float_next_after"
+version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3f9eec918d3f24069decb9af1554cad7c880e2da24a9afd88aca000531ab82c1"
+checksum = "8bf7cc16383c4b8d58b9905a8509f02926ce3058053c056376248d958c9df1e8"
 
 [[package]]
 name = "foldhash"
@@ -1426,20 +1381,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "48ce8546b993eaf241d69ded33b1be6d205dd9857ec879d9d18bd05d3676e144"
 
 [[package]]
-name = "i-slint-backend-android-activity"
-version = "1.18.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "70d538003a566d7312572ac1435be0704934e46a63d55abdabede513f72332cb"
-dependencies = [
- "android-build",
- "i-slint-common",
- "i-slint-core",
- "i-slint-renderer-skia",
- "jni",
- "raw-window-handle",
-]
-
-[[package]]
 name = "i-slint-backend-linuxkms"
 version = "1.18.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1448,17 +1389,14 @@ dependencies = [
  "bytemuck",
  "calloop 0.14.5",
  "cfg_aliases",
- "drm 0.14.1",
+ "drm",
  "i-slint-common",
  "i-slint-core",
- "i-slint-renderer-femtovg",
- "i-slint-renderer-skia",
  "i-slint-renderer-software",
  "input",
  "libseat",
  "memmap2",
  "nix",
- "wgpu",
  "xkbcommon",
 ]
 
@@ -1490,8 +1428,6 @@ dependencies = [
  "i-slint-common",
  "i-slint-core",
  "i-slint-core-macros",
- "i-slint-renderer-femtovg",
- "i-slint-renderer-skia",
 ]
 
 [[package]]
@@ -1522,7 +1458,6 @@ dependencies = [
  "i-slint-common",
  "i-slint-core",
  "i-slint-core-macros",
- "i-slint-renderer-femtovg",
  "i-slint-renderer-skia",
  "i-slint-renderer-software",
  "imgref",
@@ -1655,28 +1590,6 @@ dependencies = [
  "quote",
  "serde_json",
  "syn 3.0.6",
-]
-
-[[package]]
-name = "i-slint-renderer-femtovg"
-version = "1.18.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "eb0de504d57cdadf80c2abf7bcb8b7135a3716aee1f41b6ebb90ea93e3649d7c"
-dependencies = [
- "cfg-if",
- "const-field-offset",
- "femtovg",
- "glow 0.18.0",
- "i-slint-common",
- "i-slint-core",
- "i-slint-core-macros",
- "imgref",
- "lyon_path",
- "pin-weak",
- "rgb",
- "wasm-bindgen",
- "web-sys",
- "wgpu",
 ]
 
 [[package]]
@@ -2325,6 +2238,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5c463f9c428b7fc5ec885dcd39ce4aa61e29111d0e33483f6f98c74e89d8621e"
 dependencies = [
  "lyon_geom",
+ "num-traits",
+]
+
+[[package]]
+name = "lyon_tessellation"
+version = "1.0.23"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "fd4872650e70dc907dd4f7ebc449d7d657a0d2658e423b2e724970870bbbf75b"
+dependencies = [
+ "float_next_after",
+ "lyon_path",
  "num-traits",
 ]
 
@@ -3015,6 +2939,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "pixel-diff"
+version = "0.1.0"
+dependencies = [
+ "png",
+]
+
+[[package]]
 name = "pkg-config"
 version = "0.3.34"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3574,12 +3505,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "15e477d5ff6fec20909100ff8f7062432ebfbda7a62a0f37d0252aa126f38c83"
 dependencies = [
  "const-field-offset",
- "i-slint-backend-android-activity",
  "i-slint-backend-selector",
  "i-slint-common",
  "i-slint-core",
  "i-slint-core-macros",
- "i-slint-renderer-femtovg",
  "i-slint-renderer-software",
  "num-traits",
  "once_cell",
@@ -3587,7 +3516,6 @@ dependencies = [
  "slint-macros",
  "unicode-segmentation",
  "vtable",
- "wgpu",
 ]
 
 [[package]]
@@ -3602,6 +3530,7 @@ dependencies = [
  "slint-dart-interpreter",
  "slint-embed",
  "slint-interpreter",
+ "slintx-wgpu",
  "thiserror 2.0.21",
 ]
 
@@ -3609,7 +3538,7 @@ dependencies = [
 name = "slint-bindings-ffi"
 version = "0.1.0"
 dependencies = [
- "png",
+ "pixel-diff",
  "slint-bindings-core",
 ]
 
@@ -3668,6 +3597,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "slintx-wgpu"
+version = "0.1.0"
+dependencies = [
+ "bytemuck",
+ "i-slint-core",
+ "lyon_tessellation",
+ "pixel-diff",
+ "pollster",
+ "slint",
+ "slint-embed",
+ "slint-interpreter",
+ "swash",
+ "wgpu",
+]
+
+[[package]]
 name = "slotmap"
 version = "1.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3708,7 +3653,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "aac18da81ebbf05109ab275b157c22a653bb3c12cf884450179942f81bcbf6c3"
 dependencies = [
  "bytemuck",
- "drm 0.14.1",
  "js-sys",
  "ndk",
  "objc2 0.6.5",
@@ -3718,7 +3662,6 @@ dependencies = [
  "objc2-quartz-core 0.3.2",
  "raw-window-handle",
  "redox_syscall 0.5.18",
- "rustix 1.1.5",
  "tracing",
  "wasm-bindgen",
  "web-sys",
@@ -4434,7 +4377,6 @@ dependencies = [
  "thiserror 2.0.21",
  "wgpu-core-deps-apple",
  "wgpu-core-deps-emscripten",
- "wgpu-core-deps-wasm",
  "wgpu-core-deps-windows-linux-android",
  "wgpu-hal",
  "wgpu-naga-bridge",
@@ -4455,15 +4397,6 @@ name = "wgpu-core-deps-emscripten"
 version = "30.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d98b86cf4abf524a902dd35f18ca6a3f08fc2ae9847c8f10b48e30491b1f0b86"
-dependencies = [
- "wgpu-hal",
-]
-
-[[package]]
-name = "wgpu-core-deps-wasm"
-version = "30.0.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d260ca2ca8adc654f513a869bf3cac0b47f5b8d3f87803d6942015f8de597aae"
 dependencies = [
  "wgpu-hal",
 ]
@@ -4492,7 +4425,6 @@ dependencies = [
  "bytemuck",
  "cfg-if",
  "cfg_aliases",
- "drm 0.15.0",
  "glow 0.17.0",
  "glutin_wgl_sys",
  "gpu-allocator",

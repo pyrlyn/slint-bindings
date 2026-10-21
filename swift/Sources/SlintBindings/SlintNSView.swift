@@ -193,7 +193,9 @@ public final class SlintNSView: NSView {
         present()
     }
 
-    private func present() {
+    /// Paints and shows a frame if anything changed. The display link calls it
+    /// each vsync; tests call it directly.
+    func present() {
         guard let host else { return }
         do {
             if host.rendersOnGpu {

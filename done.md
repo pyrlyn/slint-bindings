@@ -63,6 +63,21 @@ at 1× and 2×, and the form after the name is set to "Ada".
 `SB_UPDATE_SNAPSHOTS=1` rewrites the PNGs when that picture is meant to change.
 `just check` passes.
 
+### T4. macOS keyboard, IME and focus
+
+Adopt `NSTextInputClient` in `SlintNSView` so composition (CJK, dead keys,
+emoji picker) reaches Slint as preedit and commit text; complete the AppKit →
+Slint key map (function keys, Home/End, Page Up/Down, modifiers as separate
+key events) with table-driven tests; make Tab move focus out of the Slint view
+into SwiftUI when Slint has no next focus item. Done when a Japanese input
+method commits text into the demo field and the key-map tests cover every
+`slint::platform::Key`.
+
+Execution: the AppKit → Slint map lives in `slint-bindings-core` (one table,
+tested on every `Key`). `SlintNSView` adopts `NSTextInputClient`: marked text
+is a preedit, `insertText` commits, and a rejected Tab or Backtab calls
+`selectNextKeyView` / `selectPreviousKeyView`.
+
 ### T6. WinUI host builds and runs (M2)
 
 The WinUI host compiles in CI. Virtual keys, IME composition and the per-RID
@@ -88,6 +103,29 @@ longer swizzles. `just windows-dll` (and the ARM64 triple) produces the DLL.
 `runtimes/<rid>/native`. `just pinvoke-check` fails if `NativeMethods.cs` and
 the header disagree on `sb_*` names. Marshalling stays hand-written.
 
+### T5. CI
+
+GitHub Actions: `macos-26` (arm64) runs `just check`; `windows-latest` runs
+`cargo build -p slint-bindings-ffi`, `cargo nextest run` and
+`dotnet build windows/SlintDemo.WinUI`. Use the shared workflows from
+`pyrlyn/ci` where they fit. Done when both jobs are required checks on `main`.
+
+Result: `.github/workflows/ci.yml` already covered the card, so nothing in it
+changed. Checked on the green `main` run for `9c1b353` (run 39153182955):
+
+- `macos`: `just check` after `cargo install cbindgen` (`header-check`). The
+  runner comes from pyrlyn/ci's `macos-runner` action: `MACOS_RUNNER` unset or
+  `hosted` gives `macos-26`; it is set to the self-hosted `xcode-27-local` for
+  now. `just renderer-check` from PR #32 needs no extra tool.
+- `windows-host`: `just windows-dll` (`cargo rustc -p slint-bindings-ffi
+  --crate-type cdylib`), the C# host tests, then `dotnet build
+  windows/SlintDemo.WinUI` and a WinUI window smoke run.
+- `rust / x86_64-pc-windows-msvc` (pyrlyn/ci `ci-rust.yml`): `cargo nextest run
+  --workspace` on `windows-latest`, 60 tests passed.
+- Required checks: the `protect-main` ruleset requires `gate`, which needs
+  `rust`, `macos` and `windows-host` and fails if any of them fails or is
+  cancelled. The one allowed skip is `macos` under `MACOS_CI_DISABLED=true`.
+
 ### T7. GPU path on macOS (M3)
 
 FemtoVG renders on wgpu's Metal backend into a `CAMetalLayer` sublayer of
@@ -106,6 +144,55 @@ The same renderer presents into a `SwapChainPanel`. The panel passes
 chain and calls `SetSwapChain` on the UI thread. `CompositionScaleChanged`
 resizes it. A failed COM query or adapter keeps the `WriteableBitmap` path.
 The window was not launched, and the frame-time checkpoint was not measured.
+
+### T72. slintx-wgpu: our own Slint renderer on wgpu
+
+The GPU path draws through FemtoVG (`renderer-femtovg-wgpu`), which is Slint's
+renderer code. Replace it with our own renderer, written from scratch on wgpu:
+the build must not contain Slint's GPU renderers (`i-slint-renderer-femtovg`,
+`i-slint-renderer-skia`), and no code is copied from them. Done when
+`crates/slintx-wgpu` draws Slint scenes, tests compare its frames with the
+software renderer's (the original) within a tolerance, the core's GPU host uses
+it, and `cargo tree` shows no FemtoVG or Skia renderer.
+
+Execution:
+
+1. `crates/slintx-wgpu`: `WgpuRenderer` implements `i_slint_core`'s
+   `RendererSealed` (text measuring through the default `sharedparley` methods
+   and a `TextLayoutCache`) and, per frame, `ItemRenderer` + `GlyphRenderer`.
+   Items become a display list of primitives in physical pixels: rounded
+   rectangles and border rings (SDF), box shadows (Gaussian SDF), images and
+   nine-slices (`graphics::fit`, `fit9slice`), glyphs (swash masks in an R8
+   atlas), paths (lyon tessellation). Brushes: solid, linear, radial, conic
+   (a gradient ramp texture). Clips: an intersected rectangle plus the latest
+   corner radii. Opacity multiplies into every primitive. One WGSL pipeline,
+   4× MSAA, premultiplied blending in sRGB-encoded space like the software
+   renderer. `render_to_texture` draws into a caller's texture;
+   `take_snapshot` reads an offscreen frame back.
+   Not in the first cut: rotation and scale transforms
+   (`supports_transformations` is false, as in the software renderer) and
+   layers (children of `Opacity` are faded one by one).
+2. Tests (`crates/slintx-wgpu/tests`): scenes built with `slint!` (rectangles,
+   borders, radii, gradients, clips, shadows, text, images, paths, opacity)
+   and the demo form, each drawn by the software renderer and by slintx-wgpu
+   through `slint_embed`'s platform, compared with `Window::take_snapshot`.
+   The comparison passes when the share of pixels whose largest channel
+   difference exceeds a threshold stays under a budget; a failure writes the
+   two frames and a diff PNG under `target/tmp/slintx-wgpu/`. No GPU adapter is a
+   skip, as in `gpu_smoke.rs`.
+3. `slint-bindings-core/src/gpu.rs` switches to `WgpuRenderer`; the
+   `renderer-femtovg-wgpu` and `unstable-wgpu-30` features go away;
+   `just renderer-check` (part of `just check`) fails when `cargo tree` finds
+   `i-slint-renderer-femtovg` or `i-slint-renderer-skia`.
+4. `toolchain.md`, `README.md`, `AGENTS.md`; `just check` passes.
+
+Found while comparing: Slint 1.18's software renderer draws no box shadows,
+ignores clip radii and samples images nearest-neighbour from the pixel's left
+edge. Shadows and rounded clips are checked against expected pixels instead,
+compared images are `pixelated`, and the image scene's budget covers the
+one-pixel shift of scaled texel edges. The workspace `rust.md` lists the new
+crates. `header-check` was not run (no cbindgen on that machine); the C ABI did
+not change.
 
 ### T19. Drop Intel macOS leftovers from the Flutter copy
 
@@ -226,6 +313,39 @@ WinUI code without running any of it.
 - CI `windows-host`: the host tests, a self-contained build
   (`WindowsAppSDKSelfContained`), the smoke run, and the capture as the
   `weft-winui` artifact.
+
+### T10. Multiple hosts and popups
+
+`slint::platform::set_platform` is once per thread, and each component gets its
+own `MinimalSoftwareWindow`. Verify two `SlintNSView`s in one window and two
+windows; make Slint `PopupWindow` and menus render inside the host view (no
+native child windows) and clip correctly. Done with a demo showing two views
+and a combo-box popup in each.
+
+Execution: Slint 1.18 renders a popup as a child window inside its parent's
+buffer when the window adapter cannot make one of its own, which
+`MinimalSoftwareWindow` cannot, so no native windows appear. CPU path only.
+1. Fixture `crates/slint-bindings-core/ui/popups.slint`: a `ComboBox` near the
+   top, one near the bottom edge (its popup must stay inside the view) and a
+   `ContextMenuArea`, with `out` properties for what was picked.
+2. Core (`host.rs`): `focus_changed(false)` closes the view's auto-close popups.
+   Slint closes them on a click elsewhere in the same window only; a click in
+   another host view or in SwiftUI never reaches it.
+3. Core tests: two hosts on one thread stay independent; a popup draws into
+   its host's buffer and no window adapter is created; the bottom popup fits
+   inside the frame; closing it restores the frame pixel for pixel (partial
+   repaint); focus loss closes it; the context menu draws inline.
+4. Swift tests: two `SlintNSView`s in one `NSWindow` and one in each of two
+   windows; opening a popup adds no `NSWindow`.
+5. Demo: a second window with two CPU `SlintView`s of `popups.slint`.
+Verify with `just check` and `just swift-run`.
+
+Result: no native windows needed fixing; Slint 1.18 already draws every popup
+inside the host's buffer and places it inside the view. The one change is in
+`EmbeddedHost::focus_changed`: losing focus closes the view's auto-close
+popups. `GpuHost::focus_changed` still needs the same `close_auto_popups` call
+once the GPU path is replaced (T72). The demo opens a second window,
+"Slint popups", with two CPU views.
 
 ### T12. Weft → Slint renderer (dropped)
 

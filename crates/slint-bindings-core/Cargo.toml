@@ -17,12 +17,12 @@ slint-dart-interpreter = { workspace = true }
 thiserror = { workspace = true }
 accesskit = { workspace = true }
 
-# FemtoVG's wgpu renderer is the public GPU API (Slint has no public Skia
-# renderer). It stays off the Linux build: Skia is a multi-gigabyte compile,
-# and this feature set is what actually pulls wgpu in.
+# The GPU path draws with slintx-wgpu; Slint's own GPU renderers must not be in
+# the build (`just renderer-check`). Only macOS and Windows present on the GPU,
+# so Linux skips the wgpu compile.
 [target.'cfg(any(target_os = "macos", target_os = "windows"))'.dependencies]
-slint = { workspace = true, features = ["renderer-femtovg-wgpu", "unstable-wgpu-30"] }
-pollster = "0.4.0"
+slintx-wgpu = { workspace = true }
+pollster = { workspace = true }
 
 [target.'cfg(target_os = "macos")'.dependencies]
 accesskit_macos = { workspace = true }

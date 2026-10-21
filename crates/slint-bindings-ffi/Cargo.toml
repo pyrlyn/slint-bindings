@@ -18,7 +18,7 @@ crate-type = ["rlib"]
 slint-bindings-core = { workspace = true }
 
 [dev-dependencies]
-png = { workspace = true }
+pixel-diff = { workspace = true }
 
 [lints]
 workspace = true
