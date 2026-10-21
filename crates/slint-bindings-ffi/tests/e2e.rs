@@ -322,28 +322,6 @@ fn snapshot_path(name: &str) -> std::path::PathBuf {
     std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join(format!("tests/snapshots/{name}.png"))
 }
 
-fn encode_png(width: u32, height: u32, rgba: &[u8]) -> Result<Vec<u8>, png::EncodingError> {
-    let mut out = Vec::new();
-    let mut encoder = png::Encoder::new(&mut out, width, height);
-    encoder.set_color(png::ColorType::Rgba);
-    encoder.set_depth(png::BitDepth::Eight);
-    // The samples are already sRGB. The chunk stops a viewer from converting them.
-    encoder.set_source_srgb(png::SrgbRenderingIntent::Perceptual);
-    let mut writer = encoder.write_header()?;
-    writer.write_image_data(rgba)?;
-    writer.finish()?;
-    Ok(out)
-}
-
-fn decode_png(bytes: &[u8]) -> Result<(u32, u32, Vec<u8>), png::DecodingError> {
-    let decoder = png::Decoder::new(std::io::Cursor::new(bytes));
-    let mut reader = decoder.read_info()?;
-    let mut buf = vec![0; reader.output_buffer_size().unwrap_or(0)];
-    let info = reader.next_frame(&mut buf)?;
-    buf.truncate(info.line_size * info.height as usize);
-    Ok((info.width, info.height, buf))
-}
-
 fn must<T, E: std::fmt::Display>(result: Result<T, E>) -> T {
     match result {
         Ok(value) => value,
@@ -355,16 +333,9 @@ fn must<T, E: std::fmt::Display>(result: Result<T, E>) -> T {
     }
 }
 
-fn differing_pixels(left: &[u8], right: &[u8]) -> usize {
-    left.chunks(4)
-        .zip(right.chunks(4))
-        .filter(|(a, b)| a != b)
-        .count()
-}
-
 fn assert_snapshot(name: &str, width: u32, height: u32, rgba: &[u8]) {
     let path = snapshot_path(name);
-    let encoded = must(encode_png(width, height, rgba));
+    let encoded = must(pixel_diff::encode_png(width, height, rgba));
     if std::env::var_os("SB_UPDATE_SNAPSHOTS").is_some() {
         if let Some(parent) = path.parent() {
             let _ = std::fs::create_dir_all(parent);
@@ -382,13 +353,13 @@ fn assert_snapshot(name: &str, width: u32, height: u32, rgba: &[u8]) {
         assert!(message.is_empty(), "read {}: {message}", path.display());
         std::process::abort();
     });
-    let (got_width, got_height, pixels) = must(decode_png(&saved));
+    let (got_width, got_height, pixels) = must(pixel_diff::decode_png(&saved));
     assert_eq!(
         (got_width, got_height, pixels.len()),
         (width, height, rgba.len()),
         "{name} snapshot size"
     );
-    let diffs = differing_pixels(&pixels, rgba);
+    let diffs = pixel_diff::differing_pixels(&pixels, rgba, 0);
     if diffs == 0 {
         return;
     }
@@ -429,7 +400,7 @@ fn sign_in_frame_matches_the_snapshot() {
         let first = paint(FORM_WIDTH, FORM_HEIGHT, 1.0, None);
         let second = paint(FORM_WIDTH, FORM_HEIGHT, 1.0, None);
         assert_eq!(
-            differing_pixels(&first, &second),
+            pixel_diff::differing_pixels(&first, &second, 0),
             0,
             "the sign-in frame is not stable across two hosts"
         );

@@ -1,0 +1,28 @@
+[package]
+name = "slintx-wgpu"
+description = "A Slint renderer written on wgpu: draws Slint item trees into wgpu textures without Slint's own GPU renderers."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+[dependencies]
+# The renderer traits (`RendererSealed`, `ItemRenderer`) and the shared parley
+# text layout live here; they are internal API, hence the exact pin.
+i-slint-core = { workspace = true, features = ["std", "shared-parley", "path"] }
+wgpu = { workspace = true }
+swash = { workspace = true }
+lyon_tessellation = { workspace = true }
+bytemuck = { workspace = true }
+pollster = { workspace = true }
+
+[dev-dependencies]
+slint = { workspace = true }
+slint-embed = { workspace = true }
+slint-interpreter = { workspace = true }
+pixel-diff = { workspace = true }
+
+[lints]
+workspace = true
