@@ -1,4 +1,3 @@
-- T5. CI
 - T9. Packaging (M4)
 - T13. Typed host APIs
 - T14. Accessibility spike
