@@ -57,7 +57,7 @@ Not added: `slint_embed::events` is used only by slint_dart and stays there; `i-
 | T73.1.4 | in progress | P0 | 3 | 100% | Claude / opus-5.5 |
 | T73.1.5 | in progress | P0 | 3 | 100% | Claude / opus-5.5 |
 | T73.1.6 | in progress | P0 | 2 | 100% | Claude / opus-5.5 |
-| T73.2 | in progress | P0 | 2 | 0% | Claude / opus-5.5 |
+| T73.2 | in progress | P0 | 2 | 90% | Claude / opus-5.5 |
 | T74 | in progress | P0 | 3 | 60% | Claude / opus-5.5 |
 | T75 | todo | P1 | 3 | 0% | |
 | T76 | todo | P1 | 3 | 0% | |
@@ -378,6 +378,32 @@ test against a throwaway crate that depends on one; and a `wasm-check` recipe
 plus CI job that builds every `slintx-*` crate for `wasm32-unknown-unknown`
 and runs its tests there. Done when both recipes run in CI and pass with no
 `slintx-*` crate yet and with T73.1's crate once it lands.
+
+Execution plan:
+
+1. `scripts/slintx-check.sh license|wasm [Cargo.toml]`: lists workspace members
+   named `slintx-*` (`cargo tree --workspace --depth 0`); `license` runs
+   `cargo tree -p <crate> --target all -e normal,build` and fails on `slint`,
+   `slint-*`, `i-slint-*`; `wasm` builds the crates for `wasm32-unknown-unknown`
+   and runs `cargo test --tests` there through `wasm-bindgen-test-runner` on
+   Node, failing a crate with no wasm32 `wasm-bindgen-test` dev-dependency
+   (the runner would pass it untested). No `slintx-*` crate: both print that
+   and exit 0. `slintx-wgpu` (T72) is exempt from `license` until T83 and from
+   `wasm` until T85; `slintx-conformance` (T74, a native-only harness) from
+   `wasm` for good.
+2. `scripts/slintx-check-test.sh` with offline path-only fixture workspaces in
+   `scripts/fixtures/license-check/` (stub crates named `slint`,
+   `i-slint-core`, `slint-build`): none, clean (dev-only or non-slintx use) and
+   exempt pass; direct, transitive, build-dependency and wasm-only dependencies
+   fail; a manifest cargo cannot load errors instead of passing.
+3. `justfile`: `license-check`, `license-check-test`, `wasm-check`, all in
+   `just check`. `mise.toml`: `wasm32-unknown-unknown` rustup target, Node LTS,
+   `wasm-bindgen` CLI at the lockfile's `wasm-bindgen` version. `toolchain.md`
+   rows.
+4. CI: a Linux `slintx` job (mise, `just license-check license-check-test
+   wasm-check`) in `ci.yml`, required by the gate.
+
+Verify: `just check` locally; the fixture test fails if the gate is weakened.
 
 ### T74. slintx-conformance: differential harness against Slint
 

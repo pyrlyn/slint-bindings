@@ -5,7 +5,7 @@ header_path := "swift/Sources/CSlintBindings/slint_bindings.h"
 default: check
 
 # Everything CI runs on macOS. Cleanup is last so it does not invalidate the Swift link.
-check: fmt-check renderer-check clippy nextest header-check pinvoke-check swift-package-check swift-build swift-test tidy
+check: fmt-check renderer-check license-check license-check-test clippy nextest wasm-check header-check pinvoke-check swift-package-check swift-build swift-test tidy
 
 # Fail when Slint's own GPU renderers (FemtoVG, Skia) enter the build on any
 # target we ship; the GPU path draws with slintx-wgpu.
@@ -26,6 +26,19 @@ renderer-check:
 
 fmt-check:
     cargo fmt --check
+
+# Fail when slint, slint-* or i-slint-* enters the normal or build dependencies of a
+# slintx-* crate on any target: slintx is a clean-room Apache-2.0 implementation.
+license-check:
+    scripts/slintx-check.sh license
+
+# The gate against throwaway workspaces that do and do not depend on Slint crates.
+license-check-test:
+    scripts/slintx-check-test.sh
+
+# Build every slintx-* crate for wasm32-unknown-unknown and run its tests there on Node.
+wasm-check:
+    scripts/slintx-check.sh wasm
 
 clippy:
     cargo clippy --all-targets -- -D warnings

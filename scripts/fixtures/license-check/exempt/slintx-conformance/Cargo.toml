@@ -1,0 +1,8 @@
+[package]
+name = "slintx-conformance"
+version = "0.0.0"
+edition = "2024"
+publish = false
+
+[dev-dependencies]
+slint = { path = "../../stubs/slint" }

@@ -1,0 +1,3 @@
+[workspace]
+members = ["slintx-conformance", "slintx-wgpu"]
+resolver = "3"

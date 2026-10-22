@@ -6,9 +6,13 @@ uv = "0.12.23" # installs the pipx: ptools tool
 "cargo:cargo-sweep" = "0.8.0" # `mise run sweep`: drops build artifacts unused for 1 day (ptools sweep)
 mold = { version = "2.42.1", os = ["linux"] } # linker, Linux only; mise [env] below turns it on where it is installed
 # Same pin as weft, so the Weft milestone can share one toolchain.
-rust = { version = "1.99.0", components = "rustfmt,clippy" }
+rust = { version = "1.99.0", components = "rustfmt,clippy", targets = "wasm32-unknown-unknown" } # wasm32: `just wasm-check` (T73.2)
 "cargo:cargo-nextest" = "0.9.143"
 just = "1.58.0"
+# `just wasm-check`: wasm-bindgen-test-runner runs the slintx-* tests on Node. The CLI must
+# match the `wasm-bindgen` version in Cargo.lock exactly.
+"github:wasm-bindgen/wasm-bindgen" = "0.2.129"
+node = "24.22.0" # Active LTS
 
 [env]
 # mold as the Linux linker only where mise has installed it (clang is the driver): without mold

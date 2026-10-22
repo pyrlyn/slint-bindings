@@ -1,0 +1,11 @@
+[package]
+name = "slintx-transitive"
+version = "0.0.0"
+edition = "2024"
+publish = false
+
+[workspace]
+members = ["helper"]
+
+[dependencies]
+helper = { path = "helper" }

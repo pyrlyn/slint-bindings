@@ -24,7 +24,7 @@ jobs:
       value: ${{ steps.r.outputs.value }}
     steps:
       - id: r
-        uses: pyrlyn/ci/.github/actions/macos-runner@4b5b5470544893cd515b88c751e92728341c6daa # main
+        uses: pyrlyn/ci/.github/actions/macos-runner@main
         with:
           runner: ${{ vars.MACOS_RUNNER }}
           value: '["macos-26"]'
@@ -65,6 +65,25 @@ jobs:
         run: cargo install cbindgen --locked --force
       - name: just check
         run: just check
+
+  # The slintx-* checks on Linux too, so they still gate a PR while MACOS_CI_DISABLED skips
+  # the macOS `just check`.
+  slintx:
+    if: github.event_name != 'pull_request' || !github.event.pull_request.draft
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: jdx/mise-action@2d8d4cafcbd33be2ea37d2b6f5ad595363d1f1ca # v5.1.1
+        with:
+          # Only what the checks run; the rest of mise.toml builds tools from source.
+          install_args: rust just node github:wasm-bindgen/wasm-bindgen
+      - name: Licence gate and wasm32 tests
+        run: just license-check license-check-test wasm-check
 
   windows-host:
     if: github.event_name != 'pull_request' || !github.event.pull_request.draft
@@ -107,7 +126,7 @@ jobs:
           if-no-files-found: ignore
 
   gate:
-    needs: [rust, macos, windows-host]
+    needs: [rust, macos, slintx, windows-host]
     # always(): report failed or cancelled needs instead of reading a skipped gate as passing.
     if: >-
       always()

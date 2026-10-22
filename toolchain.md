@@ -2,7 +2,9 @@
 
 | Program | How to install | Why here | Source |
 | --- | --- | --- | --- |
-| rust (rustc, cargo, rustfmt, clippy) | mise (`mise.toml`, 1.99.0) | Builds the core and the C ABI | https://github.com/rust-lang/rust |
+| rust (rustc, cargo, rustfmt, clippy) | mise (`mise.toml`, 1.99.0) | Builds the core and the C ABI; the `wasm32-unknown-unknown` target for `just wasm-check` | https://github.com/rust-lang/rust |
+| wasm-bindgen CLI (wasm-bindgen-test-runner) | mise (`github:wasm-bindgen/wasm-bindgen`, same version as `wasm-bindgen` in `Cargo.lock`) | Runs the `slintx-*` tests on `wasm32-unknown-unknown` (`just wasm-check`) | https://github.com/wasm-bindgen/wasm-bindgen |
+| Node.js | mise (`node`, Active LTS) | JavaScript host for wasm-bindgen-test-runner | https://github.com/nodejs/node |
 | cargo-nextest | mise (`cargo:cargo-nextest`) | Test runner (`just test`) | https://github.com/nextest-rs/nextest |
 | just | mise | Recipes (`justfile`) | https://github.com/casey/just |
 | cbindgen | global (`cargo install cbindgen`) | Generates the C header from the FFI crate (`just header`) | https://github.com/mozilla/cbindgen |
