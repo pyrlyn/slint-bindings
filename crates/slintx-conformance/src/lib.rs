@@ -13,7 +13,7 @@
 //! | 2. Parse | Every case Slint accepts parses without syntax errors and round-trips | hook ready, [`Frontend`] stubbed until `slintx-syntax` lands |
 //! | 3. Values | Property values after scripted steps | stub: needs the slintx evaluator and runtime |
 //! | 4. Geometry | Layout geometry of every element | stub: needs the slintx layout engine |
-//! | 5. Pixels | Rendered frames within a pixel budget (`pixel-diff`) | stub: needs `slintx-wgpu` |
+//! | 5. Pixels | Rendered frames within a pixel budget (`rgba-png`) | stub: needs `slintx-wgpu` |
 
 use std::fmt::Write as _;
 use std::fs;

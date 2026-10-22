@@ -2970,13 +2970,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "pixel-diff"
-version = "0.1.0"
-dependencies = [
- "png",
-]
-
-[[package]]
 name = "pkg-config"
 version = "0.3.34"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3259,6 +3252,14 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "47b34b781b31e5d73e9fbc8689c70551fd1ade9a19e3e28cfec8580a79290cc4"
 dependencies = [
  "bytemuck",
+]
+
+[[package]]
+name = "rgba-png"
+version = "0.1.0"
+source = "git+https://github.com/pyrlyn/crates?rev=a6f89b270ac5442c090715cfca6f36996c668f22#a6f89b270ac5442c090715cfca6f36996c668f22"
+dependencies = [
+ "png",
 ]
 
 [[package]]
@@ -3569,7 +3570,7 @@ dependencies = [
 name = "slint-bindings-ffi"
 version = "0.1.0"
 dependencies = [
- "pixel-diff",
+ "rgba-png",
  "slint-bindings-core",
 ]
 
@@ -3650,8 +3651,8 @@ dependencies = [
  "bytemuck",
  "i-slint-core",
  "lyon_tessellation",
- "pixel-diff",
  "pollster",
+ "rgba-png",
  "slint",
  "slint-embed",
  "slint-interpreter",

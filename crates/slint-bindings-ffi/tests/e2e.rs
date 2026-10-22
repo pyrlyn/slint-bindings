@@ -335,7 +335,7 @@ fn must<T, E: std::fmt::Display>(result: Result<T, E>) -> T {
 
 fn assert_snapshot(name: &str, width: u32, height: u32, rgba: &[u8]) {
     let path = snapshot_path(name);
-    let encoded = must(pixel_diff::encode_png(width, height, rgba));
+    let encoded = must(rgba_png::encode_png(width, height, rgba));
     if std::env::var_os("SB_UPDATE_SNAPSHOTS").is_some() {
         if let Some(parent) = path.parent() {
             let _ = std::fs::create_dir_all(parent);
@@ -353,13 +353,13 @@ fn assert_snapshot(name: &str, width: u32, height: u32, rgba: &[u8]) {
         assert!(message.is_empty(), "read {}: {message}", path.display());
         std::process::abort();
     });
-    let (got_width, got_height, pixels) = must(pixel_diff::decode_png(&saved));
+    let (got_width, got_height, pixels) = must(rgba_png::decode_png(&saved));
     assert_eq!(
         (got_width, got_height, pixels.len()),
         (width, height, rgba.len()),
         "{name} snapshot size"
     );
-    let diffs = pixel_diff::differing_pixels(&pixels, rgba, 0);
+    let diffs = rgba_png::differing_pixels(&pixels, rgba, 0);
     if diffs == 0 {
         return;
     }
@@ -400,7 +400,7 @@ fn sign_in_frame_matches_the_snapshot() {
         let first = paint(FORM_WIDTH, FORM_HEIGHT, 1.0, None);
         let second = paint(FORM_WIDTH, FORM_HEIGHT, 1.0, None);
         assert_eq!(
-            pixel_diff::differing_pixels(&first, &second, 0),
+            rgba_png::differing_pixels(&first, &second, 0),
             0,
             "the sign-in frame is not stable across two hosts"
         );

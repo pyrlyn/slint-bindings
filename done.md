@@ -359,3 +359,17 @@ decision 3). The hosts show `weft-slint`'s output instead: T70 and T71.
 Dropped, not done. Weft builds its desktop editor itself (weft T69,
 WeftStudio) on these bindings; a second app here would duplicate it. Approved
 with T12 (weft T69.1, decision 3).
+
+### T89. Screenshot helpers from the shared rgba-png crate
+
+`crates/pixel-diff` (T72) is the same code as `rgba-png` in pyrlyn/crates
+(`rust/rgba-png`), which scull also uses. The workspace rule moves code shared by
+two projects into one package, so the crate is deleted and the dev-dependencies of
+`slint-bindings-ffi` and `slintx-wgpu` pin `rgba-png` by git rev (it is not on
+crates.io). `encode_png`, `decode_png`, `differing_pixels` and `diff_image` are
+byte-for-byte the functions `pixel-diff` had, so no snapshot changed.
+
+Result: `cargo nextest run` passes all 131 tests, including the FFI e2e snapshot
+and the slintx-wgpu comparisons that call the crate; clippy with warnings denied,
+the format check and `just license-check` pass (`rgba-png` is a dev-dependency,
+outside the gate's normal and build graph).

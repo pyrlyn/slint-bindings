@@ -118,13 +118,13 @@ fn compare(
     let reference = snapshot(&software, size, scale)?;
 
     assert_eq!(reference.len(), frame.len(), "{name}: frame sizes differ");
-    let differing = pixel_diff::differing_pixels(&reference, &frame, CHANNEL_THRESHOLD);
+    let differing = rgba_png::differing_pixels(&reference, &frame, CHANNEL_THRESHOLD);
     let total = (size[0] * size[1]) as usize;
     let share = differing as f64 / total as f64;
     eprintln!(
         "{name}: {:.2}% of pixels differ, {} not identical",
         share * 100.0,
-        pixel_diff::differing_pixels(&reference, &frame, 0),
+        rgba_png::differing_pixels(&reference, &frame, 0),
     );
     // Always written, so a passing run can be looked at too.
     let dir = write_frames(name, size, &reference, &frame)?;
@@ -177,9 +177,9 @@ fn write_frames(
 ) -> Result<PathBuf, Box<dyn Error>> {
     let dir = Path::new(env!("CARGO_TARGET_TMPDIR")).join("slintx-wgpu");
     std::fs::create_dir_all(&dir)?;
-    let diff = pixel_diff::diff_image(reference, frame, CHANNEL_THRESHOLD);
+    let diff = rgba_png::diff_image(reference, frame, CHANNEL_THRESHOLD);
     for (suffix, pixels) in [("software", reference), ("wgpu", frame), ("diff", &diff)] {
-        let png = pixel_diff::encode_png(size[0], size[1], pixels)?;
+        let png = rgba_png::encode_png(size[0], size[1], pixels)?;
         std::fs::write(dir.join(format!("{name}-{suffix}.png")), png)?;
     }
     Ok(dir)
