@@ -34,6 +34,10 @@ i-slint-core = { version = "=1.18.1", default-features = false, features = ["ima
 thiserror = "2.0.21"
 rowan = "0.17.0"
 wasm-bindgen-test = "0.3.79"
+# T14: the accessibility tree schema (platform-neutral) and its AppKit adapter.
+# Not through Slint's winit backend, which would bring winit and its renderers.
+accesskit = "0.25.1"
+accesskit_macos = "0.27.1"
 slintx-wgpu = { path = "crates/slintx-wgpu" }
 # slintx-wgpu: the GPU API it draws with, glyph rasterizing, path tessellation
 # and plain-data vertex buffers. wgpu, swash, bytemuck and pollster keep the

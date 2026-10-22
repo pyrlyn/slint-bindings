@@ -21,6 +21,8 @@
 | slint-dart-interpreter | local (path, `flutter/packages/slint_build/interpreter`) | https://github.com/listepo/slint_dart | Shared compile helper and JSON value bridge for properties and callbacks |
 | i-slint-core | local | https://github.com/slint-ui/slint | Image and SVG decoding without a backend; the renderer traits and shared parley text layout slintx-wgpu implements |
 | thiserror | local | https://github.com/dtolnay/thiserror | Core error enum |
+| accesskit | local | https://github.com/AccessKit/accesskit | Platform-neutral accessibility tree built from the Slint item tree (T14) |
+| accesskit_macos | local (macOS) | https://github.com/AccessKit/accesskit | VoiceOver adapter behind the host `NSView` (T14) |
 | slintx-wgpu | local (path, `crates/slintx-wgpu`) | this repository | Our Slint renderer on wgpu; the only GPU renderer in the build |
 | wgpu | local | https://github.com/gfx-rs/wgpu | GPU API slintx-wgpu draws with; Metal and D3D12 surfaces in the core |
 | swash | local | https://github.com/dfrg/swash | Glyph rasterizing in slintx-wgpu |

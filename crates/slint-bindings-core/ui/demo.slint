@@ -27,6 +27,7 @@ export component DemoForm inherits Window {
         width: 288px;
         height: 32px;
         placeholder-text: "Name";
+        accessible-label: "Name";
         text <=> root.name;
         accepted => { submit.clicked(); }
     }

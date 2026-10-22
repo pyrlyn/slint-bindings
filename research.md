@@ -1248,3 +1248,87 @@ Source: https://releases.slint.dev/1.18.0/docs/slint/reference/std-widgets/misc/
 - [ ] Popups — Palette used in custom sidebar recipe; breakpoint recipe uses states on width
 - [ ] Visual contract hints — pressed state shifts label slightly (1-2px), hover/pressed colour changes, rounded pill radius = height/2, disabled uses greyed colours; these are illustrative only
 Source: https://releases.slint.dev/1.18.0/docs/slint/guide/development/custom-controls/
+
+## 9. Accessibility (T14, 2026-10-20)
+
+Sources: the published crate sources from crates.io (the same files as the
+`v1.18.1` tag of [slint-ui/slint](https://github.com/slint-ui/slint/tree/v1.18.1)),
+the crates.io API and docs.rs, all checked 2026-10-20.
+
+### What Slint 1.18.1 gives a custom platform
+
+- No public accessibility API. Everything a screen-reader bridge needs is in
+  `i-slint-core` 1.18.1, which this repo already depends on with an exact pin:
+  - `accessibility.rs`: `AccessibleStringProperty` (line 19),
+    `AccessibilityAction` (52), `accessible_descendents` (84),
+    `nearest_accessible_item` (128), `find_text_input` (137)
+    ([source](https://github.com/slint-ui/slint/blob/v1.18.1/internal/core/accessibility.rs)).
+  - `item_tree.rs`: `ItemRc::accessible_role` (546),
+    `accessible_string_property` (551), `accessible_action` (561),
+    `supported_accessibility_actions` (566); geometry through `geometry` and
+    `map_to_window`
+    ([source](https://github.com/slint-ui/slint/blob/v1.18.1/internal/core/item_tree.rs)).
+  - `window.rs`: `WindowInner::try_component`, `focus_item`, `active_popups`,
+    `set_focus_item`
+    ([source](https://github.com/slint-ui/slint/blob/v1.18.1/internal/core/window.rs)).
+- Structure changes (`register_item_tree`, `unregister_item_tree`,
+  `handle_focus_change`) are announced only through `WindowAdapterInternal`
+  (`window.rs` line 225), which is `#[doc(hidden)]`. The prototype does not
+  implement it; it rebuilds after a redrawn frame and uses a
+  `PropertyTracker` to catch property changes without a redraw.
+- `i-slint-core`'s own `accesskit` feature (Cargo.toml line 51) only adds
+  `AccessKit` glue for parley text; it is not a platform bridge.
+
+### How the winit backend does it
+
+- `i-slint-backend-winit` 1.18.1 depends on `accesskit` 0.24 and
+  `accesskit_winit` 0.33 (Cargo.toml lines 268–275), one version behind the
+  current crates. Its `accesskit.rs`
+  ([source](https://github.com/slint-ui/slint/blob/v1.18.1/internal/backends/winit/accesskit.rs)):
+  node ids pack a component id and an item index (line 462); actions are
+  deferred with `Timer::single_shot` (line 313) so they run outside the
+  platform's accessibility call.
+- Using it here would bring winit and Slint's GPU renderers into the build
+  (see T72, PR pyrlyn/slint-bindings#32), so the bridge is our own.
+- The backend is GPL-3.0 / Slint royalty-free / Slint commercial
+  (Cargo.toml line 27); this repo is Apache-2.0, so its role mapping was
+  reimplemented from the public `AccessibleRole` and AccessKit `Role` docs,
+  not copied.
+
+### AccessKit crates
+
+| Crate | Version | Released | License | Notes |
+| --- | --- | --- | --- | --- |
+| [accesskit](https://crates.io/crates/accesskit) | 0.25.1 | 2026-09-25 | MIT OR Apache-2.0 | Tree schema, no platform code |
+| [accesskit_macos](https://crates.io/crates/accesskit_macos) | 0.27.1 | 2026-09-25 | MIT OR Apache-2.0 | `rust-version` 1.87; objc2 0.5 / objc2-app-kit 0.2 (already in `Cargo.lock`) |
+| [accesskit_windows](https://crates.io/crates/accesskit_windows) | 0.35.1 | 2026-09-25 | MIT OR Apache-2.0 | UIA provider for a whole `HWND` |
+| [accesskit_consumer](https://crates.io/crates/accesskit_consumer) | 0.39.1 | 2026-09-25 | MIT OR Apache-2.0 | Pulled in by the adapters |
+| [accesskit_winit](https://crates.io/crates/accesskit_winit) | 0.34.1 | 2026-09-25 | MIT OR Apache-2.0 | Not used |
+
+Repository: [AccessKit/accesskit](https://github.com/AccessKit/accesskit).
+
+### accesskit_macos 0.27.1 facts the host relies on
+
+- Two entry points: `Adapter` (the view forwards `accessibilityChildren`,
+  `accessibilityFocusedUIElement` and `accessibilityHitTest:`; `adapter.rs`
+  lines 223, 248, 275) and `SubclassingAdapter`, which swaps the view's class
+  at run time (`subclass.rs`). The host uses `Adapter`: `SlintNSView` is a
+  Swift class it owns.
+- Bounds are physical pixels from the view's top-left; `util.rs` divides by
+  the window's `backingScaleFactor` (line 44) and calls
+  `view.window().unwrap()` (line 39), so a frame query on a view with no
+  window panics.
+- `Role::Label` exposes its label as the value (`node.rs` line 233).
+
+### Windows options
+
+- `accesskit_windows` 0.35.1: `Adapter::new(hwnd, is_window_focused,
+  action_handler)` and `handle_wm_getobject` answer `WM_GETOBJECT` for the
+  whole `HWND`
+  ([docs.rs](https://docs.rs/accesskit_windows/0.35.1/accesskit_windows/struct.Adapter.html)).
+  A WinUI 3 `SwapChainPanel` has no `HWND` of its own, so the adapter would
+  replace XAML's UIA tree for the whole window.
+- WinUI's own route: a custom `AutomationPeer` from `OnCreateAutomationPeer`,
+  with `GetChildrenCore` returning peers for a custom child structure
+  ([Custom automation peers](https://learn.microsoft.com/en-us/windows/apps/design/accessibility/custom-automation-peers),
+  ms.date 2026-08-21).

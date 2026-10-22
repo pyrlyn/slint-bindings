@@ -95,6 +95,15 @@ internal static partial class NativeMethods
     [return: MarshalAs(UnmanagedType.U1)]
     internal static partial bool sb_host_focus_changed(IntPtr host, [MarshalAs(UnmanagedType.U1)] bool focused);
 
+    // macOS only (VoiceOver through the host NSView); on Windows these fail. T14.
+    [LibraryImport(Lib)]
+    [return: MarshalAs(UnmanagedType.U1)]
+    internal static partial bool sb_host_accessibility_attach(IntPtr host, IntPtr view);
+
+    [LibraryImport(Lib)] internal static partial IntPtr sb_host_accessibility_children(IntPtr host);
+    [LibraryImport(Lib)] internal static partial IntPtr sb_host_accessibility_focus(IntPtr host);
+    [LibraryImport(Lib)] internal static partial IntPtr sb_host_accessibility_hit_test(IntPtr host, double x, double y);
+
     [LibraryImport(Lib, StringMarshalling = StringMarshalling.Utf8)]
     [return: MarshalAs(UnmanagedType.U1)]
     internal static partial bool sb_host_key_pressed(IntPtr host, string text);

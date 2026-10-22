@@ -6,6 +6,7 @@
 //! frame whenever it wants one. The CPU path paints into a buffer the host
 //! owns. On macOS and Windows, FemtoVG can paint into a host surface instead.
 
+pub mod a11y;
 #[cfg(any(target_os = "macos", target_os = "windows"))]
 mod gpu;
 mod host;
