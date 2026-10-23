@@ -22,7 +22,7 @@ pollster = { workspace = true }
 slint = { workspace = true }
 slint-embed = { workspace = true }
 slint-interpreter = { workspace = true }
-pixel-diff = { workspace = true }
+rgba-png = { workspace = true }
 
 [lints]
 workspace = true

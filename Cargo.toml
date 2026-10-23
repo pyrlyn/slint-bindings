@@ -48,9 +48,9 @@ lyon_tessellation = "1.0.23"
 bytemuck = { version = "1.25.2", features = ["derive"] }
 pollster = "0.4.0"
 # Screenshot tests: the demo frame is stored as a PNG snapshot (FFI e2e), and
-# slintx-wgpu frames are compared with the software renderer's.
-png = "0.18.1"
-pixel-diff = { path = "crates/pixel-diff" }
+# slintx-wgpu frames are compared with the software renderer's. rgba-png is shared
+# with scull and not on crates.io, so it is pinned by rev.
+rgba-png = { git = "https://github.com/pyrlyn/crates", rev = "a6f89b270ac5442c090715cfca6f36996c668f22" }
 
 [workspace.lints.rust]
 unsafe_op_in_unsafe_fn = "deny"
