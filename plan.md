@@ -73,11 +73,11 @@ Not added: `slint_embed::events` is used only by slint_dart and stays there; `i-
 | T86 | todo | P2 | 5 | 0% | |
 | T87 | todo | P2 | 5 | 0% | |
 | T88 | todo | P3 | 4 | 0% | |
-| T89 | in progress | P1 | 5 | 5% | Claude / opus-5.5 |
-| T89.1 | in progress | P1 | 4 | 5% | Claude / opus-5.5 |
-| T89.2 | todo | P1 | 3 | 0% | |
-| T89.3 | todo | P1 | 3 | 0% | |
-| T89.4 | todo | P1 | 4 | 0% | |
+| T89 | in progress | P1 | 5 | 75% | Claude / opus-5.5 |
+| T89.1 | in progress | P1 | 4 | 95% | Claude / opus-5.5 |
+| T89.2 | in progress | P1 | 3 | 95% | Claude / opus-5.5 |
+| T89.3 | in progress | P1 | 3 | 95% | Claude / opus-5.5 |
+| T89.4 | in progress | P1 | 4 | 95% | Claude / opus-5.5 |
 | T89.5 | todo | P2 | 5 | 0% | |
 
 ## Milestones
@@ -638,3 +638,10 @@ Colima and in Linux CI; `ibtool` and an AppKit loader on macOS; Slint
 reference geometry from `slint-viewer` or the `slintx-conformance` oracle
 (dev-only). Compare element rectangles with a tolerance and a soft perceptual
 threshold through `pixel-diff`. Platform tests are `#[ignore]` or `cfg`-gated.
+
+Known so far: the Blueprint output compiles with `blueprint-compiler` 0.16.0
+and the GTK 4 typelibs on Debian trixie; Fedora's 0.20.4 package does not find
+the GTK 4 typelibs, so the image starts from Debian. Still unproven and to be
+measured here: the default stretch the backends assume per widget, and whether
+UIKit stack views apply their margins (`layoutMarginsRelativeArrangement`,
+which Interface Builder drops on save) — check in the iOS Simulator.
