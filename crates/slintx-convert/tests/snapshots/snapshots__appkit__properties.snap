@@ -1,0 +1,303 @@
+---
+source: crates/slintx-convert/tests/snapshots.rs
+expression: "render(name, format, options)"
+---
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Converted from properties.slint by slint-convert. -->
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="23504" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="s00-00-001">
+  <dependencies>
+    <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="23504"/>
+  </dependencies>
+  <scenes>
+    <scene sceneID="s00-00-000">
+      <objects>
+        <viewController id="s00-00-001" customClass="PropertiesViewController" sceneMemberID="viewController">
+          <view key="view" id="s00-00-002">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <subviews>
+              <stackView orientation="vertical" alignment="centerX" spacing="4" detachesHiddenViews="YES" distribution="fill" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-003">
+                <edgeInsets key="edgeInsets" left="8" right="8" top="8" bottom="8"/>
+                <subviews>
+                  <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-004">
+                    <textFieldCell key="cell" lineBreakMode="clipping" title="Styled" alignment="center" id="s00-00-005">
+                      <font key="font" metaFont="systemBold" size="20"/>
+                      <color key="textColor" red="0.2" green="0.4" blue="0.6" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                      <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                  </textField>
+                  <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-006">
+                    <textFieldCell key="cell" lineBreakMode="wordWrapping" title="Light italic" id="s00-00-007">
+                      <font key="font" metaFont="system" size="14"/>
+                      <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                      <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                  </textField>
+                  <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-008">
+                    <textFieldCell key="cell" lineBreakMode="truncatingTail" title="Serif" id="s00-00-009">
+                      <font key="font" size="14" name="Georgia"/>
+                      <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                      <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                  </textField>
+                  <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-010">
+                    <buttonCell key="cell" type="push" title="Disabled" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="s00-00-011" enabled="NO">
+                      <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                      <font key="font" metaFont="system"/>
+                    </buttonCell>
+                  </button>
+                  <button hidden="YES" alphaValue="0.5" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-012">
+                    <buttonCell key="cell" type="push" title="Hidden" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="s00-00-013">
+                      <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                      <font key="font" metaFont="system"/>
+                    </buttonCell>
+                  </button>
+                  <secureTextField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-014">
+                    <!-- accepted => { debug("go"); } -->
+                    <secureTextFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" placeholderString="Password" title="" drawsBackground="YES" id="s00-00-015">
+                      <font key="font" metaFont="system" size="14"/>
+                      <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                      <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </secureTextFieldCell>
+                    <connections>
+                      <action selector="lineEditAccepted:" target="s00-00-001" id="s00-00-016"/>
+                    </connections>
+                  </secureTextField>
+                  <textField verticalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-017">
+                    <textFieldCell key="cell" lineBreakMode="wordWrapping" selectable="YES" editable="NO" sendsActionOnEndEditing="YES" borderStyle="bezel" title="Read only" drawsBackground="YES" id="s00-00-018">
+                      <font key="font" metaFont="system" size="14"/>
+                      <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                      <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                  </textField>
+                  <progressIndicator maxValue="1" doubleValue="0" indeterminate="YES" style="bar" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-019"/>
+                  <progressIndicator maxValue="100" indeterminate="YES" style="spinning" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-020"/>
+                  <imageView verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-021">
+                    <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyUpOrDown" image="photo.png" id="s00-00-022"/>
+                    <constraints>
+                      <constraint firstAttribute="height" constant="40" id="s00-00-023"/>
+                    </constraints>
+                  </imageView>
+                  <stackView orientation="horizontal" alignment="centerY" spacing="0" detachesHiddenViews="YES" distribution="fill" verticalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-024">
+                    <subviews>
+                      <button horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-025">
+                        <buttonCell key="cell" type="push" title="S" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="s00-00-026">
+                          <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                          <font key="font" metaFont="system"/>
+                        </buttonCell>
+                      </button>
+                      <customView userLabel="Spacer" horizontalHuggingPriority="1" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-027"/>
+                    </subviews>
+                    <constraints>
+                      <constraint firstItem="s00-00-025" firstAttribute="height" secondItem="s00-00-024" secondAttribute="height" id="s00-00-028"/>
+                      <constraint firstItem="s00-00-027" firstAttribute="height" secondItem="s00-00-024" secondAttribute="height" id="s00-00-029"/>
+                    </constraints>
+                  </stackView>
+                  <stackView orientation="horizontal" alignment="centerY" spacing="0" detachesHiddenViews="YES" distribution="fill" verticalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-030">
+                    <subviews>
+                      <customView userLabel="Spacer" horizontalHuggingPriority="1" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-035"/>
+                      <button horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-031">
+                        <buttonCell key="cell" type="push" title="C1" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="s00-00-032">
+                          <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                          <font key="font" metaFont="system"/>
+                        </buttonCell>
+                      </button>
+                      <button horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-033">
+                        <buttonCell key="cell" type="push" title="C2" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="s00-00-034">
+                          <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                          <font key="font" metaFont="system"/>
+                        </buttonCell>
+                      </button>
+                      <customView userLabel="Spacer" horizontalHuggingPriority="1" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-036"/>
+                    </subviews>
+                    <constraints>
+                      <constraint firstItem="s00-00-036" firstAttribute="width" secondItem="s00-00-035" secondAttribute="width" id="s00-00-037"/>
+                      <constraint firstItem="s00-00-035" firstAttribute="height" secondItem="s00-00-030" secondAttribute="height" id="s00-00-038"/>
+                      <constraint firstItem="s00-00-031" firstAttribute="height" secondItem="s00-00-030" secondAttribute="height" id="s00-00-039"/>
+                      <constraint firstItem="s00-00-033" firstAttribute="height" secondItem="s00-00-030" secondAttribute="height" id="s00-00-040"/>
+                      <constraint firstItem="s00-00-036" firstAttribute="height" secondItem="s00-00-030" secondAttribute="height" id="s00-00-041"/>
+                    </constraints>
+                  </stackView>
+                  <stackView orientation="horizontal" alignment="centerY" spacing="0" detachesHiddenViews="YES" distribution="fill" verticalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-042">
+                    <subviews>
+                      <customView userLabel="Spacer" horizontalHuggingPriority="1" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-045"/>
+                      <button horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-043">
+                        <buttonCell key="cell" type="push" title="E" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="s00-00-044">
+                          <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                          <font key="font" metaFont="system"/>
+                        </buttonCell>
+                      </button>
+                    </subviews>
+                    <constraints>
+                      <constraint firstItem="s00-00-045" firstAttribute="height" secondItem="s00-00-042" secondAttribute="height" id="s00-00-046"/>
+                      <constraint firstItem="s00-00-043" firstAttribute="height" secondItem="s00-00-042" secondAttribute="height" id="s00-00-047"/>
+                    </constraints>
+                  </stackView>
+                  <stackView orientation="horizontal" alignment="centerY" spacing="0" detachesHiddenViews="YES" distribution="fill" verticalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-048">
+                    <subviews>
+                      <customView userLabel="Spacer" horizontalHuggingPriority="1" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-053"/>
+                      <button horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-049">
+                        <buttonCell key="cell" type="push" title="A1" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="s00-00-050">
+                          <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                          <font key="font" metaFont="system"/>
+                        </buttonCell>
+                      </button>
+                      <customView userLabel="Spacer" horizontalHuggingPriority="1" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-054"/>
+                      <button horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-051">
+                        <buttonCell key="cell" type="push" title="A2" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="s00-00-052">
+                          <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                          <font key="font" metaFont="system"/>
+                        </buttonCell>
+                      </button>
+                      <customView userLabel="Spacer" horizontalHuggingPriority="1" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-055"/>
+                    </subviews>
+                    <constraints>
+                      <constraint firstItem="s00-00-054" firstAttribute="width" secondItem="s00-00-053" secondAttribute="width" multiplier="2" id="s00-00-056"/>
+                      <constraint firstItem="s00-00-055" firstAttribute="width" secondItem="s00-00-053" secondAttribute="width" id="s00-00-057"/>
+                      <constraint firstItem="s00-00-053" firstAttribute="height" secondItem="s00-00-048" secondAttribute="height" id="s00-00-058"/>
+                      <constraint firstItem="s00-00-049" firstAttribute="height" secondItem="s00-00-048" secondAttribute="height" id="s00-00-059"/>
+                      <constraint firstItem="s00-00-054" firstAttribute="height" secondItem="s00-00-048" secondAttribute="height" id="s00-00-060"/>
+                      <constraint firstItem="s00-00-051" firstAttribute="height" secondItem="s00-00-048" secondAttribute="height" id="s00-00-061"/>
+                      <constraint firstItem="s00-00-055" firstAttribute="height" secondItem="s00-00-048" secondAttribute="height" id="s00-00-062"/>
+                    </constraints>
+                  </stackView>
+                  <stackView orientation="horizontal" alignment="centerY" spacing="0" detachesHiddenViews="YES" distribution="fill" verticalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-063">
+                    <subviews>
+                      <customView userLabel="Spacer" horizontalHuggingPriority="1" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-068"/>
+                      <button horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-064">
+                        <buttonCell key="cell" type="push" title="V1" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="s00-00-065">
+                          <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                          <font key="font" metaFont="system"/>
+                        </buttonCell>
+                      </button>
+                      <customView userLabel="Spacer" horizontalHuggingPriority="1" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-069"/>
+                      <button horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-066">
+                        <buttonCell key="cell" type="push" title="V2" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="s00-00-067">
+                          <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                          <font key="font" metaFont="system"/>
+                        </buttonCell>
+                      </button>
+                      <customView userLabel="Spacer" horizontalHuggingPriority="1" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-070"/>
+                    </subviews>
+                    <constraints>
+                      <constraint firstItem="s00-00-069" firstAttribute="width" secondItem="s00-00-068" secondAttribute="width" id="s00-00-071"/>
+                      <constraint firstItem="s00-00-070" firstAttribute="width" secondItem="s00-00-068" secondAttribute="width" id="s00-00-072"/>
+                      <constraint firstItem="s00-00-068" firstAttribute="height" secondItem="s00-00-063" secondAttribute="height" id="s00-00-073"/>
+                      <constraint firstItem="s00-00-064" firstAttribute="height" secondItem="s00-00-063" secondAttribute="height" id="s00-00-074"/>
+                      <constraint firstItem="s00-00-069" firstAttribute="height" secondItem="s00-00-063" secondAttribute="height" id="s00-00-075"/>
+                      <constraint firstItem="s00-00-066" firstAttribute="height" secondItem="s00-00-063" secondAttribute="height" id="s00-00-076"/>
+                      <constraint firstItem="s00-00-070" firstAttribute="height" secondItem="s00-00-063" secondAttribute="height" id="s00-00-077"/>
+                    </constraints>
+                  </stackView>
+                  <customView verticalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-078">
+                    <!-- not converted: clicked => { debug("tap"); } -->
+                    <subviews>
+                      <customView translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-079"/>
+                    </subviews>
+                    <constraints>
+                      <constraint firstItem="s00-00-079" firstAttribute="leading" secondItem="s00-00-078" secondAttribute="leading" id="s00-00-080"/>
+                      <constraint firstItem="s00-00-078" firstAttribute="trailing" secondItem="s00-00-079" secondAttribute="trailing" id="s00-00-081"/>
+                      <constraint firstItem="s00-00-079" firstAttribute="top" secondItem="s00-00-078" secondAttribute="top" id="s00-00-082"/>
+                      <constraint firstItem="s00-00-078" firstAttribute="bottom" secondItem="s00-00-079" secondAttribute="bottom" id="s00-00-083"/>
+                    </constraints>
+                  </customView>
+                  <customView verticalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-084">
+                    <subviews>
+                      <stackView orientation="vertical" alignment="centerX" spacing="0" detachesHiddenViews="YES" distribution="fill" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-085">
+                        <subviews>
+                          <textField focusRingType="none" verticalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-086">
+                            <textFieldCell key="cell" lineBreakMode="clipping" title="Scrolled" id="s00-00-087">
+                              <font key="font" metaFont="system" size="14"/>
+                              <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                              <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                            </textFieldCell>
+                          </textField>
+                        </subviews>
+                        <constraints>
+                          <constraint firstItem="s00-00-086" firstAttribute="width" secondItem="s00-00-085" secondAttribute="width" id="s00-00-088"/>
+                        </constraints>
+                      </stackView>
+                    </subviews>
+                    <constraints>
+                      <constraint firstItem="s00-00-085" firstAttribute="leading" secondItem="s00-00-084" secondAttribute="leading" id="s00-00-089"/>
+                      <constraint firstItem="s00-00-084" firstAttribute="trailing" secondItem="s00-00-085" secondAttribute="trailing" id="s00-00-090"/>
+                      <constraint firstItem="s00-00-085" firstAttribute="top" secondItem="s00-00-084" secondAttribute="top" id="s00-00-091"/>
+                      <constraint firstItem="s00-00-084" firstAttribute="bottom" secondItem="s00-00-085" secondAttribute="bottom" id="s00-00-092"/>
+                    </constraints>
+                  </customView>
+                  <customView verticalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-093">
+                    <!-- GroupBox title: Group -->
+                    <subviews>
+                      <textField focusRingType="none" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-094">
+                        <textFieldCell key="cell" lineBreakMode="clipping" title="Inside" id="s00-00-095">
+                          <font key="font" metaFont="system" size="14"/>
+                          <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                          <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                      </textField>
+                    </subviews>
+                    <constraints>
+                      <constraint firstItem="s00-00-094" firstAttribute="centerX" secondItem="s00-00-093" secondAttribute="centerX" id="s00-00-096"/>
+                      <constraint firstItem="s00-00-094" firstAttribute="centerY" secondItem="s00-00-093" secondAttribute="centerY" id="s00-00-097"/>
+                    </constraints>
+                  </customView>
+                </subviews>
+                <constraints>
+                  <constraint firstItem="s00-00-024" firstAttribute="height" secondItem="s00-00-017" secondAttribute="height" priority="999" id="s00-00-098"/>
+                  <constraint firstItem="s00-00-030" firstAttribute="height" secondItem="s00-00-017" secondAttribute="height" priority="999" id="s00-00-099"/>
+                  <constraint firstItem="s00-00-042" firstAttribute="height" secondItem="s00-00-017" secondAttribute="height" priority="999" id="s00-00-100"/>
+                  <constraint firstItem="s00-00-048" firstAttribute="height" secondItem="s00-00-017" secondAttribute="height" priority="999" id="s00-00-101"/>
+                  <constraint firstItem="s00-00-063" firstAttribute="height" secondItem="s00-00-017" secondAttribute="height" priority="999" id="s00-00-102"/>
+                  <constraint firstItem="s00-00-078" firstAttribute="height" secondItem="s00-00-017" secondAttribute="height" priority="999" id="s00-00-103"/>
+                  <constraint firstItem="s00-00-084" firstAttribute="height" secondItem="s00-00-017" secondAttribute="height" priority="999" id="s00-00-104"/>
+                  <constraint firstItem="s00-00-093" firstAttribute="height" secondItem="s00-00-017" secondAttribute="height" priority="999" id="s00-00-105"/>
+                  <constraint firstItem="s00-00-004" firstAttribute="width" secondItem="s00-00-003" secondAttribute="width" constant="-16" id="s00-00-106"/>
+                  <constraint firstItem="s00-00-006" firstAttribute="width" secondItem="s00-00-003" secondAttribute="width" constant="-16" id="s00-00-107"/>
+                  <constraint firstItem="s00-00-008" firstAttribute="width" secondItem="s00-00-003" secondAttribute="width" constant="-16" id="s00-00-108"/>
+                  <constraint firstItem="s00-00-010" firstAttribute="width" secondItem="s00-00-003" secondAttribute="width" constant="-16" id="s00-00-109"/>
+                  <constraint firstItem="s00-00-012" firstAttribute="width" secondItem="s00-00-003" secondAttribute="width" constant="-16" id="s00-00-110"/>
+                  <constraint firstItem="s00-00-014" firstAttribute="width" secondItem="s00-00-003" secondAttribute="width" constant="-16" id="s00-00-111"/>
+                  <constraint firstItem="s00-00-017" firstAttribute="width" secondItem="s00-00-003" secondAttribute="width" constant="-16" id="s00-00-112"/>
+                  <constraint firstItem="s00-00-019" firstAttribute="width" secondItem="s00-00-003" secondAttribute="width" constant="-16" id="s00-00-113"/>
+                  <constraint firstItem="s00-00-020" firstAttribute="width" secondItem="s00-00-003" secondAttribute="width" constant="-16" id="s00-00-114"/>
+                  <constraint firstItem="s00-00-021" firstAttribute="width" secondItem="s00-00-003" secondAttribute="width" constant="-16" id="s00-00-115"/>
+                  <constraint firstItem="s00-00-024" firstAttribute="width" secondItem="s00-00-003" secondAttribute="width" constant="-16" id="s00-00-116"/>
+                  <constraint firstItem="s00-00-030" firstAttribute="width" secondItem="s00-00-003" secondAttribute="width" constant="-16" id="s00-00-117"/>
+                  <constraint firstItem="s00-00-042" firstAttribute="width" secondItem="s00-00-003" secondAttribute="width" constant="-16" id="s00-00-118"/>
+                  <constraint firstItem="s00-00-048" firstAttribute="width" secondItem="s00-00-003" secondAttribute="width" constant="-16" id="s00-00-119"/>
+                  <constraint firstItem="s00-00-063" firstAttribute="width" secondItem="s00-00-003" secondAttribute="width" constant="-16" id="s00-00-120"/>
+                  <constraint firstItem="s00-00-078" firstAttribute="width" secondItem="s00-00-003" secondAttribute="width" constant="-16" id="s00-00-121"/>
+                  <constraint firstItem="s00-00-084" firstAttribute="width" secondItem="s00-00-003" secondAttribute="width" constant="-16" id="s00-00-122"/>
+                  <constraint firstItem="s00-00-093" firstAttribute="width" secondItem="s00-00-003" secondAttribute="width" constant="-16" id="s00-00-123"/>
+                </constraints>
+              </stackView>
+            </subviews>
+            <constraints>
+              <constraint firstItem="s00-00-003" firstAttribute="leading" secondItem="s00-00-002" secondAttribute="leading" id="s00-00-124"/>
+              <constraint firstItem="s00-00-002" firstAttribute="trailing" secondItem="s00-00-003" secondAttribute="trailing" id="s00-00-125"/>
+              <constraint firstItem="s00-00-003" firstAttribute="top" secondItem="s00-00-002" secondAttribute="top" id="s00-00-126"/>
+              <constraint firstItem="s00-00-002" firstAttribute="bottom" secondItem="s00-00-003" secondAttribute="bottom" id="s00-00-127"/>
+            </constraints>
+          </view>
+        </viewController>
+        <customObject id="s00-00-128" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+      </objects>
+      <point key="canvasLocation" x="0" y="0"/>
+    </scene>
+  </scenes>
+  <resources>
+    <image name="photo.png" width="16" height="40"/>
+  </resources>
+</document>
+
+--- warnings ---
+properties.slint:8:5: warning: property `background` of `Window` has no AppKit equivalent
+properties.slint:18:13: warning: vertical-alignment center has no AppKit label equivalent; text is placed at the top
+properties.slint:21:56: warning: property `font-italic` of `Text` has no AppKit equivalent
+properties.slint:22:72: warning: vertical-alignment bottom has no AppKit label equivalent; text is placed at the top
+properties.slint:24:64: warning: property `accessible-label` of `Button` has no AppKit equivalent
+properties.slint:36:13: warning: callback `clicked` of `TouchArea` is not converted: no AppKit event
+properties.slint:37:25: warning: property `border-radius` of `Rectangle` has no AppKit equivalent
+properties.slint:37:45: warning: property `background` of `Rectangle` has no AppKit equivalent
+properties.slint:39:9: warning: scrolling is not converted for AppKit: the content is placed in a plain view
+properties.slint:42:9: warning: GroupBox title is not shown: AppKit has no titled container here

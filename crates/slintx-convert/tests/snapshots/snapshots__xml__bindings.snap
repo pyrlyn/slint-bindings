@@ -1,0 +1,35 @@
+---
+source: crates/slintx-convert/tests/snapshots.rs
+expression: "render(name, format, options)"
+---
+<?xml version="1.0" encoding="UTF-8"?>
+<slint file="bindings.slint">
+  <component name="Bindings" base="Window" exported="true" at="4:8">
+    <declare name="counter" type="int" visibility="in-out" kind="number" value="0" at="5:5"/>
+    <declare name="name" type="string" visibility="in-out" at="6:5"/>
+    <callback name="submit" params="string" at="7:5"/>
+  </component>
+  <Window component="Bindings" at="4:8">
+    <declare name="counter" type="int" visibility="in-out" kind="number" value="0" at="5:5"/>
+    <declare name="name" type="string" visibility="in-out" at="6:5"/>
+    <VerticalLayout at="9:5">
+      <layout kind="vertical"/>
+      <Text id="label" at="10:9">
+        <property name="text" kind="binding" expr="&quot;Count: \{root.counter}&quot;" references="root.counter" at="11:13"/>
+        <property name="color" kind="binding" expr="root.counter &gt; 3 ? red : black" references="black red root.counter" at="12:13"/>
+      </Text>
+      <LineEdit id="input" at="14:9">
+        <property name="text" kind="two-way" expr="root.name" references="root.name" at="15:13"/>
+        <handler event="edited" kind="callback" params="value" body="{ root.name = value; }" at="16:13"/>
+      </LineEdit>
+      <Button at="18:9">
+        <property name="text" kind="string" value="Add" at="19:13"/>
+        <handler event="clicked" kind="callback" body="{ root.counter += 1; root.submit(input.text); }" at="20:13"/>
+      </Button>
+      <Text at="25:9">
+        <property name="text" kind="binding" expr="label.text" references="label.text" at="26:13"/>
+        <handler event="text" kind="changed" body="{ debug(self.text); }" at="27:13"/>
+      </Text>
+    </VerticalLayout>
+  </Window>
+</slint>

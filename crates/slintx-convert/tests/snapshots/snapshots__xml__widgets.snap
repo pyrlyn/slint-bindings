@@ -1,0 +1,58 @@
+---
+source: crates/slintx-convert/tests/snapshots.rs
+expression: "render(name, format, options)"
+---
+<?xml version="1.0" encoding="UTF-8"?>
+<slint file="widgets.slint">
+  <component name="Widgets" base="Window" exported="true" at="4:8"/>
+  <Window component="Widgets" at="4:8">
+    <VerticalLayout at="5:5">
+      <layout kind="vertical" spacing="6px"/>
+      <Button id="ok" at="7:9">
+        <property name="text" kind="string" value="OK" at="7:24"/>
+      </Button>
+      <CheckBox at="8:9">
+        <property name="text" kind="string" value="Remember me" at="8:20"/>
+        <property name="checked" kind="bool" value="true" at="8:41"/>
+      </CheckBox>
+      <Switch at="9:9">
+        <property name="text" kind="string" value="Wi-Fi" at="9:18"/>
+        <property name="checked" kind="bool" value="false" at="9:33"/>
+      </Switch>
+      <LineEdit at="10:9">
+        <property name="placeholder-text" kind="string" value="Name" at="10:20"/>
+        <property name="text" kind="string" value="Ivan" at="10:46"/>
+      </LineEdit>
+      <TextEdit at="11:9">
+        <property name="text" kind="string" value="Multi
+line" at="11:20"/>
+      </TextEdit>
+      <Slider at="12:9">
+        <property name="minimum" kind="number" value="0" at="12:18"/>
+        <property name="maximum" kind="number" value="100" at="12:30"/>
+        <property name="value" kind="number" value="40" at="12:44"/>
+      </Slider>
+      <ProgressIndicator at="13:9">
+        <property name="progress" kind="number" value="0.25" at="13:29"/>
+      </ProgressIndicator>
+      <SpinBox at="14:9">
+        <property name="minimum" kind="number" value="1" at="14:19"/>
+        <property name="maximum" kind="number" value="9" at="14:31"/>
+        <property name="value" kind="number" value="3" at="14:43"/>
+      </SpinBox>
+      <ComboBox at="15:9">
+        <property name="model" kind="array" value="[Red, Green, Blue]" at="15:20">
+          <item kind="string" value="Red"/>
+          <item kind="string" value="Green"/>
+          <item kind="string" value="Blue"/>
+        </property>
+        <property name="current-index" kind="number" value="1" at="15:53"/>
+      </ComboBox>
+      <Image at="16:9">
+        <size axis="width" fixed="32px"/>
+        <size axis="height" fixed="32px"/>
+        <property name="source" kind="url" value="icon.png" at="16:17"/>
+      </Image>
+    </VerticalLayout>
+  </Window>
+</slint>

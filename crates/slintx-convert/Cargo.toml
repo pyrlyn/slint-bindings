@@ -1,0 +1,29 @@
+[package]
+name = "slintx-convert"
+description = "Converts .slint files to XML, HTML, Apple Storyboard and GTK Blueprint, keeping structure, layout and bindings."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "slint-convert"
+path = "src/main.rs"
+
+[dependencies]
+slintx-syntax = { path = "../slintx-syntax" }
+thiserror = { workspace = true }
+# Attribute and text escaping for the XML-shaped outputs (XML, HTML, Storyboard).
+quick-xml = "0.42.0"
+# The binary only: argument parsing and the one error that bubbles up to main.
+clap = { version = "4.6.7", features = ["derive"] }
+anyhow = "1.0.104"
+
+[dev-dependencies]
+insta = "1.49.0"
+trycmd = "1.2.1"
+
+[lints]
+workspace = true

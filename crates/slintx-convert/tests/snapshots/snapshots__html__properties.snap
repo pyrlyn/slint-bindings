@@ -1,0 +1,59 @@
+---
+source: crates/slintx-convert/tests/snapshots.rs
+expression: "render(name, format, options)"
+---
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <meta name="generator" content="slint-convert"/>
+    <title>Properties</title>
+    <style>html,body{margin:0;height:100%}body{font-family:system-ui,sans-serif;font-size:14px}[data-slint]{box-sizing:border-box;margin:0}[data-slint=Text]{display:flex;flex-direction:column;white-space:pre}</style>
+  </head>
+  <body>
+    <main data-slint="Window" data-component="Properties" data-at="5:8" style="width:320px;height:480px;position:relative;background:#f0f0f0">
+      <div data-slint="VerticalLayout" data-at="10:5" style="position:absolute;left:0;right:0;top:0;bottom:0;padding:8px 8px 8px 8px;display:flex;flex-direction:column;gap:4px">
+        <span data-slint="Text" data-at="13:9" style="flex:0 1 auto;font-size:20px;font-weight:700;text-align:center;justify-content:center;color:#336699">Styled</span>
+        <span data-slint="Text" data-at="21:9" style="flex:0 1 auto;font-weight:300;font-style:italic;white-space:pre-wrap">Light italic</span>
+        <span data-slint="Text" data-at="22:9" style="flex:0 1 auto;font-family:&quot;Georgia&quot;;overflow:hidden;text-overflow:ellipsis;justify-content:flex-end">Serif</span>
+        <button data-slint="Button" data-at="23:9" disabled="" type="button" style="flex:0 1 auto">Disabled</button>
+        <button data-slint="Button" data-at="24:9" aria-label="Hidden button" type="button" style="flex:0 1 auto;visibility:hidden;opacity:0.5">Hidden</button>
+        <input data-slint="LineEdit" data-at="25:9" type="password" placeholder="Password" data-on-accepted="{ debug(&quot;go&quot;); }" style="flex:0 1 auto"/>
+        <textarea data-slint="TextEdit" data-at="26:9" readonly="" style="flex:1 1 auto">Read only</textarea>
+        <progress data-slint="ProgressIndicator" data-at="27:9" max="1" style="flex:0 1 auto"></progress>
+        <div data-slint="Spinner" data-at="28:9" role="progressbar" aria-busy="true" style="flex:0 1 auto"></div>
+        <img data-slint="Image" data-at="29:9" src="photo.png" alt="" style="flex:0 0 40px;height:40px;object-fit:contain"/>
+        <div data-slint="HorizontalLayout" data-at="30:9" style="flex:1 1 auto;display:flex;flex-direction:row">
+          <button data-slint="Button" data-at="30:46" type="button" style="flex:0 1 auto">S</button>
+        </div>
+        <div data-slint="HorizontalLayout" data-at="31:9" style="flex:1 1 auto;display:flex;flex-direction:row;justify-content:center">
+          <button data-slint="Button" data-at="31:47" type="button" style="flex:0 1 auto">C1</button>
+          <button data-slint="Button" data-at="31:70" type="button" style="flex:0 1 auto">C2</button>
+        </div>
+        <div data-slint="HorizontalLayout" data-at="32:9" style="flex:1 1 auto;display:flex;flex-direction:row;justify-content:flex-end">
+          <button data-slint="Button" data-at="32:44" type="button" style="flex:0 1 auto">E</button>
+        </div>
+        <div data-slint="HorizontalLayout" data-at="33:9" style="flex:1 1 auto;display:flex;flex-direction:row;justify-content:space-around">
+          <button data-slint="Button" data-at="33:53" type="button" style="flex:0 1 auto">A1</button>
+          <button data-slint="Button" data-at="33:76" type="button" style="flex:0 1 auto">A2</button>
+        </div>
+        <div data-slint="HorizontalLayout" data-at="34:9" style="flex:1 1 auto;display:flex;flex-direction:row;justify-content:space-evenly">
+          <button data-slint="Button" data-at="34:53" type="button" style="flex:0 1 auto">V1</button>
+          <button data-slint="Button" data-at="34:76" type="button" style="flex:0 1 auto">V2</button>
+        </div>
+        <div data-slint="TouchArea" data-at="35:9" data-on-clicked="{ debug(&quot;tap&quot;); }" style="flex:1 1 auto;position:relative">
+          <div data-slint="Rectangle" data-at="37:13" style="position:absolute;left:0;right:0;top:0;bottom:0;border-radius:4px;background:white"></div>
+        </div>
+        <div data-slint="ScrollView" data-at="39:9" style="flex:1 1 auto;position:relative;overflow:auto">
+          <div data-slint="VerticalLayout" data-at="40:13" style="position:absolute;left:0;right:0;top:0;bottom:0;display:flex;flex-direction:column">
+            <span data-slint="Text" data-at="40:30" style="flex:1 1 auto">Scrolled</span>
+          </div>
+        </div>
+        <fieldset data-slint="GroupBox" data-at="42:9" style="flex:1 1 auto;position:relative">
+          <legend>Group</legend>
+          <span data-slint="Text" data-at="44:13" style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%)">Inside</span>
+        </fieldset>
+      </div>
+    </main>
+  </body>
+</html>

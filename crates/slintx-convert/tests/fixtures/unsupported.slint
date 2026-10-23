@@ -1,0 +1,16 @@
+import { Fancy } from "fancy.slint";
+
+// Constructs no target can express: each becomes a warning and a comment.
+export component Unsupported inherits Window {
+    VerticalLayout {
+        r := Rectangle {
+            background: red;
+            animate background { duration: 200ms; }
+        }
+        Fancy { }
+        Mystery { }
+    }
+    states [
+        active when true: { r.background: blue; }
+    ]
+}

@@ -1,0 +1,50 @@
+---
+source: crates/slintx-convert/tests/snapshots.rs
+expression: "render(name, format, options)"
+---
+using Gtk 4.0;
+
+// Converted from unicode.slint by slint-convert.
+
+Gtk.Window {
+  title: "Привет, мир";
+  Gtk.Box {
+    orientation: vertical;
+    Gtk.Label {
+      label: "Привет, мир";
+      vexpand: true;
+      xalign: 0;
+      yalign: 0;
+    }
+    Gtk.Label {
+      label: "こんにちは世界";
+      vexpand: true;
+      xalign: 0;
+      yalign: 0;
+    }
+    Gtk.Label {
+      label: "Emoji: 👋🌍";
+      vexpand: true;
+      xalign: 0;
+      yalign: 0;
+    }
+    Gtk.Label {
+      label: "مرحبا بالعالم";
+      vexpand: true;
+      xalign: 1;
+      yalign: 0;
+    }
+    Gtk.Label {
+      label: "Quote \" backslash \\ newline\nend ☺";
+      vexpand: true;
+      xalign: 0;
+      yalign: 0;
+    }
+    Gtk.Label {
+      label: _("Translated <&>");
+      vexpand: true;
+      xalign: 0;
+      yalign: 0;
+    }
+  }
+}

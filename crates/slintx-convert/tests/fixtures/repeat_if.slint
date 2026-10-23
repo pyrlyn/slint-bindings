@@ -1,0 +1,12 @@
+// `for` and `if` keep their element as a template, emitted once.
+export component RepeatIf inherits Window {
+    in property <[string]> names: ["Ann", "Bob"];
+    in property <bool> show-footer: true;
+
+    VerticalLayout {
+        for name[index] in root.names: Text {
+            text: "\{index}: \{name}";
+        }
+        if root.show-footer: Text { text: "Footer"; }
+    }
+}

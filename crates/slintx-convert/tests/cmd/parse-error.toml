@@ -1,0 +1,4 @@
+bin.name = "slint-convert"
+args = ["broken.slint", "--to", "storyboard", "--platform", "appkit"]
+status.code = 1
+fs.cwd = "../fixtures"

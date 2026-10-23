@@ -1,0 +1,128 @@
+---
+source: crates/slintx-convert/tests/snapshots.rs
+expression: "render(name, format, options)"
+---
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Converted from widgets.slint by slint-convert. -->
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="23504" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="s00-00-001">
+  <dependencies>
+    <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23506"/>
+    <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+    <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+  </dependencies>
+  <scenes>
+    <scene sceneID="s00-00-000">
+      <objects>
+        <viewController id="s00-00-001" customClass="WidgetsViewController" sceneMemberID="viewController">
+          <view key="view" contentMode="scaleToFill" id="s00-00-002">
+            <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <viewLayoutGuide key="safeArea" id="s00-00-003"/>
+            <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <subviews>
+              <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="6" distribution="fill" alignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-004">
+                <subviews>
+                  <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-005">
+                    <state key="normal" title="OK"/>
+                  </button>
+                  <stackView opaque="NO" contentMode="scaleToFill" axis="horizontal" spacing="8" distribution="fill" alignment="center" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-009">
+                    <subviews>
+                      <switch opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-007"/>
+                      <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="Remember me" horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-008">
+                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                        <nil key="highlightedColor"/>
+                      </label>
+                      <view contentMode="scaleToFill" userLabel="Spacer" horizontalHuggingPriority="1" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-010"/>
+                    </subviews>
+                    <constraints>
+                      <constraint firstItem="s00-00-010" firstAttribute="height" secondItem="s00-00-009" secondAttribute="height" id="s00-00-011"/>
+                    </constraints>
+                  </stackView>
+                  <stackView opaque="NO" contentMode="scaleToFill" axis="horizontal" spacing="8" distribution="fill" alignment="center" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-014">
+                    <subviews>
+                      <switch opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="NO" horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-012"/>
+                      <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="Wi-Fi" horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-013">
+                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                        <nil key="highlightedColor"/>
+                      </label>
+                      <view contentMode="scaleToFill" userLabel="Spacer" horizontalHuggingPriority="1" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-015"/>
+                    </subviews>
+                    <constraints>
+                      <constraint firstItem="s00-00-015" firstAttribute="height" secondItem="s00-00-014" secondAttribute="height" id="s00-00-016"/>
+                    </constraints>
+                  </stackView>
+                  <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Name" text="Ivan" textAlignment="natural" minimumFontSize="17" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-017">
+                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                    <textInputTraits key="textInputTraits"/>
+                  </textField>
+                  <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" textAlignment="natural" verticalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-018">
+                    <string key="text">Multi
+line</string>
+                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                    <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                  </textView>
+                  <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="40" minValue="0" maxValue="100" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-019"/>
+                  <progressView opaque="NO" contentMode="scaleToFill" progressViewStyle="default" progress="0.25" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-020"/>
+                  <stackView opaque="NO" contentMode="scaleToFill" axis="horizontal" spacing="8" distribution="fill" alignment="center" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-023">
+                    <subviews>
+                      <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="3" horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-022">
+                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                        <nil key="highlightedColor"/>
+                      </label>
+                      <stepper opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="3" minimumValue="1" maximumValue="9" stepValue="1" horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-021"/>
+                      <view contentMode="scaleToFill" userLabel="Spacer" horizontalHuggingPriority="1" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-024"/>
+                    </subviews>
+                    <constraints>
+                      <constraint firstItem="s00-00-024" firstAttribute="height" secondItem="s00-00-023" secondAttribute="height" id="s00-00-025"/>
+                    </constraints>
+                  </stackView>
+                  <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" showsMenuAsPrimaryAction="YES" changesSelectionAsPrimaryAction="YES" buttonType="system" lineBreakMode="middleTruncation" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-026">
+                    <menu key="menu" id="s00-00-030">
+                      <children>
+                        <command title="Red" id="s00-00-027"/>
+                        <command title="Green" menuElementState="on" id="s00-00-028"/>
+                        <command title="Blue" id="s00-00-029"/>
+                      </children>
+                    </menu>
+                    <state key="normal" title="Green"/>
+                  </button>
+                  <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" image="icon.png" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-031">
+                    <constraints>
+                      <constraint firstAttribute="width" constant="32" id="s00-00-032"/>
+                      <constraint firstAttribute="height" constant="32" id="s00-00-033"/>
+                    </constraints>
+                  </imageView>
+                </subviews>
+                <constraints>
+                  <constraint firstItem="s00-00-005" firstAttribute="width" secondItem="s00-00-004" secondAttribute="width" id="s00-00-034"/>
+                  <constraint firstItem="s00-00-009" firstAttribute="width" secondItem="s00-00-004" secondAttribute="width" id="s00-00-035"/>
+                  <constraint firstItem="s00-00-014" firstAttribute="width" secondItem="s00-00-004" secondAttribute="width" id="s00-00-036"/>
+                  <constraint firstItem="s00-00-017" firstAttribute="width" secondItem="s00-00-004" secondAttribute="width" id="s00-00-037"/>
+                  <constraint firstItem="s00-00-018" firstAttribute="width" secondItem="s00-00-004" secondAttribute="width" id="s00-00-038"/>
+                  <constraint firstItem="s00-00-019" firstAttribute="width" secondItem="s00-00-004" secondAttribute="width" id="s00-00-039"/>
+                  <constraint firstItem="s00-00-020" firstAttribute="width" secondItem="s00-00-004" secondAttribute="width" id="s00-00-040"/>
+                  <constraint firstItem="s00-00-023" firstAttribute="width" secondItem="s00-00-004" secondAttribute="width" id="s00-00-041"/>
+                  <constraint firstItem="s00-00-026" firstAttribute="width" secondItem="s00-00-004" secondAttribute="width" id="s00-00-042"/>
+                </constraints>
+              </stackView>
+            </subviews>
+            <constraints>
+              <constraint firstItem="s00-00-004" firstAttribute="leading" secondItem="s00-00-003" secondAttribute="leading" id="s00-00-043"/>
+              <constraint firstItem="s00-00-003" firstAttribute="trailing" secondItem="s00-00-004" secondAttribute="trailing" id="s00-00-044"/>
+              <constraint firstItem="s00-00-004" firstAttribute="top" secondItem="s00-00-003" secondAttribute="top" id="s00-00-045"/>
+              <constraint firstItem="s00-00-003" firstAttribute="bottom" secondItem="s00-00-004" secondAttribute="bottom" id="s00-00-046"/>
+            </constraints>
+          </view>
+          <connections>
+            <outlet property="ok" destination="s00-00-005" id="s00-00-006"/>
+          </connections>
+        </viewController>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="s00-00-047" userLabel="First Responder" sceneMemberID="firstResponder"/>
+      </objects>
+      <point key="canvasLocation" x="0" y="0"/>
+    </scene>
+  </scenes>
+  <resources>
+    <image name="icon.png" width="32" height="32"/>
+  </resources>
+</document>

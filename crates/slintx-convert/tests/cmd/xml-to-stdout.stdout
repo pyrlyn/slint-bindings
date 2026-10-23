@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<slint file="repeat_if.slint">
+  <component name="RepeatIf" base="Window" exported="true" at="2:8">
+    <declare name="names" type="[string]" visibility="in" kind="array" value="[Ann, Bob]" at="3:5"/>
+    <declare name="show-footer" type="bool" visibility="in" kind="bool" value="true" at="4:5"/>
+  </component>
+  <Window component="RepeatIf" at="2:8">
+    <declare name="names" type="[string]" visibility="in" kind="array" value="[Ann, Bob]" at="3:5"/>
+    <declare name="show-footer" type="bool" visibility="in" kind="bool" value="true" at="4:5"/>
+    <VerticalLayout at="6:5">
+      <layout kind="vertical"/>
+      <Text at="7:40">
+        <for model="root.names" item="name" index="index"/>
+        <property name="text" kind="binding" expr="&quot;/{index}: /{name}&quot;" references="index name" at="8:13"/>
+      </Text>
+      <Text at="10:30">
+        <if condition="root.show-footer"/>
+        <property name="text" kind="string" value="Footer" at="10:37"/>
+      </Text>
+    </VerticalLayout>
+  </Window>
+</slint>

@@ -1,0 +1,56 @@
+---
+source: crates/slintx-convert/tests/snapshots.rs
+expression: "render(name, format, options)"
+---
+<?xml version="1.0" encoding="UTF-8"?>
+<slint file="nested_layouts.slint">
+  <component name="NestedLayouts" base="Window" exported="true" at="2:8"/>
+  <Window component="NestedLayouts" at="2:8">
+    <size axis="width" fixed="360px"/>
+    <size axis="height" fixed="240px"/>
+    <property name="title" kind="string" value="Nested layouts" at="3:5"/>
+    <VerticalLayout at="7:5">
+      <layout kind="vertical" spacing="8px" padding-left="12px" padding-right="12px" padding-top="12px" padding-bottom="12px"/>
+      <HorizontalLayout id="header" at="11:9">
+        <layout kind="horizontal" spacing="4px" alignment="space-between"/>
+        <Text at="14:13">
+          <property name="text" kind="string" value="Left" at="14:20"/>
+        </Text>
+        <Text at="15:13">
+          <property name="text" kind="string" value="Right" at="15:20"/>
+        </Text>
+      </HorizontalLayout>
+      <GridLayout at="18:9">
+        <layout kind="grid" spacing-horizontal="6px" spacing-vertical="2px"/>
+        <Text at="22:17">
+          <cell row="0" col="0" rowspan="1" colspan="1"/>
+          <property name="text" kind="string" value="Name" at="22:24"/>
+        </Text>
+        <Rectangle at="23:17">
+          <cell row="0" col="1" rowspan="1" colspan="1"/>
+          <property name="background" kind="color" value="#e0e0e0" at="23:29"/>
+        </Rectangle>
+        <Text at="26:17">
+          <cell row="1" col="0" rowspan="1" colspan="1"/>
+          <property name="text" kind="string" value="Mail" at="26:24"/>
+        </Text>
+        <Rectangle at="27:17">
+          <cell row="1" col="1" rowspan="1" colspan="2"/>
+          <property name="background" kind="color" value="#e0e0e0" at="27:29"/>
+        </Rectangle>
+        <Text at="29:13">
+          <cell row="3" col="1" rowspan="1" colspan="1"/>
+          <property name="text" kind="string" value="Notes" at="29:20"/>
+        </Text>
+      </GridLayout>
+      <HorizontalLayout at="32:9">
+        <layout kind="horizontal" padding-top="4px" alignment="end"/>
+        <Rectangle at="35:13">
+          <size axis="width" fixed="80px"/>
+          <size axis="height" fixed="24px"/>
+          <property name="background" kind="color" value="steelblue" at="35:52"/>
+        </Rectangle>
+      </HorizontalLayout>
+    </VerticalLayout>
+  </Window>
+</slint>

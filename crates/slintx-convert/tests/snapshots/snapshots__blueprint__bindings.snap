@@ -1,0 +1,44 @@
+---
+source: crates/slintx-convert/tests/snapshots.rs
+expression: "render(name, format, options)"
+---
+using Gtk 4.0;
+
+// Converted from bindings.slint by slint-convert.
+// Interface of Bindings:
+//   in-out property <int> counter = 0
+//   in-out property <string> name
+//   callback submit(string)
+
+Gtk.Window {
+  Gtk.Box {
+    orientation: vertical;
+    // binding text : "Count: \{root.counter}"
+    // binding color : root.counter > 3 ? red : black
+    Gtk.Label label {
+      vexpand: true;
+      xalign: 0;
+      yalign: 0;
+    }
+    // binding text <=> root.name
+    Gtk.Entry input {
+      vexpand: true;
+      // edited(value) => { root.name = value; }
+      changed => $on_input_edited();
+    }
+    Gtk.Button {
+      vexpand: true;
+      label: "Add";
+      // clicked => { root.counter += 1; root.submit(input.text); }
+      clicked => $on_button_clicked();
+    }
+    // binding text : label.text
+    Gtk.Label {
+      vexpand: true;
+      xalign: 0;
+      yalign: 0;
+      // changed text => { debug(self.text); }
+      notify::label => $on_text_text_changed();
+    }
+  }
+}

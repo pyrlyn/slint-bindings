@@ -1,0 +1,47 @@
+import { Button, LineEdit, TextEdit, ScrollView, GroupBox, ProgressIndicator, Spinner } from "std-widgets.slint";
+
+// Shared properties, text styling, events on plain elements, and every
+// leftover-space alignment.
+export component Properties inherits Window {
+    width: 320px;
+    height: 480px;
+    background: #f0f0f0;
+
+    VerticalLayout {
+        padding: 8px;
+        spacing: 4px;
+        Text {
+            text: "Styled";
+            font-size: 20px;
+            font-weight: 700;
+            horizontal-alignment: center;
+            vertical-alignment: center;
+            color: #336699;
+        }
+        Text { text: "Light italic"; font-weight: 300; font-italic: true; wrap: word-wrap; }
+        Text { text: "Serif"; font-family: "Georgia"; overflow: elide; vertical-alignment: bottom; }
+        Button { text: "Disabled"; enabled: false; }
+        Button { text: "Hidden"; visible: false; opacity: 0.5; accessible-label: "Hidden button"; }
+        LineEdit { input-type: password; placeholder-text: "Password"; accepted => { debug("go"); } }
+        TextEdit { text: "Read only"; read-only: true; }
+        ProgressIndicator { indeterminate: true; }
+        Spinner { }
+        Image { source: @image-url("photo.png"); image-fit: contain; height: 40px; }
+        HorizontalLayout { alignment: start; Button { text: "S"; } }
+        HorizontalLayout { alignment: center; Button { text: "C1"; } Button { text: "C2"; } }
+        HorizontalLayout { alignment: end; Button { text: "E"; } }
+        HorizontalLayout { alignment: space-around; Button { text: "A1"; } Button { text: "A2"; } }
+        HorizontalLayout { alignment: space-evenly; Button { text: "V1"; } Button { text: "V2"; } }
+        TouchArea {
+            clicked => { debug("tap"); }
+            Rectangle { border-radius: 4px; background: white; }
+        }
+        ScrollView {
+            VerticalLayout { Text { text: "Scrolled"; } }
+        }
+        GroupBox {
+            title: "Group";
+            Text { text: "Inside"; }
+        }
+    }
+}

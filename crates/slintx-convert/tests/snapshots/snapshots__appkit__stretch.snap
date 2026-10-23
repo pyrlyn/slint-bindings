@@ -1,0 +1,107 @@
+---
+source: crates/slintx-convert/tests/snapshots.rs
+expression: "render(name, format, options)"
+---
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Converted from stretch.slint by slint-convert. -->
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="23504" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="s00-00-001">
+  <dependencies>
+    <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="23504"/>
+  </dependencies>
+  <scenes>
+    <scene sceneID="s00-00-000">
+      <objects>
+        <viewController id="s00-00-001" customClass="StretchViewController" sceneMemberID="viewController">
+          <view key="view" id="s00-00-002">
+            <rect key="frame" x="0.0" y="0.0" width="400" height="120"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <subviews>
+              <stackView orientation="vertical" alignment="centerX" spacing="0" detachesHiddenViews="YES" distribution="fill" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-003">
+                <subviews>
+                  <stackView orientation="horizontal" alignment="centerY" spacing="0" detachesHiddenViews="YES" distribution="fill" verticalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-004">
+                    <subviews>
+                      <customView horizontalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-005"/>
+                      <customView horizontalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-006"/>
+                      <customView horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-007">
+                        <constraints>
+                          <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="40" id="s00-00-008"/>
+                        </constraints>
+                      </customView>
+                    </subviews>
+                    <constraints>
+                      <constraint firstItem="s00-00-006" firstAttribute="width" secondItem="s00-00-005" secondAttribute="width" multiplier="2" priority="999" id="s00-00-009"/>
+                      <constraint firstItem="s00-00-005" firstAttribute="height" secondItem="s00-00-004" secondAttribute="height" id="s00-00-010"/>
+                      <constraint firstItem="s00-00-006" firstAttribute="height" secondItem="s00-00-004" secondAttribute="height" id="s00-00-011"/>
+                      <constraint firstItem="s00-00-007" firstAttribute="height" secondItem="s00-00-004" secondAttribute="height" id="s00-00-012"/>
+                    </constraints>
+                  </stackView>
+                  <stackView orientation="horizontal" alignment="centerY" spacing="0" detachesHiddenViews="YES" distribution="fill" verticalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-013">
+                    <subviews>
+                      <customView userLabel="Spacer" horizontalHuggingPriority="1" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-019"/>
+                      <customView horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-014">
+                        <constraints>
+                          <constraint firstAttribute="width" relation="lessThanOrEqual" constant="80" id="s00-00-015"/>
+                          <constraint firstAttribute="width" constant="50" priority="700" id="s00-00-016"/>
+                        </constraints>
+                      </customView>
+                      <customView horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-017">
+                        <constraints>
+                          <constraint firstAttribute="width" constant="50" priority="700" id="s00-00-018"/>
+                        </constraints>
+                      </customView>
+                      <customView userLabel="Spacer" horizontalHuggingPriority="1" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-020"/>
+                    </subviews>
+                    <constraints>
+                      <constraint firstItem="s00-00-020" firstAttribute="width" secondItem="s00-00-019" secondAttribute="width" id="s00-00-021"/>
+                      <constraint firstItem="s00-00-019" firstAttribute="height" secondItem="s00-00-013" secondAttribute="height" id="s00-00-022"/>
+                      <constraint firstItem="s00-00-014" firstAttribute="height" secondItem="s00-00-013" secondAttribute="height" id="s00-00-023"/>
+                      <constraint firstItem="s00-00-017" firstAttribute="height" secondItem="s00-00-013" secondAttribute="height" id="s00-00-024"/>
+                      <constraint firstItem="s00-00-020" firstAttribute="height" secondItem="s00-00-013" secondAttribute="height" id="s00-00-025"/>
+                    </constraints>
+                  </stackView>
+                  <customView verticalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-026">
+                    <subviews>
+                      <customView translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-027">
+                        <constraints>
+                          <constraint firstAttribute="width" constant="20" id="s00-00-028"/>
+                          <constraint firstAttribute="height" constant="20" id="s00-00-029"/>
+                        </constraints>
+                      </customView>
+                    </subviews>
+                    <constraints>
+                      <constraint firstItem="s00-00-027" firstAttribute="leading" secondItem="s00-00-026" secondAttribute="leading" constant="10" id="s00-00-030"/>
+                      <constraint firstItem="s00-00-027" firstAttribute="top" secondItem="s00-00-026" secondAttribute="top" constant="4" id="s00-00-031"/>
+                    </constraints>
+                  </customView>
+                </subviews>
+                <constraints>
+                  <constraint firstItem="s00-00-013" firstAttribute="height" secondItem="s00-00-004" secondAttribute="height" priority="999" id="s00-00-032"/>
+                  <constraint firstItem="s00-00-026" firstAttribute="height" secondItem="s00-00-004" secondAttribute="height" priority="999" id="s00-00-033"/>
+                  <constraint firstItem="s00-00-004" firstAttribute="width" secondItem="s00-00-003" secondAttribute="width" id="s00-00-034"/>
+                  <constraint firstItem="s00-00-013" firstAttribute="width" secondItem="s00-00-003" secondAttribute="width" id="s00-00-035"/>
+                  <constraint firstItem="s00-00-026" firstAttribute="width" secondItem="s00-00-003" secondAttribute="width" id="s00-00-036"/>
+                </constraints>
+              </stackView>
+            </subviews>
+            <constraints>
+              <constraint firstItem="s00-00-003" firstAttribute="leading" secondItem="s00-00-002" secondAttribute="leading" id="s00-00-037"/>
+              <constraint firstItem="s00-00-002" firstAttribute="trailing" secondItem="s00-00-003" secondAttribute="trailing" id="s00-00-038"/>
+              <constraint firstItem="s00-00-003" firstAttribute="top" secondItem="s00-00-002" secondAttribute="top" id="s00-00-039"/>
+              <constraint firstItem="s00-00-002" firstAttribute="bottom" secondItem="s00-00-003" secondAttribute="bottom" id="s00-00-040"/>
+            </constraints>
+          </view>
+        </viewController>
+        <customObject id="s00-00-041" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+      </objects>
+      <point key="canvasLocation" x="0" y="0"/>
+    </scene>
+  </scenes>
+</document>
+
+--- warnings ---
+stretch.slint:8:48: warning: property `background` of `Rectangle` has no AppKit equivalent
+stretch.slint:9:48: warning: property `background` of `Rectangle` has no AppKit equivalent
+stretch.slint:10:65: warning: property `background` of `Rectangle` has no AppKit equivalent
+stretch.slint:14:65: warning: property `background` of `Rectangle` has no AppKit equivalent
+stretch.slint:15:69: warning: property `background` of `Rectangle` has no AppKit equivalent
+stretch.slint:18:69: warning: property `background` of `Rectangle` has no AppKit equivalent

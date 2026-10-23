@@ -1,0 +1,4 @@
+broken.slint:2:18: error: unterminated string literal
+broken.slint:5:1: error: expected `;`
+broken.slint:5:1: error: expected `}`
+error: conversion failed with 3 error(s)

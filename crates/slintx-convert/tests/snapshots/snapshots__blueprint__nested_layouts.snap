@@ -1,0 +1,101 @@
+---
+source: crates/slintx-convert/tests/snapshots.rs
+expression: "render(name, format, options)"
+---
+using Gtk 4.0;
+
+// Converted from nested_layouts.slint by slint-convert.
+
+Gtk.Window {
+  default-width: 360;
+  default-height: 240;
+  title: "Nested layouts";
+  Gtk.Box {
+    margin-start: 12;
+    margin-end: 12;
+    margin-top: 12;
+    margin-bottom: 12;
+    orientation: vertical;
+    spacing: 8;
+    Gtk.Box header {
+      vexpand: true;
+      orientation: horizontal;
+      spacing: 4;
+      Gtk.Label {
+        label: "Left";
+        xalign: 0;
+        yalign: 0;
+      }
+      Gtk.Label {
+        label: "Right";
+        xalign: 0;
+        yalign: 0;
+      }
+    }
+    Gtk.Grid {
+      vexpand: true;
+      row-spacing: 2;
+      column-spacing: 6;
+      Gtk.Label {
+        label: "Name";
+        xalign: 0;
+        yalign: 0;
+        layout {
+          row: 0;
+          column: 0;
+        }
+      }
+      Gtk.Box {
+        hexpand: true;
+        vexpand: true;
+        layout {
+          row: 0;
+          column: 1;
+        }
+      }
+      Gtk.Label {
+        label: "Mail";
+        xalign: 0;
+        yalign: 0;
+        layout {
+          row: 1;
+          column: 0;
+        }
+      }
+      Gtk.Box {
+        hexpand: true;
+        vexpand: true;
+        layout {
+          row: 1;
+          column: 1;
+          column-span: 2;
+        }
+      }
+      Gtk.Label {
+        label: "Notes";
+        xalign: 0;
+        yalign: 0;
+        layout {
+          row: 3;
+          column: 1;
+        }
+      }
+    }
+    Gtk.Box {
+      vexpand: true;
+      margin-top: 4;
+      orientation: horizontal;
+      halign: end;
+      Gtk.Box {
+        width-request: 80;
+        height-request: 24;
+      }
+    }
+  }
+}
+
+--- warnings ---
+nested_layouts.slint:11:9: warning: alignment space-between has no Gtk.Box equivalent
+nested_layouts.slint:23:29: warning: property `background` of `Rectangle` has no GTK equivalent
+nested_layouts.slint:27:29: warning: property `background` of `Rectangle` has no GTK equivalent
+nested_layouts.slint:35:52: warning: property `background` of `Rectangle` has no GTK equivalent

@@ -1,0 +1,8 @@
+---
+source: crates/slintx-convert/tests/snapshots.rs
+expression: "render(name, format, options)"
+---
+--- failed ---
+broken.slint:2:18: error: unterminated string literal
+broken.slint:5:1: error: expected `;`
+broken.slint:5:1: error: expected `}`

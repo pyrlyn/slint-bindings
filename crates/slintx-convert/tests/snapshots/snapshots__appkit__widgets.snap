@@ -1,0 +1,140 @@
+---
+source: crates/slintx-convert/tests/snapshots.rs
+expression: "render(name, format, options)"
+---
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Converted from widgets.slint by slint-convert. -->
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="23504" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="s00-00-001">
+  <dependencies>
+    <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="23504"/>
+  </dependencies>
+  <scenes>
+    <scene sceneID="s00-00-000">
+      <objects>
+        <viewController id="s00-00-001" customClass="WidgetsViewController" sceneMemberID="viewController">
+          <view key="view" id="s00-00-002">
+            <rect key="frame" x="0.0" y="0.0" width="480" height="270"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <subviews>
+              <stackView orientation="vertical" alignment="centerX" spacing="6" detachesHiddenViews="YES" distribution="fill" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-003">
+                <subviews>
+                  <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-004">
+                    <buttonCell key="cell" type="push" title="OK" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="s00-00-005">
+                      <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                      <font key="font" metaFont="system"/>
+                    </buttonCell>
+                  </button>
+                  <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-007">
+                    <buttonCell key="cell" type="check" title="Remember me" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="s00-00-008">
+                      <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                      <font key="font" metaFont="system"/>
+                    </buttonCell>
+                  </button>
+                  <stackView orientation="horizontal" alignment="centerY" spacing="8" detachesHiddenViews="YES" distribution="fill" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-012">
+                    <subviews>
+                      <switch baseWritingDirection="leftToRight" alignment="left" state="off" horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-009"/>
+                      <textField focusRingType="none" horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-010">
+                        <textFieldCell key="cell" lineBreakMode="clipping" title="Wi-Fi" id="s00-00-011">
+                          <font key="font" metaFont="system" size="14"/>
+                          <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                          <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                      </textField>
+                      <customView userLabel="Spacer" horizontalHuggingPriority="1" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-013"/>
+                    </subviews>
+                    <constraints>
+                      <constraint firstItem="s00-00-013" firstAttribute="height" secondItem="s00-00-012" secondAttribute="height" id="s00-00-014"/>
+                    </constraints>
+                  </stackView>
+                  <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-015">
+                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" placeholderString="Name" title="Ivan" drawsBackground="YES" id="s00-00-016">
+                      <font key="font" metaFont="system" size="14"/>
+                      <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                      <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                  </textField>
+                  <textField verticalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-017">
+                    <textFieldCell key="cell" lineBreakMode="wordWrapping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" id="s00-00-018">
+                      <string key="title">Multi
+line</string>
+                      <font key="font" metaFont="system" size="14"/>
+                      <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                      <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                  </textField>
+                  <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-019">
+                    <sliderCell key="cell" continuous="YES" state="on" alignment="left" minValue="0" maxValue="100" doubleValue="40" tickMarkPosition="above" sliderType="linear" id="s00-00-020"/>
+                  </slider>
+                  <progressIndicator maxValue="1" doubleValue="0.25" style="bar" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-021"/>
+                  <stackView orientation="horizontal" alignment="centerY" spacing="8" detachesHiddenViews="YES" distribution="fill" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-026">
+                    <subviews>
+                      <textField focusRingType="none" horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-024">
+                        <textFieldCell key="cell" lineBreakMode="clipping" title="3" id="s00-00-025">
+                          <font key="font" metaFont="system" size="14"/>
+                          <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                          <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                      </textField>
+                      <stepper horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-022">
+                        <stepperCell key="cell" continuous="YES" alignment="left" increment="1" minValue="1" maxValue="9" doubleValue="3" id="s00-00-023"/>
+                      </stepper>
+                      <customView userLabel="Spacer" horizontalHuggingPriority="1" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-027"/>
+                    </subviews>
+                    <constraints>
+                      <constraint firstItem="s00-00-027" firstAttribute="height" secondItem="s00-00-026" secondAttribute="height" id="s00-00-028"/>
+                    </constraints>
+                  </stackView>
+                  <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-029">
+                    <popUpButtonCell key="cell" type="push" title="Green" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="s00-00-031" id="s00-00-034">
+                      <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                      <font key="font" metaFont="menu"/>
+                      <menu key="menu" id="s00-00-033">
+                        <items>
+                          <menuItem title="Red" id="s00-00-030"/>
+                          <menuItem title="Green" state="on" id="s00-00-031"/>
+                          <menuItem title="Blue" id="s00-00-032"/>
+                        </items>
+                      </menu>
+                    </popUpButtonCell>
+                  </popUpButton>
+                  <imageView verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-035">
+                    <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="axesIndependently" image="icon.png" id="s00-00-036"/>
+                    <constraints>
+                      <constraint firstAttribute="width" constant="32" id="s00-00-037"/>
+                      <constraint firstAttribute="height" constant="32" id="s00-00-038"/>
+                    </constraints>
+                  </imageView>
+                </subviews>
+                <constraints>
+                  <constraint firstItem="s00-00-004" firstAttribute="width" secondItem="s00-00-003" secondAttribute="width" id="s00-00-039"/>
+                  <constraint firstItem="s00-00-007" firstAttribute="width" secondItem="s00-00-003" secondAttribute="width" id="s00-00-040"/>
+                  <constraint firstItem="s00-00-012" firstAttribute="width" secondItem="s00-00-003" secondAttribute="width" id="s00-00-041"/>
+                  <constraint firstItem="s00-00-015" firstAttribute="width" secondItem="s00-00-003" secondAttribute="width" id="s00-00-042"/>
+                  <constraint firstItem="s00-00-017" firstAttribute="width" secondItem="s00-00-003" secondAttribute="width" id="s00-00-043"/>
+                  <constraint firstItem="s00-00-019" firstAttribute="width" secondItem="s00-00-003" secondAttribute="width" id="s00-00-044"/>
+                  <constraint firstItem="s00-00-021" firstAttribute="width" secondItem="s00-00-003" secondAttribute="width" id="s00-00-045"/>
+                  <constraint firstItem="s00-00-026" firstAttribute="width" secondItem="s00-00-003" secondAttribute="width" id="s00-00-046"/>
+                  <constraint firstItem="s00-00-029" firstAttribute="width" secondItem="s00-00-003" secondAttribute="width" id="s00-00-047"/>
+                </constraints>
+              </stackView>
+            </subviews>
+            <constraints>
+              <constraint firstItem="s00-00-003" firstAttribute="leading" secondItem="s00-00-002" secondAttribute="leading" id="s00-00-048"/>
+              <constraint firstItem="s00-00-002" firstAttribute="trailing" secondItem="s00-00-003" secondAttribute="trailing" id="s00-00-049"/>
+              <constraint firstItem="s00-00-003" firstAttribute="top" secondItem="s00-00-002" secondAttribute="top" id="s00-00-050"/>
+              <constraint firstItem="s00-00-002" firstAttribute="bottom" secondItem="s00-00-003" secondAttribute="bottom" id="s00-00-051"/>
+            </constraints>
+          </view>
+          <connections>
+            <outlet property="ok" destination="s00-00-004" id="s00-00-006"/>
+          </connections>
+        </viewController>
+        <customObject id="s00-00-052" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+      </objects>
+      <point key="canvasLocation" x="0" y="0"/>
+    </scene>
+  </scenes>
+  <resources>
+    <image name="icon.png" width="32" height="32"/>
+  </resources>
+</document>

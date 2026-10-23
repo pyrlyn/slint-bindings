@@ -1,0 +1,34 @@
+---
+source: crates/slintx-convert/tests/snapshots.rs
+expression: "render(name, format, options)"
+---
+<?xml version="1.0" encoding="UTF-8"?>
+<slint file="unsupported.slint">
+  <component name="Unsupported" base="Window" exported="true" at="4:8"/>
+  <Window component="Unsupported" at="4:8">
+    <!-- not converted: states at 13:5 -->
+    <unsupported what="states" at="13:5"/>
+    <VerticalLayout at="5:5">
+      <layout kind="vertical"/>
+      <Rectangle id="r" at="6:9">
+        <!-- not converted: animation at 8:13 -->
+        <unsupported what="animation" at="8:13"/>
+        <property name="background" kind="color" value="red" at="7:13"/>
+      </Rectangle>
+      <Fancy at="10:9">
+        <!-- not converted: element `Fancy` imported from "fancy.slint" at 10:9 -->
+        <unsupported what="element `Fancy` imported from &quot;fancy.slint&quot;" at="10:9"/>
+      </Fancy>
+      <Mystery at="11:9">
+        <!-- not converted: unknown element `Mystery` at 11:9 -->
+        <unsupported what="unknown element `Mystery`" at="11:9"/>
+      </Mystery>
+    </VerticalLayout>
+  </Window>
+</slint>
+
+--- warnings ---
+unsupported.slint:8:13: warning: not converted: animation
+unsupported.slint:10:9: warning: not converted: element `Fancy` imported from "fancy.slint"
+unsupported.slint:11:9: warning: not converted: unknown element `Mystery`
+unsupported.slint:13:5: warning: not converted: states

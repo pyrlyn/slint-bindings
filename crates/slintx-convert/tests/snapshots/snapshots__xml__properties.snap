@@ -1,0 +1,125 @@
+---
+source: crates/slintx-convert/tests/snapshots.rs
+expression: "render(name, format, options)"
+---
+<?xml version="1.0" encoding="UTF-8"?>
+<slint file="properties.slint">
+  <component name="Properties" base="Window" exported="true" at="5:8"/>
+  <Window component="Properties" at="5:8">
+    <size axis="width" fixed="320px"/>
+    <size axis="height" fixed="480px"/>
+    <property name="background" kind="color" value="#f0f0f0" at="8:5"/>
+    <VerticalLayout at="10:5">
+      <layout kind="vertical" spacing="4px" padding-left="8px" padding-right="8px" padding-top="8px" padding-bottom="8px"/>
+      <Text at="13:9">
+        <property name="text" kind="string" value="Styled" at="14:13"/>
+        <property name="font-size" kind="measure" value="20" unit="px" at="15:13"/>
+        <property name="font-weight" kind="number" value="700" at="16:13"/>
+        <property name="horizontal-alignment" kind="enum" value="center" at="17:13"/>
+        <property name="vertical-alignment" kind="enum" value="center" at="18:13"/>
+        <property name="color" kind="color" value="#336699" at="19:13"/>
+      </Text>
+      <Text at="21:9">
+        <property name="text" kind="string" value="Light italic" at="21:16"/>
+        <property name="font-weight" kind="number" value="300" at="21:38"/>
+        <property name="font-italic" kind="bool" value="true" at="21:56"/>
+        <property name="wrap" kind="enum" value="word-wrap" at="21:75"/>
+      </Text>
+      <Text at="22:9">
+        <property name="text" kind="string" value="Serif" at="22:16"/>
+        <property name="font-family" kind="string" value="Georgia" at="22:31"/>
+        <property name="overflow" kind="enum" value="elide" at="22:55"/>
+        <property name="vertical-alignment" kind="enum" value="bottom" at="22:72"/>
+      </Text>
+      <Button at="23:9">
+        <property name="text" kind="string" value="Disabled" at="23:18"/>
+        <property name="enabled" kind="bool" value="false" at="23:36"/>
+      </Button>
+      <Button at="24:9">
+        <property name="text" kind="string" value="Hidden" at="24:18"/>
+        <property name="visible" kind="bool" value="false" at="24:34"/>
+        <property name="opacity" kind="number" value="0.5" at="24:50"/>
+        <property name="accessible-label" kind="string" value="Hidden button" at="24:64"/>
+      </Button>
+      <LineEdit at="25:9">
+        <property name="input-type" kind="enum" value="password" at="25:20"/>
+        <property name="placeholder-text" kind="string" value="Password" at="25:42"/>
+        <handler event="accepted" kind="callback" body="{ debug(&quot;go&quot;); }" at="25:72"/>
+      </LineEdit>
+      <TextEdit at="26:9">
+        <property name="text" kind="string" value="Read only" at="26:20"/>
+        <property name="read-only" kind="bool" value="true" at="26:39"/>
+      </TextEdit>
+      <ProgressIndicator at="27:9">
+        <property name="indeterminate" kind="bool" value="true" at="27:29"/>
+      </ProgressIndicator>
+      <Spinner at="28:9">
+      </Spinner>
+      <Image at="29:9">
+        <size axis="height" fixed="40px"/>
+        <property name="source" kind="url" value="photo.png" at="29:17"/>
+        <property name="image-fit" kind="enum" value="contain" at="29:50"/>
+      </Image>
+      <HorizontalLayout at="30:9">
+        <layout kind="horizontal" alignment="start"/>
+        <Button at="30:46">
+          <property name="text" kind="string" value="S" at="30:55"/>
+        </Button>
+      </HorizontalLayout>
+      <HorizontalLayout at="31:9">
+        <layout kind="horizontal" alignment="center"/>
+        <Button at="31:47">
+          <property name="text" kind="string" value="C1" at="31:56"/>
+        </Button>
+        <Button at="31:70">
+          <property name="text" kind="string" value="C2" at="31:79"/>
+        </Button>
+      </HorizontalLayout>
+      <HorizontalLayout at="32:9">
+        <layout kind="horizontal" alignment="end"/>
+        <Button at="32:44">
+          <property name="text" kind="string" value="E" at="32:53"/>
+        </Button>
+      </HorizontalLayout>
+      <HorizontalLayout at="33:9">
+        <layout kind="horizontal" alignment="space-around"/>
+        <Button at="33:53">
+          <property name="text" kind="string" value="A1" at="33:62"/>
+        </Button>
+        <Button at="33:76">
+          <property name="text" kind="string" value="A2" at="33:85"/>
+        </Button>
+      </HorizontalLayout>
+      <HorizontalLayout at="34:9">
+        <layout kind="horizontal" alignment="space-evenly"/>
+        <Button at="34:53">
+          <property name="text" kind="string" value="V1" at="34:62"/>
+        </Button>
+        <Button at="34:76">
+          <property name="text" kind="string" value="V2" at="34:85"/>
+        </Button>
+      </HorizontalLayout>
+      <TouchArea at="35:9">
+        <handler event="clicked" kind="callback" body="{ debug(&quot;tap&quot;); }" at="36:13"/>
+        <Rectangle at="37:13">
+          <property name="border-radius" kind="measure" value="4" unit="px" at="37:25"/>
+          <property name="background" kind="color" value="white" at="37:45"/>
+        </Rectangle>
+      </TouchArea>
+      <ScrollView at="39:9">
+        <VerticalLayout at="40:13">
+          <layout kind="vertical"/>
+          <Text at="40:30">
+            <property name="text" kind="string" value="Scrolled" at="40:37"/>
+          </Text>
+        </VerticalLayout>
+      </ScrollView>
+      <GroupBox at="42:9">
+        <property name="title" kind="string" value="Group" at="43:13"/>
+        <Text at="44:13">
+          <property name="text" kind="string" value="Inside" at="44:20"/>
+        </Text>
+      </GroupBox>
+    </VerticalLayout>
+  </Window>
+</slint>

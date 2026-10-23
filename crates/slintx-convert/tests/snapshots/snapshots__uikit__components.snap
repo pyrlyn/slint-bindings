@@ -1,0 +1,100 @@
+---
+source: crates/slintx-convert/tests/snapshots.rs
+expression: "render(name, format, options)"
+---
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Converted from components.slint by slint-convert. -->
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="23504" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="s00-00-001">
+  <dependencies>
+    <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23506"/>
+    <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+    <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+  </dependencies>
+  <scenes>
+    <scene sceneID="s00-00-000">
+      <objects>
+        <viewController id="s00-00-001" customClass="ComponentsViewController" sceneMemberID="viewController">
+          <view key="view" contentMode="scaleToFill" id="s00-00-002">
+            <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <viewLayoutGuide key="safeArea" id="s00-00-003"/>
+            <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <subviews>
+              <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="0" distribution="fill" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-004">
+                <subviews>
+                  <view contentMode="scaleToFill" verticalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-005">
+                    <color key="backgroundColor" red="0.98" green="0.98" blue="0.98" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                    <subviews>
+                      <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="4" distribution="fill" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-006">
+                        <subviews>
+                          <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="First" lineBreakMode="clip" verticalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-007">
+                            <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                            <nil key="highlightedColor"/>
+                          </label>
+                          <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="new" lineBreakMode="clip" verticalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-008">
+                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                            <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <nil key="highlightedColor"/>
+                          </label>
+                        </subviews>
+                        <constraints>
+                          <constraint firstItem="s00-00-008" firstAttribute="height" secondItem="s00-00-007" secondAttribute="height" priority="999" id="s00-00-009"/>
+                        </constraints>
+                      </stackView>
+                    </subviews>
+                    <constraints>
+                      <constraint firstItem="s00-00-006" firstAttribute="leading" secondItem="s00-00-005" secondAttribute="leading" id="s00-00-010"/>
+                      <constraint firstItem="s00-00-005" firstAttribute="trailing" secondItem="s00-00-006" secondAttribute="trailing" id="s00-00-011"/>
+                      <constraint firstItem="s00-00-006" firstAttribute="top" secondItem="s00-00-005" secondAttribute="top" id="s00-00-012"/>
+                      <constraint firstItem="s00-00-005" firstAttribute="bottom" secondItem="s00-00-006" secondAttribute="bottom" id="s00-00-013"/>
+                    </constraints>
+                  </view>
+                  <view contentMode="scaleToFill" verticalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-014">
+                    <color key="backgroundColor" red="0.98" green="0.98" blue="0.98" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                    <subviews>
+                      <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="8" distribution="fill" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-016">
+                        <subviews>
+                          <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="Untitled" lineBreakMode="clip" verticalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-017">
+                            <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                            <nil key="highlightedColor"/>
+                          </label>
+                          <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="Body" lineBreakMode="clip" verticalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-018">
+                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                            <nil key="highlightedColor"/>
+                          </label>
+                        </subviews>
+                        <constraints>
+                          <constraint firstItem="s00-00-018" firstAttribute="height" secondItem="s00-00-017" secondAttribute="height" priority="999" id="s00-00-019"/>
+                        </constraints>
+                      </stackView>
+                    </subviews>
+                    <constraints>
+                      <constraint firstItem="s00-00-016" firstAttribute="leading" secondItem="s00-00-014" secondAttribute="leading" id="s00-00-020"/>
+                      <constraint firstItem="s00-00-014" firstAttribute="trailing" secondItem="s00-00-016" secondAttribute="trailing" id="s00-00-021"/>
+                      <constraint firstItem="s00-00-016" firstAttribute="top" secondItem="s00-00-014" secondAttribute="top" id="s00-00-022"/>
+                      <constraint firstItem="s00-00-014" firstAttribute="bottom" secondItem="s00-00-016" secondAttribute="bottom" id="s00-00-023"/>
+                    </constraints>
+                  </view>
+                </subviews>
+                <constraints>
+                  <constraint firstItem="s00-00-014" firstAttribute="height" secondItem="s00-00-005" secondAttribute="height" priority="999" id="s00-00-024"/>
+                </constraints>
+              </stackView>
+            </subviews>
+            <constraints>
+              <constraint firstItem="s00-00-004" firstAttribute="leading" secondItem="s00-00-003" secondAttribute="leading" id="s00-00-025"/>
+              <constraint firstItem="s00-00-003" firstAttribute="trailing" secondItem="s00-00-004" secondAttribute="trailing" id="s00-00-026"/>
+              <constraint firstItem="s00-00-004" firstAttribute="top" secondItem="s00-00-003" secondAttribute="top" id="s00-00-027"/>
+              <constraint firstItem="s00-00-003" firstAttribute="bottom" secondItem="s00-00-004" secondAttribute="bottom" id="s00-00-028"/>
+            </constraints>
+          </view>
+          <connections>
+            <outlet property="second" destination="s00-00-014" id="s00-00-015"/>
+          </connections>
+        </viewController>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="s00-00-029" userLabel="First Responder" sceneMemberID="firstResponder"/>
+      </objects>
+      <point key="canvasLocation" x="0" y="0"/>
+    </scene>
+  </scenes>
+</document>

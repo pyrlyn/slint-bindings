@@ -1,0 +1,3 @@
+bin.name = "slint-convert"
+args = ["repeat_if.slint", "--to", "xml"]
+fs.cwd = "../fixtures"

@@ -1,0 +1,33 @@
+---
+source: crates/slintx-convert/tests/snapshots.rs
+expression: "render(name, format, options)"
+---
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <meta name="generator" content="slint-convert"/>
+    <title>Nested layouts</title>
+    <style>html,body{margin:0;height:100%}body{font-family:system-ui,sans-serif;font-size:14px}[data-slint]{box-sizing:border-box;margin:0}[data-slint=Text]{display:flex;flex-direction:column;white-space:pre}</style>
+  </head>
+  <body>
+    <main data-slint="Window" data-component="NestedLayouts" data-at="2:8" style="width:360px;height:240px;position:relative">
+      <div data-slint="VerticalLayout" data-at="7:5" style="position:absolute;left:0;right:0;top:0;bottom:0;padding:12px 12px 12px 12px;display:flex;flex-direction:column;gap:8px">
+        <div id="header" data-slint="HorizontalLayout" data-at="11:9" style="flex:1 1 auto;display:flex;flex-direction:row;gap:4px;justify-content:space-between">
+          <span data-slint="Text" data-at="14:13" style="flex:0 1 auto">Left</span>
+          <span data-slint="Text" data-at="15:13" style="flex:0 1 auto">Right</span>
+        </div>
+        <div data-slint="GridLayout" data-at="18:9" style="flex:1 1 auto;display:grid;row-gap:2px;column-gap:6px;grid-template-columns:auto 1fr auto;grid-template-rows:1fr 1fr auto auto">
+          <span data-slint="Text" data-at="22:17" style="grid-row:1 / span 1;grid-column:1 / span 1">Name</span>
+          <div data-slint="Rectangle" data-at="23:17" style="grid-row:1 / span 1;grid-column:2 / span 1;background:#e0e0e0"></div>
+          <span data-slint="Text" data-at="26:17" style="grid-row:2 / span 1;grid-column:1 / span 1">Mail</span>
+          <div data-slint="Rectangle" data-at="27:17" style="grid-row:2 / span 1;grid-column:2 / span 2;background:#e0e0e0"></div>
+          <span data-slint="Text" data-at="29:13" style="grid-row:4 / span 1;grid-column:2 / span 1">Notes</span>
+        </div>
+        <div data-slint="HorizontalLayout" data-at="32:9" style="flex:1 1 auto;padding:4px 0 0 0;display:flex;flex-direction:row;justify-content:flex-end">
+          <div data-slint="Rectangle" data-at="35:13" style="flex:0 0 80px;width:80px;height:24px;background:steelblue"></div>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

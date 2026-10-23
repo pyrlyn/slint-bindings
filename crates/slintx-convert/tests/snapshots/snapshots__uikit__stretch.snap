@@ -1,0 +1,101 @@
+---
+source: crates/slintx-convert/tests/snapshots.rs
+expression: "render(name, format, options)"
+---
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Converted from stretch.slint by slint-convert. -->
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="23504" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="s00-00-001">
+  <dependencies>
+    <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23506"/>
+    <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+    <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+  </dependencies>
+  <scenes>
+    <scene sceneID="s00-00-000">
+      <objects>
+        <viewController id="s00-00-001" customClass="StretchViewController" sceneMemberID="viewController">
+          <view key="view" contentMode="scaleToFill" id="s00-00-002">
+            <rect key="frame" x="0.0" y="0.0" width="400" height="120"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <viewLayoutGuide key="safeArea" id="s00-00-003"/>
+            <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <subviews>
+              <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="0" distribution="fill" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-004">
+                <subviews>
+                  <stackView opaque="NO" contentMode="scaleToFill" axis="horizontal" spacing="0" distribution="fill" verticalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-005">
+                    <subviews>
+                      <view contentMode="scaleToFill" horizontalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-006">
+                        <color key="backgroundColor" red="1" green="0" blue="0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                      </view>
+                      <view contentMode="scaleToFill" horizontalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-007">
+                        <color key="backgroundColor" red="0" green="0.502" blue="0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                      </view>
+                      <view contentMode="scaleToFill" horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-008">
+                        <color key="backgroundColor" red="0" green="0" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                          <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="40" id="s00-00-009"/>
+                        </constraints>
+                      </view>
+                    </subviews>
+                    <constraints>
+                      <constraint firstItem="s00-00-007" firstAttribute="width" secondItem="s00-00-006" secondAttribute="width" multiplier="2" priority="999" id="s00-00-010"/>
+                    </constraints>
+                  </stackView>
+                  <stackView opaque="NO" contentMode="scaleToFill" axis="horizontal" spacing="0" distribution="fill" verticalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-011">
+                    <subviews>
+                      <view contentMode="scaleToFill" userLabel="Spacer" horizontalHuggingPriority="1" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-017"/>
+                      <view contentMode="scaleToFill" horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-012">
+                        <color key="backgroundColor" red="0.2" green="0.4" blue="0.6" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                          <constraint firstAttribute="width" relation="lessThanOrEqual" constant="80" id="s00-00-013"/>
+                          <constraint firstAttribute="width" constant="50" priority="700" id="s00-00-014"/>
+                        </constraints>
+                      </view>
+                      <view contentMode="scaleToFill" horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-015">
+                        <color key="backgroundColor" red="0.6" green="0.4" blue="0.2" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                          <constraint firstAttribute="width" constant="50" priority="700" id="s00-00-016"/>
+                        </constraints>
+                      </view>
+                      <view contentMode="scaleToFill" userLabel="Spacer" horizontalHuggingPriority="1" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-018"/>
+                    </subviews>
+                    <constraints>
+                      <constraint firstItem="s00-00-018" firstAttribute="width" secondItem="s00-00-017" secondAttribute="width" id="s00-00-019"/>
+                    </constraints>
+                  </stackView>
+                  <view contentMode="scaleToFill" verticalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-020">
+                    <subviews>
+                      <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-021">
+                        <color key="backgroundColor" red="0" green="0" blue="0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                          <constraint firstAttribute="width" constant="20" id="s00-00-022"/>
+                          <constraint firstAttribute="height" constant="20" id="s00-00-023"/>
+                        </constraints>
+                      </view>
+                    </subviews>
+                    <constraints>
+                      <constraint firstItem="s00-00-021" firstAttribute="leading" secondItem="s00-00-020" secondAttribute="leading" constant="10" id="s00-00-024"/>
+                      <constraint firstItem="s00-00-021" firstAttribute="top" secondItem="s00-00-020" secondAttribute="top" constant="4" id="s00-00-025"/>
+                    </constraints>
+                  </view>
+                </subviews>
+                <constraints>
+                  <constraint firstItem="s00-00-011" firstAttribute="height" secondItem="s00-00-005" secondAttribute="height" priority="999" id="s00-00-026"/>
+                  <constraint firstItem="s00-00-020" firstAttribute="height" secondItem="s00-00-005" secondAttribute="height" priority="999" id="s00-00-027"/>
+                </constraints>
+              </stackView>
+            </subviews>
+            <constraints>
+              <constraint firstItem="s00-00-004" firstAttribute="leading" secondItem="s00-00-003" secondAttribute="leading" id="s00-00-028"/>
+              <constraint firstItem="s00-00-003" firstAttribute="trailing" secondItem="s00-00-004" secondAttribute="trailing" id="s00-00-029"/>
+              <constraint firstItem="s00-00-004" firstAttribute="top" secondItem="s00-00-003" secondAttribute="top" id="s00-00-030"/>
+              <constraint firstItem="s00-00-003" firstAttribute="bottom" secondItem="s00-00-004" secondAttribute="bottom" id="s00-00-031"/>
+            </constraints>
+          </view>
+        </viewController>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="s00-00-032" userLabel="First Responder" sceneMemberID="firstResponder"/>
+      </objects>
+      <point key="canvasLocation" x="0" y="0"/>
+    </scene>
+  </scenes>
+</document>

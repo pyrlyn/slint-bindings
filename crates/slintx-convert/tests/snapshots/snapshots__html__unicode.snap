@@ -1,0 +1,26 @@
+---
+source: crates/slintx-convert/tests/snapshots.rs
+expression: "render(name, format, options)"
+---
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <meta name="generator" content="slint-convert"/>
+    <title>Привет, мир</title>
+    <style>html,body{margin:0;height:100%}body{font-family:system-ui,sans-serif;font-size:14px}[data-slint]{box-sizing:border-box;margin:0}[data-slint=Text]{display:flex;flex-direction:column;white-space:pre}</style>
+  </head>
+  <body>
+    <main data-slint="Window" data-component="Unicode" data-at="2:8" style="width:100%;height:100%;position:relative">
+      <div data-slint="VerticalLayout" data-at="4:5" style="position:absolute;left:0;right:0;top:0;bottom:0;display:flex;flex-direction:column">
+        <span data-slint="Text" data-at="5:9" style="flex:1 1 auto">Привет, мир</span>
+        <span data-slint="Text" data-at="6:9" style="flex:1 1 auto">こんにちは世界</span>
+        <span data-slint="Text" data-at="7:9" style="flex:1 1 auto">Emoji: 👋🌍</span>
+        <span data-slint="Text" data-at="8:9" style="flex:1 1 auto;text-align:right">مرحبا بالعالم</span>
+        <span data-slint="Text" data-at="9:9" style="flex:1 1 auto">Quote &quot; backslash \ newline
+end ☺</span>
+        <span data-slint="Text" data-at="10:9" data-tr-text="" style="flex:1 1 auto">Translated &lt;&amp;&gt;</span>
+      </div>
+    </main>
+  </body>
+</html>
