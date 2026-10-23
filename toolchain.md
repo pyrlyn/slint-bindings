@@ -31,8 +31,8 @@
 | swash | local | https://github.com/dfrg/swash | Glyph rasterizing in slintx-wgpu |
 | lyon_tessellation | local | https://github.com/nical/lyon | Path fill and stroke tessellation in slintx-wgpu |
 | bytemuck | local | https://github.com/Lokathor/bytemuck | Plain-data vertex and storage buffers in slintx-wgpu |
-| pixel-diff | local (dev, path, `crates/pixel-diff`) | this repository | PNG snapshots and pixel comparison in the screenshot tests |
-| png | local (via pixel-diff) | https://github.com/image-rs/image-png | Encode and decode the frame snapshots |
+| rgba-png | local (dev, git rev) | https://github.com/pyrlyn/crates | PNG snapshots and pixel comparison in the screenshot tests; shared with scull |
+| png | local (via rgba-png) | https://github.com/image-rs/image-png | Encode and decode the frame snapshots |
 | rowan | local | https://github.com/rust-analyzer/rowan | Lossless syntax tree of `slintx-syntax` |
 | wasm-bindgen-test | local | https://github.com/wasm-bindgen/wasm-bindgen | Runs the `slintx-syntax` tests on `wasm32-unknown-unknown` |
 | quick-xml | local | https://github.com/tafia/quick-xml | Escaping in `slintx-convert`'s XML, HTML and storyboard output; well-formedness checks in its tests |

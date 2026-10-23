@@ -417,7 +417,7 @@ An unpublished crate (`publish = false`) that runs each `.slint` fixture
 through slintx and through Slint (`slint-interpreter` and the software
 renderer, test-only) and compares: accept or reject and diagnostic positions
 first, then property values after scripted steps, layout geometry and pixels
-(reusing `pixel-diff`). The corpus is written here from the docs and from
+(reusing `rgba-png`). The corpus is written here from the docs and from
 penpotx emitter outputs; every OPEN item in `research.md` §8.4 gets a case.
 Slint is the oracle only and never a dependency of a shipped crate. Done when
 the harness runs in `just check` with the parser-level comparison live and the

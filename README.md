@@ -23,7 +23,6 @@ here, and the WinUI window itself has not been launched.
 | --- | --- |
 | `crates/slint-bindings-core` | Host-driven Slint platform: CPU renderer into a caller-owned RGBA buffer, and slintx-wgpu into a host surface. Input forwarding, timers, the demo component. |
 | `crates/slintx-wgpu` | Our Slint renderer on wgpu (SDF shapes, swash glyphs, lyon paths). Its tests compare every scene with Slint's software renderer. |
-| `crates/pixel-diff` | PNG snapshots and pixel comparison for the screenshot tests. |
 | `crates/slintx-convert` | `slint-convert`: `.slint` to XML, HTML, UIKit/AppKit storyboards and GTK 4 Blueprint, keeping layout, bindings and handlers. |
 | `crates/slint-bindings-ffi` | `sb_*` C ABI over the core (static library for Swift, DLL for WinUI). Forwards only. |
 | `flutter/` | Copy of [slint_dart](https://github.com/listepo/slint_dart). Its `slint-embed` crate (`flutter/packages/slint/rust/embed`) is the software platform, Dart event map and UI-thread guard shared with the core. |
