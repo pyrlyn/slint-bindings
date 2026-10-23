@@ -73,6 +73,12 @@ Not added: `slint_embed::events` is used only by slint_dart and stays there; `i-
 | T86 | todo | P2 | 5 | 0% | |
 | T87 | todo | P2 | 5 | 0% | |
 | T88 | todo | P3 | 4 | 0% | |
+| T89 | in progress | P1 | 5 | 5% | Claude / opus-5.5 |
+| T89.1 | in progress | P1 | 4 | 5% | Claude / opus-5.5 |
+| T89.2 | todo | P1 | 3 | 0% | |
+| T89.3 | todo | P1 | 3 | 0% | |
+| T89.4 | todo | P1 | 4 | 0% | |
+| T89.5 | todo | P2 | 5 | 0% | |
 
 ## Milestones
 
@@ -549,3 +555,86 @@ Run the slint-bindings hosts' runtime components (T11's `sb_compile` path) on
 slintx so the shipped host build drops `slint`, `slint-interpreter` and
 `i-slint-*`. Done when the demo runs on both hosts and the licence gate covers
 the FFI crate.
+
+### T89. slint-convert: `.slint` to XML, HTML, Storyboard and Blueprint
+
+A converter that keeps the structure and meaning of a `.slint` file, not its
+pixels: the element tree, the layouts (`HorizontalLayout`, `VerticalLayout`,
+`GridLayout`), alignment, stretch, texts, bindings and handlers. It parses with
+`slintx-syntax` only (never `i-slint-compiler`); type checking, import
+resolution and layout are the converter's own job. Slint logic is never run:
+bindings become outlets and actions (Storyboard), signal handlers (Blueprint),
+ids and `data-*` attributes (HTML). Missing AST features go into
+`slintx-syntax` as their own change, never around it by reading source text.
+
+Done when `crates/slintx-convert` ships a library and the `slint-convert`
+binary (`slint-convert <input> --to xml|html|storyboard|blueprint -o <out>`,
+`--strict`), four backends on one `Backend` trait over a format-free IR, the
+fixtures and tests below are green under `just check`, and the README support
+table, its limits and `docs/mapping.md` are written.
+
+Decisions: the crate lives in this workspace as `slintx-convert` so the
+licence gate covers it (no `slint`, `slint-*` or `i-slint-*` in its normal or
+build graph); it is exempt from the wasm32 check, as a native CLI. GTK and HTML
+screenshot tests run in one Docker image, locally on Colima and in Linux CI;
+`ibtool` runs on the macOS runner.
+
+### T89.1. slintx-convert: IR, `Backend`, CLI and the `xml` backend
+
+Blocker for T89.2-T89.5.
+
+Plan:
+
+1. `crates/slintx-convert`: `Cargo.toml` (lib + `[[bin]] slint-convert`),
+   deps `slintx-syntax` (path), `thiserror`, `quick-xml` (escaping and XML
+   writing), `clap` and `anyhow` for the binary only; dev-deps `insta`,
+   `trycmd`.
+2. `ir.rs`: `Document` → components → `Node` (base widget, id, properties with
+   units, bindings, handlers, `for`/`if` markers, children, `Origin` with file,
+   line and column from the `TextRange`). `Layout` model: kind, spacing,
+   padding, alignment; per child stretch, min/max/preferred size and grid
+   cells (`Row`, `row`, `col`, `rowspan`, `colspan`).
+3. `lower.rs`: AST → IR. Parse diagnostics are printed with positions and
+   stop the run. Local components are kept as definitions and inlined at use
+   sites with their origin; the root is the last exported component.
+4. `mapping.rs`: the widget table as plain data (Slint widget → XML element,
+   HTML tag, UIKit/AppKit class, GTK class). `docs/mapping.md` is generated
+   from it; a test fails when the doc is stale.
+5. `diag.rs`: warnings with positions; unsupported input becomes a warning
+   plus a comment stub, an error under `--strict`.
+6. `backend/mod.rs` (`Backend` trait, `Format`), `backend/xml.rs`.
+7. `src/bin/slint-convert.rs`: clap front end only.
+8. Fixtures in `crates/slintx-convert/tests/fixtures/`: nested layouts,
+   stretch, Unicode, `for`, `if`, components, a broken file, an unsupported
+   widget. `insta` snapshots of IR and XML; `trycmd` for the CLI; XML checked
+   well-formed by re-parsing with `quick-xml`.
+9. `scripts/slintx-check.sh`: add `slintx-convert` to `exempt_wasm`;
+   `toolchain.md` and `rust.md` rows for new crates.
+
+Check: `cargo fmt --check`, `cargo clippy -p slintx-convert --all-targets --
+-D warnings`, `cargo nextest run -p slintx-convert`, `just license-check`.
+
+### T89.2. slintx-convert: `html` backend
+
+HTML plus CSS flex (box layouts) and grid (`GridLayout`); ids, `data-*` for
+bindings and handlers. Snapshots, and the output validated as well-formed.
+
+### T89.3. slintx-convert: `blueprint` backend
+
+GTK 4 Blueprint: `Gtk.Box`/`Gtk.Grid`, `hexpand`/`vexpand`, `halign`/`valign`,
+signal handlers for callbacks. Snapshots; `blueprint-compiler` validation as a
+platform test (`#[ignore]` without the tool).
+
+### T89.4. slintx-convert: `storyboard` backend
+
+UIKit or AppKit by flag, Auto Layout with `UIStackView`/`NSStackView` and
+constraints, outlets and actions for bindings and callbacks. Snapshots;
+`ibtool --compile` validation on macOS only (`cfg`).
+
+### T89.5. slintx-convert: screenshot and geometry tests
+
+One Docker image (GTK 4, `blueprint-compiler`, xvfb, headless Chromium) run on
+Colima and in Linux CI; `ibtool` and an AppKit loader on macOS; Slint
+reference geometry from `slint-viewer` or the `slintx-conformance` oracle
+(dev-only). Compare element rectangles with a tolerance and a soft perceptual
+threshold through `pixel-diff`. Platform tests are `#[ignore]` or `cfg`-gated.
