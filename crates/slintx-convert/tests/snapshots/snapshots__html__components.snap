@@ -1,0 +1,31 @@
+---
+source: crates/slintx-convert/tests/snapshots.rs
+expression: "render(name, format, options)"
+---
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <meta name="generator" content="slint-convert"/>
+    <title>Components</title>
+    <style>html,body{margin:0;height:100%}body{font-family:system-ui,sans-serif;font-size:14px}[data-slint]{box-sizing:border-box;margin:0}[data-slint=Text]{display:flex;flex-direction:column;white-space:pre}</style>
+  </head>
+  <body>
+    <main data-slint="Window" data-component="Components" data-at="17:8" style="width:100%;height:100%;position:relative">
+      <div data-slint="VerticalLayout" data-at="18:5" style="position:absolute;left:0;right:0;top:0;bottom:0;display:flex;flex-direction:column">
+        <div data-slint="Rectangle" data-component="Card" data-at="19:9" data-prop-title="First" data-prop-gap="4px" style="flex:1 1 auto;position:relative;background:#fafafa">
+          <div data-slint="VerticalLayout" data-at="6:5" style="position:absolute;left:0;right:0;top:0;bottom:0;display:flex;flex-direction:column;gap:4px">
+            <span data-slint="Text" data-at="8:9" style="flex:1 1 auto;font-size:16px">First</span>
+            <span data-slint="Text" data-component="Badge" data-at="21:13" style="flex:1 1 auto;color:white">new</span>
+          </div>
+        </div>
+        <div id="second" data-slint="Rectangle" data-component="Card" data-at="23:9" data-prop-title="Untitled" data-prop-gap="8px" style="flex:1 1 auto;position:relative;background:#fafafa">
+          <div data-slint="VerticalLayout" data-at="6:5" style="position:absolute;left:0;right:0;top:0;bottom:0;display:flex;flex-direction:column;gap:8px">
+            <span data-slint="Text" data-at="8:9" style="flex:1 1 auto;font-size:16px">Untitled</span>
+            <span data-slint="Text" data-at="25:13" style="flex:1 1 auto">Body</span>
+          </div>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

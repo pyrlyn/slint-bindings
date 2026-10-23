@@ -1,0 +1,5 @@
+unsupported.slint:7:13: warning: property `background` of `Rectangle` has no GTK equivalent
+unsupported.slint:8:13: warning: not converted: animation
+unsupported.slint:10:9: warning: not converted: element `Fancy` imported from "fancy.slint"
+unsupported.slint:11:9: warning: not converted: unknown element `Mystery`
+unsupported.slint:13:5: warning: not converted: states

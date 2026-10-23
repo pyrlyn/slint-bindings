@@ -1,0 +1,4 @@
+bin.name = "slint-convert"
+args = ["missing.slint", "--to", "html"]
+status.code = 1
+fs.cwd = "../fixtures"

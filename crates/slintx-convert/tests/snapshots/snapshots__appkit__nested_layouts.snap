@@ -1,0 +1,173 @@
+---
+source: crates/slintx-convert/tests/snapshots.rs
+expression: "render(name, format, options)"
+---
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Converted from nested_layouts.slint by slint-convert. -->
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="23504" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="s00-00-001">
+  <dependencies>
+    <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="23504"/>
+  </dependencies>
+  <scenes>
+    <scene sceneID="s00-00-000">
+      <objects>
+        <viewController id="s00-00-001" customClass="NestedLayoutsViewController" sceneMemberID="viewController" title="Nested layouts">
+          <view key="view" id="s00-00-002">
+            <rect key="frame" x="0.0" y="0.0" width="360" height="240"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <subviews>
+              <stackView orientation="vertical" alignment="centerX" spacing="8" detachesHiddenViews="YES" distribution="fill" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-003">
+                <edgeInsets key="edgeInsets" left="12" right="12" top="12" bottom="12"/>
+                <subviews>
+                  <stackView orientation="horizontal" alignment="centerY" spacing="4" detachesHiddenViews="YES" distribution="equalSpacing" verticalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-004">
+                    <subviews>
+                      <textField focusRingType="none" horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-006">
+                        <textFieldCell key="cell" lineBreakMode="clipping" title="Left" id="s00-00-007">
+                          <font key="font" metaFont="system" size="14"/>
+                          <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                          <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                      </textField>
+                      <textField focusRingType="none" horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-008">
+                        <textFieldCell key="cell" lineBreakMode="clipping" title="Right" id="s00-00-009">
+                          <font key="font" metaFont="system" size="14"/>
+                          <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                          <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                      </textField>
+                    </subviews>
+                    <constraints>
+                      <constraint firstItem="s00-00-006" firstAttribute="height" secondItem="s00-00-004" secondAttribute="height" id="s00-00-010"/>
+                      <constraint firstItem="s00-00-008" firstAttribute="height" secondItem="s00-00-004" secondAttribute="height" id="s00-00-011"/>
+                    </constraints>
+                  </stackView>
+                  <stackView orientation="vertical" alignment="centerX" spacing="2" detachesHiddenViews="YES" distribution="fill" verticalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-012">
+                    <subviews>
+                      <stackView orientation="horizontal" alignment="centerY" spacing="6" detachesHiddenViews="YES" distribution="fill" verticalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-013">
+                        <subviews>
+                          <textField focusRingType="none" horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-014">
+                            <textFieldCell key="cell" lineBreakMode="clipping" title="Name" id="s00-00-015">
+                              <font key="font" metaFont="system" size="14"/>
+                              <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                              <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                            </textFieldCell>
+                          </textField>
+                          <customView horizontalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-016"/>
+                          <customView userLabel="Spacer" horizontalHuggingPriority="1" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-017"/>
+                        </subviews>
+                        <constraints>
+                          <constraint firstItem="s00-00-014" firstAttribute="height" secondItem="s00-00-013" secondAttribute="height" id="s00-00-018"/>
+                          <constraint firstItem="s00-00-016" firstAttribute="height" secondItem="s00-00-013" secondAttribute="height" id="s00-00-019"/>
+                          <constraint firstItem="s00-00-017" firstAttribute="height" secondItem="s00-00-013" secondAttribute="height" id="s00-00-020"/>
+                        </constraints>
+                      </stackView>
+                      <stackView orientation="horizontal" alignment="centerY" spacing="6" detachesHiddenViews="YES" distribution="fill" verticalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-021">
+                        <subviews>
+                          <textField focusRingType="none" horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-022">
+                            <textFieldCell key="cell" lineBreakMode="clipping" title="Mail" id="s00-00-023">
+                              <font key="font" metaFont="system" size="14"/>
+                              <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                              <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                            </textFieldCell>
+                          </textField>
+                          <customView horizontalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-024"/>
+                        </subviews>
+                        <constraints>
+                          <constraint firstItem="s00-00-022" firstAttribute="height" secondItem="s00-00-021" secondAttribute="height" id="s00-00-025"/>
+                          <constraint firstItem="s00-00-024" firstAttribute="height" secondItem="s00-00-021" secondAttribute="height" id="s00-00-026"/>
+                        </constraints>
+                      </stackView>
+                      <stackView orientation="horizontal" alignment="centerY" spacing="6" detachesHiddenViews="YES" distribution="fill" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-027">
+                        <subviews>
+                          <customView userLabel="Spacer" horizontalHuggingPriority="1" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-028"/>
+                          <customView userLabel="Spacer" horizontalHuggingPriority="1" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-029"/>
+                          <customView userLabel="Spacer" horizontalHuggingPriority="1" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-030"/>
+                        </subviews>
+                        <constraints>
+                          <constraint firstItem="s00-00-028" firstAttribute="height" secondItem="s00-00-027" secondAttribute="height" id="s00-00-031"/>
+                          <constraint firstItem="s00-00-029" firstAttribute="height" secondItem="s00-00-027" secondAttribute="height" id="s00-00-032"/>
+                          <constraint firstItem="s00-00-030" firstAttribute="height" secondItem="s00-00-027" secondAttribute="height" id="s00-00-033"/>
+                        </constraints>
+                      </stackView>
+                      <stackView orientation="horizontal" alignment="centerY" spacing="6" detachesHiddenViews="YES" distribution="fill" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-034">
+                        <subviews>
+                          <customView userLabel="Spacer" horizontalHuggingPriority="1" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-035"/>
+                          <textField focusRingType="none" horizontalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-036">
+                            <textFieldCell key="cell" lineBreakMode="clipping" title="Notes" id="s00-00-037">
+                              <font key="font" metaFont="system" size="14"/>
+                              <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                              <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                            </textFieldCell>
+                          </textField>
+                          <customView userLabel="Spacer" horizontalHuggingPriority="1" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-038"/>
+                        </subviews>
+                        <constraints>
+                          <constraint firstItem="s00-00-035" firstAttribute="height" secondItem="s00-00-034" secondAttribute="height" id="s00-00-039"/>
+                          <constraint firstItem="s00-00-036" firstAttribute="height" secondItem="s00-00-034" secondAttribute="height" id="s00-00-040"/>
+                          <constraint firstItem="s00-00-038" firstAttribute="height" secondItem="s00-00-034" secondAttribute="height" id="s00-00-041"/>
+                        </constraints>
+                      </stackView>
+                    </subviews>
+                    <constraints>
+                      <constraint firstItem="s00-00-021" firstAttribute="height" secondItem="s00-00-013" secondAttribute="height" priority="999" id="s00-00-042"/>
+                      <constraint firstItem="s00-00-013" firstAttribute="width" secondItem="s00-00-012" secondAttribute="width" id="s00-00-043"/>
+                      <constraint firstItem="s00-00-021" firstAttribute="width" secondItem="s00-00-012" secondAttribute="width" id="s00-00-044"/>
+                      <constraint firstItem="s00-00-027" firstAttribute="width" secondItem="s00-00-012" secondAttribute="width" id="s00-00-045"/>
+                      <constraint firstItem="s00-00-034" firstAttribute="width" secondItem="s00-00-012" secondAttribute="width" id="s00-00-046"/>
+                      <constraint firstItem="s00-00-022" firstAttribute="width" secondItem="s00-00-014" secondAttribute="width" priority="999" id="s00-00-047"/>
+                      <constraint firstItem="s00-00-028" firstAttribute="width" secondItem="s00-00-014" secondAttribute="width" priority="999" id="s00-00-048"/>
+                      <constraint firstItem="s00-00-035" firstAttribute="width" secondItem="s00-00-014" secondAttribute="width" priority="999" id="s00-00-049"/>
+                      <constraint firstItem="s00-00-029" firstAttribute="width" secondItem="s00-00-016" secondAttribute="width" priority="999" id="s00-00-050"/>
+                      <constraint firstItem="s00-00-036" firstAttribute="width" secondItem="s00-00-016" secondAttribute="width" priority="999" id="s00-00-051"/>
+                      <constraint firstItem="s00-00-030" firstAttribute="width" secondItem="s00-00-017" secondAttribute="width" priority="999" id="s00-00-052"/>
+                      <constraint firstItem="s00-00-038" firstAttribute="width" secondItem="s00-00-017" secondAttribute="width" priority="999" id="s00-00-053"/>
+                    </constraints>
+                  </stackView>
+                  <stackView orientation="horizontal" alignment="centerY" spacing="0" detachesHiddenViews="YES" distribution="fill" verticalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-054">
+                    <edgeInsets key="edgeInsets" left="0" right="0" top="4" bottom="0"/>
+                    <subviews>
+                      <customView userLabel="Spacer" horizontalHuggingPriority="1" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-058"/>
+                      <customView horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-055">
+                        <constraints>
+                          <constraint firstAttribute="width" constant="80" id="s00-00-056"/>
+                          <constraint firstAttribute="height" constant="24" id="s00-00-057"/>
+                        </constraints>
+                      </customView>
+                    </subviews>
+                    <constraints>
+                      <constraint firstItem="s00-00-058" firstAttribute="height" secondItem="s00-00-054" secondAttribute="height" constant="-4" id="s00-00-059"/>
+                    </constraints>
+                  </stackView>
+                </subviews>
+                <constraints>
+                  <constraint firstItem="s00-00-012" firstAttribute="height" secondItem="s00-00-004" secondAttribute="height" priority="999" id="s00-00-060"/>
+                  <constraint firstItem="s00-00-054" firstAttribute="height" secondItem="s00-00-004" secondAttribute="height" priority="999" id="s00-00-061"/>
+                  <constraint firstItem="s00-00-004" firstAttribute="width" secondItem="s00-00-003" secondAttribute="width" constant="-24" id="s00-00-062"/>
+                  <constraint firstItem="s00-00-012" firstAttribute="width" secondItem="s00-00-003" secondAttribute="width" constant="-24" id="s00-00-063"/>
+                  <constraint firstItem="s00-00-054" firstAttribute="width" secondItem="s00-00-003" secondAttribute="width" constant="-24" id="s00-00-064"/>
+                </constraints>
+              </stackView>
+            </subviews>
+            <constraints>
+              <constraint firstItem="s00-00-003" firstAttribute="leading" secondItem="s00-00-002" secondAttribute="leading" id="s00-00-065"/>
+              <constraint firstItem="s00-00-002" firstAttribute="trailing" secondItem="s00-00-003" secondAttribute="trailing" id="s00-00-066"/>
+              <constraint firstItem="s00-00-003" firstAttribute="top" secondItem="s00-00-002" secondAttribute="top" id="s00-00-067"/>
+              <constraint firstItem="s00-00-002" firstAttribute="bottom" secondItem="s00-00-003" secondAttribute="bottom" id="s00-00-068"/>
+            </constraints>
+          </view>
+          <connections>
+            <outlet property="header" destination="s00-00-004" id="s00-00-005"/>
+          </connections>
+        </viewController>
+        <customObject id="s00-00-069" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+      </objects>
+      <point key="canvasLocation" x="0" y="0"/>
+    </scene>
+  </scenes>
+</document>
+
+--- warnings ---
+nested_layouts.slint:23:29: warning: property `background` of `Rectangle` has no AppKit equivalent
+nested_layouts.slint:27:17: warning: row-span 1 and col-span 2 are approximated: stack views cannot span
+nested_layouts.slint:27:29: warning: property `background` of `Rectangle` has no AppKit equivalent
+nested_layouts.slint:35:52: warning: property `background` of `Rectangle` has no AppKit equivalent

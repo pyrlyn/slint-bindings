@@ -1,0 +1,22 @@
+using Gtk 4.0;
+
+// Converted from unsupported.slint by slint-convert.
+
+// not converted: states at 13:5
+Gtk.Window {
+  Gtk.Box {
+    orientation: vertical;
+    // not converted: animation at 8:13
+    Gtk.Box r {
+      vexpand: true;
+    }
+    // not converted: element `Fancy` imported from "fancy.slint" at 10:9
+    Gtk.Box {
+      vexpand: true;
+    }
+    // not converted: unknown element `Mystery` at 11:9
+    Gtk.Box {
+      vexpand: true;
+    }
+  }
+}

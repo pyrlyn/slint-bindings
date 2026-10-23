@@ -1,0 +1,5 @@
+unsupported.slint:8:13: error: not converted: animation
+unsupported.slint:10:9: error: not converted: element `Fancy` imported from "fancy.slint"
+unsupported.slint:11:9: error: not converted: unknown element `Mystery`
+unsupported.slint:13:5: error: not converted: states
+error: conversion failed with 4 error(s)

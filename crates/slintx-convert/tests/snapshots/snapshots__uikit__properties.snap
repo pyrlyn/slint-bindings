@@ -1,0 +1,220 @@
+---
+source: crates/slintx-convert/tests/snapshots.rs
+expression: "render(name, format, options)"
+---
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Converted from properties.slint by slint-convert. -->
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="23504" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="s00-00-001">
+  <dependencies>
+    <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23506"/>
+    <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+    <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+  </dependencies>
+  <scenes>
+    <scene sceneID="s00-00-000">
+      <objects>
+        <viewController id="s00-00-001" customClass="PropertiesViewController" sceneMemberID="viewController">
+          <view key="view" contentMode="scaleToFill" id="s00-00-002">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <viewLayoutGuide key="safeArea" id="s00-00-003"/>
+            <color key="backgroundColor" red="0.941" green="0.941" blue="0.941" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <subviews>
+              <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="4" layoutMarginsRelativeArrangement="YES" distribution="fill" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-004">
+                <directionalEdgeInsets key="directionalLayoutMargins" top="8" leading="8" bottom="8" trailing="8"/>
+                <subviews>
+                  <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="Styled" textAlignment="center" lineBreakMode="clip" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-005">
+                    <fontDescription key="fontDescription" type="boldSystem" pointSize="20"/>
+                    <color key="textColor" red="0.2" green="0.4" blue="0.6" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                    <nil key="highlightedColor"/>
+                  </label>
+                  <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="Light italic" lineBreakMode="wordWrap" numberOfLines="0" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-006">
+                    <fontDescription key="fontDescription" type="italicSystem" pointSize="14"/>
+                    <nil key="highlightedColor"/>
+                  </label>
+                  <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="Serif" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-007">
+                    <fontDescription key="fontDescription" name="Georgia" family="Georgia" pointSize="14"/>
+                    <nil key="highlightedColor"/>
+                  </label>
+                  <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" enabled="NO" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-008">
+                    <state key="normal" title="Disabled"/>
+                  </button>
+                  <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" hidden="YES" alpha="0.5" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-009">
+                    <state key="normal" title="Hidden"/>
+                    <accessibility key="accessibilityConfiguration" label="Hidden button"/>
+                  </button>
+                  <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Password" textAlignment="natural" minimumFontSize="17" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-010">
+                    <!-- accepted => { debug("go"); } -->
+                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                    <textInputTraits key="textInputTraits" secureTextEntry="YES"/>
+                    <connections>
+                      <action selector="lineEditAccepted:" destination="s00-00-001" eventType="primaryActionTriggered" id="s00-00-011"/>
+                    </connections>
+                  </textField>
+                  <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" textAlignment="natural" editable="NO" verticalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-012">
+                    <string key="text">Read only</string>
+                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                    <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                  </textView>
+                  <progressView opaque="NO" contentMode="scaleToFill" progressViewStyle="default" progress="0" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-013"/>
+                  <activityIndicatorView opaque="NO" contentMode="scaleToFill" animating="YES" style="medium" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-014"/>
+                  <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" image="photo.png" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-015">
+                    <constraints>
+                      <constraint firstAttribute="height" constant="40" id="s00-00-016"/>
+                    </constraints>
+                  </imageView>
+                  <stackView opaque="NO" contentMode="scaleToFill" axis="horizontal" spacing="0" distribution="fill" verticalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-017">
+                    <subviews>
+                      <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-018">
+                        <state key="normal" title="S"/>
+                      </button>
+                      <view contentMode="scaleToFill" userLabel="Spacer" horizontalHuggingPriority="1" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-019"/>
+                    </subviews>
+                  </stackView>
+                  <stackView opaque="NO" contentMode="scaleToFill" axis="horizontal" spacing="0" distribution="fill" verticalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-020">
+                    <subviews>
+                      <view contentMode="scaleToFill" userLabel="Spacer" horizontalHuggingPriority="1" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-023"/>
+                      <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-021">
+                        <state key="normal" title="C1"/>
+                      </button>
+                      <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-022">
+                        <state key="normal" title="C2"/>
+                      </button>
+                      <view contentMode="scaleToFill" userLabel="Spacer" horizontalHuggingPriority="1" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-024"/>
+                    </subviews>
+                    <constraints>
+                      <constraint firstItem="s00-00-024" firstAttribute="width" secondItem="s00-00-023" secondAttribute="width" id="s00-00-025"/>
+                    </constraints>
+                  </stackView>
+                  <stackView opaque="NO" contentMode="scaleToFill" axis="horizontal" spacing="0" distribution="fill" verticalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-026">
+                    <subviews>
+                      <view contentMode="scaleToFill" userLabel="Spacer" horizontalHuggingPriority="1" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-028"/>
+                      <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-027">
+                        <state key="normal" title="E"/>
+                      </button>
+                    </subviews>
+                  </stackView>
+                  <stackView opaque="NO" contentMode="scaleToFill" axis="horizontal" spacing="0" distribution="fill" verticalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-029">
+                    <subviews>
+                      <view contentMode="scaleToFill" userLabel="Spacer" horizontalHuggingPriority="1" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-032"/>
+                      <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-030">
+                        <state key="normal" title="A1"/>
+                      </button>
+                      <view contentMode="scaleToFill" userLabel="Spacer" horizontalHuggingPriority="1" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-033"/>
+                      <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-031">
+                        <state key="normal" title="A2"/>
+                      </button>
+                      <view contentMode="scaleToFill" userLabel="Spacer" horizontalHuggingPriority="1" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-034"/>
+                    </subviews>
+                    <constraints>
+                      <constraint firstItem="s00-00-033" firstAttribute="width" secondItem="s00-00-032" secondAttribute="width" multiplier="2" id="s00-00-035"/>
+                      <constraint firstItem="s00-00-034" firstAttribute="width" secondItem="s00-00-032" secondAttribute="width" id="s00-00-036"/>
+                    </constraints>
+                  </stackView>
+                  <stackView opaque="NO" contentMode="scaleToFill" axis="horizontal" spacing="0" distribution="fill" verticalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-037">
+                    <subviews>
+                      <view contentMode="scaleToFill" userLabel="Spacer" horizontalHuggingPriority="1" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-040"/>
+                      <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-038">
+                        <state key="normal" title="V1"/>
+                      </button>
+                      <view contentMode="scaleToFill" userLabel="Spacer" horizontalHuggingPriority="1" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-041"/>
+                      <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-039">
+                        <state key="normal" title="V2"/>
+                      </button>
+                      <view contentMode="scaleToFill" userLabel="Spacer" horizontalHuggingPriority="1" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-042"/>
+                    </subviews>
+                    <constraints>
+                      <constraint firstItem="s00-00-041" firstAttribute="width" secondItem="s00-00-040" secondAttribute="width" id="s00-00-043"/>
+                      <constraint firstItem="s00-00-042" firstAttribute="width" secondItem="s00-00-040" secondAttribute="width" id="s00-00-044"/>
+                    </constraints>
+                  </stackView>
+                  <view contentMode="scaleToFill" verticalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-045">
+                    <subviews>
+                      <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-049">
+                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                      </view>
+                    </subviews>
+                    <constraints>
+                      <constraint firstItem="s00-00-049" firstAttribute="leading" secondItem="s00-00-045" secondAttribute="leading" id="s00-00-050"/>
+                      <constraint firstItem="s00-00-045" firstAttribute="trailing" secondItem="s00-00-049" secondAttribute="trailing" id="s00-00-051"/>
+                      <constraint firstItem="s00-00-049" firstAttribute="top" secondItem="s00-00-045" secondAttribute="top" id="s00-00-052"/>
+                      <constraint firstItem="s00-00-045" firstAttribute="bottom" secondItem="s00-00-049" secondAttribute="bottom" id="s00-00-053"/>
+                    </constraints>
+                    <connections>
+                      <outletCollection property="gestureRecognizers" destination="s00-00-047" appends="YES" id="s00-00-048"/>
+                    </connections>
+                  </view>
+                  <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" verticalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-054">
+                    <subviews>
+                      <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="0" distribution="fill" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-055">
+                        <subviews>
+                          <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="Scrolled" lineBreakMode="clip" verticalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-056">
+                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                            <nil key="highlightedColor"/>
+                          </label>
+                        </subviews>
+                      </stackView>
+                    </subviews>
+                    <constraints>
+                      <constraint firstItem="s00-00-055" firstAttribute="leading" secondItem="s00-00-054" secondAttribute="leading" id="s00-00-057"/>
+                      <constraint firstItem="s00-00-055" firstAttribute="trailing" secondItem="s00-00-054" secondAttribute="trailing" id="s00-00-058"/>
+                      <constraint firstItem="s00-00-055" firstAttribute="top" secondItem="s00-00-054" secondAttribute="top" id="s00-00-059"/>
+                      <constraint firstItem="s00-00-055" firstAttribute="bottom" secondItem="s00-00-054" secondAttribute="bottom" id="s00-00-060"/>
+                      <constraint firstItem="s00-00-055" firstAttribute="width" secondItem="s00-00-054" secondAttribute="width" id="s00-00-061"/>
+                    </constraints>
+                  </scrollView>
+                  <view contentMode="scaleToFill" verticalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-062">
+                    <!-- GroupBox title: Group -->
+                    <subviews>
+                      <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="Inside" lineBreakMode="clip" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-063">
+                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                        <nil key="highlightedColor"/>
+                      </label>
+                    </subviews>
+                    <constraints>
+                      <constraint firstItem="s00-00-063" firstAttribute="centerX" secondItem="s00-00-062" secondAttribute="centerX" id="s00-00-064"/>
+                      <constraint firstItem="s00-00-063" firstAttribute="centerY" secondItem="s00-00-062" secondAttribute="centerY" id="s00-00-065"/>
+                    </constraints>
+                  </view>
+                </subviews>
+                <constraints>
+                  <constraint firstItem="s00-00-017" firstAttribute="height" secondItem="s00-00-012" secondAttribute="height" priority="999" id="s00-00-066"/>
+                  <constraint firstItem="s00-00-020" firstAttribute="height" secondItem="s00-00-012" secondAttribute="height" priority="999" id="s00-00-067"/>
+                  <constraint firstItem="s00-00-026" firstAttribute="height" secondItem="s00-00-012" secondAttribute="height" priority="999" id="s00-00-068"/>
+                  <constraint firstItem="s00-00-029" firstAttribute="height" secondItem="s00-00-012" secondAttribute="height" priority="999" id="s00-00-069"/>
+                  <constraint firstItem="s00-00-037" firstAttribute="height" secondItem="s00-00-012" secondAttribute="height" priority="999" id="s00-00-070"/>
+                  <constraint firstItem="s00-00-045" firstAttribute="height" secondItem="s00-00-012" secondAttribute="height" priority="999" id="s00-00-071"/>
+                  <constraint firstItem="s00-00-054" firstAttribute="height" secondItem="s00-00-012" secondAttribute="height" priority="999" id="s00-00-072"/>
+                  <constraint firstItem="s00-00-062" firstAttribute="height" secondItem="s00-00-012" secondAttribute="height" priority="999" id="s00-00-073"/>
+                </constraints>
+              </stackView>
+            </subviews>
+            <constraints>
+              <constraint firstItem="s00-00-004" firstAttribute="leading" secondItem="s00-00-003" secondAttribute="leading" id="s00-00-074"/>
+              <constraint firstItem="s00-00-003" firstAttribute="trailing" secondItem="s00-00-004" secondAttribute="trailing" id="s00-00-075"/>
+              <constraint firstItem="s00-00-004" firstAttribute="top" secondItem="s00-00-003" secondAttribute="top" id="s00-00-076"/>
+              <constraint firstItem="s00-00-003" firstAttribute="bottom" secondItem="s00-00-004" secondAttribute="bottom" id="s00-00-077"/>
+            </constraints>
+          </view>
+        </viewController>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="s00-00-078" userLabel="First Responder" sceneMemberID="firstResponder"/>
+        <tapGestureRecognizer id="s00-00-047">
+          <connections>
+            <!-- clicked => { debug("tap"); } -->
+            <action selector="touchAreaClicked:" destination="s00-00-001" id="s00-00-046"/>
+          </connections>
+        </tapGestureRecognizer>
+      </objects>
+      <point key="canvasLocation" x="0" y="0"/>
+    </scene>
+  </scenes>
+  <resources>
+    <image name="photo.png" width="16" height="40"/>
+  </resources>
+</document>
+
+--- warnings ---
+properties.slint:22:72: warning: vertical-alignment bottom has no UIKit label equivalent; text is placed at the center
+properties.slint:27:9: warning: indeterminate has no UIProgressView equivalent
+properties.slint:37:25: warning: property `border-radius` of `Rectangle` has no UIKit equivalent
+properties.slint:42:9: warning: GroupBox title is not shown: UIKit has no titled container here

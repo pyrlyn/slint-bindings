@@ -1,0 +1,50 @@
+---
+source: crates/slintx-convert/tests/snapshots.rs
+expression: "render(name, format, options)"
+---
+<?xml version="1.0" encoding="UTF-8"?>
+<slint file="stretch.slint">
+  <component name="Stretch" base="Window" exported="true" at="2:8"/>
+  <Window component="Stretch" at="2:8">
+    <size axis="width" fixed="400px"/>
+    <size axis="height" fixed="120px"/>
+    <VerticalLayout at="6:5">
+      <layout kind="vertical"/>
+      <HorizontalLayout at="7:9">
+        <layout kind="horizontal"/>
+        <Rectangle at="8:13">
+          <size axis="width" stretch="1"/>
+          <property name="background" kind="color" value="red" at="8:48"/>
+        </Rectangle>
+        <Rectangle at="9:13">
+          <size axis="width" stretch="2"/>
+          <property name="background" kind="color" value="green" at="9:48"/>
+        </Rectangle>
+        <Rectangle at="10:13">
+          <size axis="width" min="40px" stretch="0"/>
+          <property name="background" kind="color" value="blue" at="10:65"/>
+        </Rectangle>
+      </HorizontalLayout>
+      <HorizontalLayout at="12:9">
+        <layout kind="horizontal" alignment="center"/>
+        <Rectangle at="14:13">
+          <size axis="width" max="80px" preferred="50px"/>
+          <property name="background" kind="color" value="#336699" at="14:65"/>
+        </Rectangle>
+        <Rectangle at="15:13">
+          <size axis="width" preferred="50px"/>
+          <size axis="height" stretch="0"/>
+          <property name="background" kind="color" value="#996633" at="15:69"/>
+        </Rectangle>
+      </HorizontalLayout>
+      <Rectangle at="17:9">
+        <Rectangle at="18:13">
+          <size axis="width" fixed="20px"/>
+          <size axis="height" fixed="20px"/>
+          <position x="10px" y="4px"/>
+          <property name="background" kind="color" value="black" at="18:69"/>
+        </Rectangle>
+      </Rectangle>
+    </VerticalLayout>
+  </Window>
+</slint>

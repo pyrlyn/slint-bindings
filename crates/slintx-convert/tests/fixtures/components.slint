@@ -1,0 +1,28 @@
+// Local components are inlined; their interface values replace `root.x`.
+component Card inherits Rectangle {
+    in property <string> title: "Untitled";
+    in property <length> gap: 4px;
+    background: #fafafa;
+    VerticalLayout {
+        spacing: root.gap;
+        Text { text: root.title; font-size: 16px; }
+        @children
+    }
+}
+
+component Badge inherits Text {
+    color: white;
+}
+
+export component Components inherits Window {
+    VerticalLayout {
+        Card {
+            title: "First";
+            Badge { text: "new"; }
+        }
+        second := Card {
+            gap: 8px;
+            Text { text: "Body"; }
+        }
+    }
+}

@@ -1,0 +1,66 @@
+---
+source: crates/slintx-convert/tests/snapshots.rs
+expression: "render(name, format, options)"
+---
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Converted from repeat_if.slint by slint-convert. -->
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="23504" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="s00-00-001">
+  <dependencies>
+    <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="23504"/>
+  </dependencies>
+  <scenes>
+    <scene sceneID="s00-00-000">
+      <objects>
+        <viewController id="s00-00-001" customClass="RepeatIfViewController" sceneMemberID="viewController">
+          <!-- Interface of RepeatIf: -->
+          <!-- in property <[string]> names = [Ann, Bob] -->
+          <!-- in property <bool> show-footer = true -->
+          <view key="view" id="s00-00-002">
+            <rect key="frame" x="0.0" y="0.0" width="480" height="270"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <subviews>
+              <stackView orientation="vertical" alignment="centerX" spacing="0" detachesHiddenViews="YES" distribution="fill" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-003">
+                <subviews>
+                  <textField focusRingType="none" verticalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-004">
+                    <!-- for name[index] in root.names: template, emitted once -->
+                    <!-- binding text : "\{index}: \{name}" -->
+                    <textFieldCell key="cell" lineBreakMode="clipping" title="" id="s00-00-005">
+                      <font key="font" metaFont="system" size="14"/>
+                      <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                      <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                  </textField>
+                  <textField focusRingType="none" verticalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-007">
+                    <!-- if root.show-footer -->
+                    <textFieldCell key="cell" lineBreakMode="clipping" title="Footer" id="s00-00-008">
+                      <font key="font" metaFont="system" size="14"/>
+                      <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                      <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                  </textField>
+                </subviews>
+                <constraints>
+                  <constraint firstItem="s00-00-007" firstAttribute="height" secondItem="s00-00-004" secondAttribute="height" priority="999" id="s00-00-010"/>
+                  <constraint firstItem="s00-00-004" firstAttribute="width" secondItem="s00-00-003" secondAttribute="width" id="s00-00-011"/>
+                  <constraint firstItem="s00-00-007" firstAttribute="width" secondItem="s00-00-003" secondAttribute="width" id="s00-00-012"/>
+                </constraints>
+              </stackView>
+            </subviews>
+            <constraints>
+              <constraint firstItem="s00-00-003" firstAttribute="leading" secondItem="s00-00-002" secondAttribute="leading" id="s00-00-013"/>
+              <constraint firstItem="s00-00-002" firstAttribute="trailing" secondItem="s00-00-003" secondAttribute="trailing" id="s00-00-014"/>
+              <constraint firstItem="s00-00-003" firstAttribute="top" secondItem="s00-00-002" secondAttribute="top" id="s00-00-015"/>
+              <constraint firstItem="s00-00-002" firstAttribute="bottom" secondItem="s00-00-003" secondAttribute="bottom" id="s00-00-016"/>
+            </constraints>
+          </view>
+          <connections>
+            <outlet property="text" destination="s00-00-004" id="s00-00-006"/>
+            <outlet property="text2" destination="s00-00-007" id="s00-00-009"/>
+          </connections>
+        </viewController>
+        <customObject id="s00-00-017" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+      </objects>
+      <point key="canvasLocation" x="0" y="0"/>
+    </scene>
+  </scenes>
+</document>

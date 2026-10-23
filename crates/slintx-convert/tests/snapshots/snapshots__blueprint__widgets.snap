@@ -1,0 +1,66 @@
+---
+source: crates/slintx-convert/tests/snapshots.rs
+expression: "render(name, format, options)"
+---
+using Gtk 4.0;
+
+// Converted from widgets.slint by slint-convert.
+
+Gtk.Window {
+  Gtk.Box {
+    orientation: vertical;
+    spacing: 6;
+    Gtk.Button ok {
+      label: "OK";
+    }
+    Gtk.CheckButton {
+      label: "Remember me";
+      active: true;
+    }
+    Gtk.Switch {
+      active: false;
+    }
+    Gtk.Entry {
+      placeholder-text: "Name";
+      text: "Ivan";
+    }
+    Gtk.TextView {
+      vexpand: true;
+      buffer: Gtk.TextBuffer {
+        text: "Multi\nline";
+      };
+    }
+    Gtk.Scale {
+      adjustment: Gtk.Adjustment {
+        lower: 0;
+        upper: 100;
+        value: 40;
+      };
+    }
+    Gtk.ProgressBar {
+      fraction: 0.25;
+    }
+    Gtk.SpinButton {
+      adjustment: Gtk.Adjustment {
+        lower: 1;
+        upper: 9;
+        value: 3;
+        step-increment: 1;
+      };
+    }
+    Gtk.DropDown {
+      selected: 1;
+      model: Gtk.StringList {
+        strings ["Red", "Green", "Blue"]
+      };
+    }
+    Gtk.Picture {
+      width-request: 32;
+      height-request: 32;
+      file: "icon.png";
+    }
+  }
+}
+
+--- warnings ---
+widgets.slint:9:18: warning: property `text` of `Switch` has no GTK equivalent

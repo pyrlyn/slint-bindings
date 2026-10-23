@@ -1,0 +1,38 @@
+// Box layouts inside box layouts, and a grid with explicit and implicit cells.
+export component NestedLayouts inherits Window {
+    title: "Nested layouts";
+    width: 360px;
+    height: 240px;
+
+    VerticalLayout {
+        padding: 12px;
+        spacing: 8px;
+
+        header := HorizontalLayout {
+            spacing: 4px;
+            alignment: space-between;
+            Text { text: "Left"; }
+            Text { text: "Right"; }
+        }
+
+        GridLayout {
+            spacing-horizontal: 6px;
+            spacing-vertical: 2px;
+            Row {
+                Text { text: "Name"; }
+                Rectangle { background: #e0e0e0; }
+            }
+            Row {
+                Text { text: "Mail"; }
+                Rectangle { background: #e0e0e0; colspan: 2; }
+            }
+            Text { text: "Notes"; row: 3; col: 1; }
+        }
+
+        HorizontalLayout {
+            alignment: end;
+            padding-top: 4px;
+            Rectangle { width: 80px; height: 24px; background: Colors.steelblue; }
+        }
+    }
+}

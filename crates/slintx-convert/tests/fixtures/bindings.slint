@@ -1,0 +1,30 @@
+import { Button, LineEdit } from "std-widgets.slint";
+
+// Bindings and handlers are kept as text and connected, never evaluated.
+export component Bindings inherits Window {
+    in-out property <int> counter: 0;
+    in-out property <string> name;
+    callback submit(string);
+
+    VerticalLayout {
+        label := Text {
+            text: "Count: \{root.counter}";
+            color: root.counter > 3 ? red : black;
+        }
+        input := LineEdit {
+            text <=> root.name;
+            edited(value) => { root.name = value; }
+        }
+        Button {
+            text: "Add";
+            clicked => {
+                root.counter += 1;
+                root.submit(input.text);
+            }
+        }
+        Text {
+            text: label.text;
+            changed text => { debug(self.text); }
+        }
+    }
+}

@@ -1,0 +1,60 @@
+---
+source: crates/slintx-convert/tests/snapshots.rs
+expression: "render(name, format, options)"
+---
+using Gtk 4.0;
+
+// Converted from stretch.slint by slint-convert.
+
+Gtk.Window {
+  default-width: 400;
+  default-height: 120;
+  Gtk.Box {
+    orientation: vertical;
+    Gtk.Box {
+      vexpand: true;
+      orientation: horizontal;
+      Gtk.Box {
+        hexpand: true;
+      }
+      Gtk.Box {
+        hexpand: true;
+      }
+      Gtk.Box {
+        width-request: 40;
+      }
+    }
+    Gtk.Box {
+      vexpand: true;
+      orientation: horizontal;
+      halign: center;
+      Gtk.Box {
+      }
+      Gtk.Box {
+      }
+    }
+    Gtk.Overlay {
+      vexpand: true;
+      [overlay] Gtk.Box {
+        width-request: 20;
+        height-request: 20;
+        halign: start;
+        margin-start: 10;
+        valign: start;
+        margin-top: 4;
+      }
+    }
+  }
+}
+
+--- warnings ---
+stretch.slint:7:9: warning: stretch ratios are not kept: GTK expands children equally
+stretch.slint:8:48: warning: property `background` of `Rectangle` has no GTK equivalent
+stretch.slint:9:48: warning: property `background` of `Rectangle` has no GTK equivalent
+stretch.slint:10:65: warning: property `background` of `Rectangle` has no GTK equivalent
+stretch.slint:14:13: warning: max-width 80px has no GTK equivalent
+stretch.slint:14:13: warning: preferred-width 50px has no GTK equivalent
+stretch.slint:14:65: warning: property `background` of `Rectangle` has no GTK equivalent
+stretch.slint:15:13: warning: preferred-width 50px has no GTK equivalent
+stretch.slint:15:69: warning: property `background` of `Rectangle` has no GTK equivalent
+stretch.slint:18:69: warning: property `background` of `Rectangle` has no GTK equivalent

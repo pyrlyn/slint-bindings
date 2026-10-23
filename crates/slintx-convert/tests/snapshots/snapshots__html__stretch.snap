@@ -1,0 +1,31 @@
+---
+source: crates/slintx-convert/tests/snapshots.rs
+expression: "render(name, format, options)"
+---
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <meta name="generator" content="slint-convert"/>
+    <title>Stretch</title>
+    <style>html,body{margin:0;height:100%}body{font-family:system-ui,sans-serif;font-size:14px}[data-slint]{box-sizing:border-box;margin:0}[data-slint=Text]{display:flex;flex-direction:column;white-space:pre}</style>
+  </head>
+  <body>
+    <main data-slint="Window" data-component="Stretch" data-at="2:8" style="width:400px;height:120px;position:relative">
+      <div data-slint="VerticalLayout" data-at="6:5" style="position:absolute;left:0;right:0;top:0;bottom:0;display:flex;flex-direction:column">
+        <div data-slint="HorizontalLayout" data-at="7:9" style="flex:1 1 auto;display:flex;flex-direction:row">
+          <div data-slint="Rectangle" data-at="8:13" style="flex:1 1 auto;background:red"></div>
+          <div data-slint="Rectangle" data-at="9:13" style="flex:2 1 auto;background:green"></div>
+          <div data-slint="Rectangle" data-at="10:13" style="flex:0 1 auto;min-width:40px;background:blue"></div>
+        </div>
+        <div data-slint="HorizontalLayout" data-at="12:9" style="flex:1 1 auto;display:flex;flex-direction:row;justify-content:center">
+          <div data-slint="Rectangle" data-at="14:13" style="flex:0 1 50px;max-width:80px;background:#336699"></div>
+          <div data-slint="Rectangle" data-at="15:13" style="flex:0 1 50px;background:#996633"></div>
+        </div>
+        <div data-slint="Rectangle" data-at="17:9" style="flex:1 1 auto;position:relative">
+          <div data-slint="Rectangle" data-at="18:13" style="position:absolute;left:10px;top:4px;width:20px;height:20px;background:black"></div>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

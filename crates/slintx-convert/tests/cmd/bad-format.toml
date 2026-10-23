@@ -1,0 +1,4 @@
+bin.name = "slint-convert"
+args = ["widgets.slint", "--to", "qml"]
+status.code = 2
+fs.cwd = "../fixtures"

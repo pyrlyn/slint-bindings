@@ -1,0 +1,18 @@
+import { Button, CheckBox, LineEdit, Slider, ComboBox, ProgressIndicator, SpinBox, Switch, TextEdit } from "std-widgets.slint";
+
+// The std-widgets controls with their texts and values.
+export component Widgets inherits Window {
+    VerticalLayout {
+        spacing: 6px;
+        ok := Button { text: "OK"; }
+        CheckBox { text: "Remember me"; checked: true; }
+        Switch { text: "Wi-Fi"; checked: false; }
+        LineEdit { placeholder-text: "Name"; text: "Ivan"; }
+        TextEdit { text: "Multi\nline"; }
+        Slider { minimum: 0; maximum: 100; value: 40; }
+        ProgressIndicator { progress: 0.25; }
+        SpinBox { minimum: 1; maximum: 9; value: 3; }
+        ComboBox { model: ["Red", "Green", "Blue"]; current-index: 1; }
+        Image { source: @image-url("icon.png"); width: 32px; height: 32px; }
+    }
+}

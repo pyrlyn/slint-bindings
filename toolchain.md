@@ -8,9 +8,10 @@
 | cargo-nextest | mise (`cargo:cargo-nextest`) | Test runner (`just test`) | https://github.com/nextest-rs/nextest |
 | just | mise | Recipes (`justfile`) | https://github.com/casey/just |
 | cbindgen | global (`cargo install cbindgen`) | Generates the C header from the FFI crate (`just header`) | https://github.com/mozilla/cbindgen |
-| Xcode (swift, SwiftPM) | Mac App Store | Builds the Swift package and the macOS demo | https://developer.apple.com/xcode/ |
+| Xcode (swift, SwiftPM, ibtool) | Mac App Store | Builds the Swift package and the macOS demo; `ibtool` checks the storyboards `slintx-convert` writes (ignored tests) | https://developer.apple.com/xcode/ |
 | jq | global (preinstalled on GitHub's macOS runners; `brew install jq`) | Reads `swift package dump-package` in `just swift-package-check` | https://github.com/jqlang/jq |
 | .NET SDK 10 | mise (`dotnet`, global) | Builds the WinUI projects (Windows only) | https://github.com/dotnet/sdk |
+| blueprint-compiler | global (`apt install blueprint-compiler`, `brew install blueprint-compiler`) | Checks the GTK Blueprint `slintx-convert` writes (ignored test) | https://gitlab.gnome.org/GNOME/blueprint-compiler |
 | dunnage | ketch | Post-test `target/` cleanup in `just test`; a no-op when missing | https://github.com/listepo/dunnage |
 
 ## cargo
@@ -34,6 +35,11 @@
 | png | local (via pixel-diff) | https://github.com/image-rs/image-png | Encode and decode the frame snapshots |
 | rowan | local | https://github.com/rust-analyzer/rowan | Lossless syntax tree of `slintx-syntax` |
 | wasm-bindgen-test | local | https://github.com/wasm-bindgen/wasm-bindgen | Runs the `slintx-syntax` tests on `wasm32-unknown-unknown` |
+| quick-xml | local | https://github.com/tafia/quick-xml | Escaping in `slintx-convert`'s XML, HTML and storyboard output; well-formedness checks in its tests |
+| clap | local | https://github.com/clap-rs/clap | Arguments of the `slint-convert` binary |
+| anyhow | local | https://github.com/dtolnay/anyhow | The one error that reaches `slint-convert`'s `main` |
+| insta | local (dev) | https://github.com/mitsuhiko/insta | Snapshots of every `slintx-convert` backend |
+| trycmd | local (dev) | https://github.com/assert-rs/trycmd | `slint-convert` command-line cases |
 
 ## NuGet
 

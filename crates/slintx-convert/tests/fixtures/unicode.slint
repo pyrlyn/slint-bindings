@@ -1,0 +1,12 @@
+// Texts outside ASCII: Cyrillic, CJK, emoji, right-to-left, and escapes.
+export component Unicode inherits Window {
+    title: "Привет, мир";
+    VerticalLayout {
+        Text { text: "Привет, мир"; }
+        Text { text: "こんにちは世界"; }
+        Text { text: "Emoji: 👋🌍"; }
+        Text { text: "مرحبا بالعالم"; horizontal-alignment: right; }
+        Text { text: "Quote \" backslash \\ newline\nend \u{263A}"; }
+        Text { text: @tr("Translated <&>"); }
+    }
+}

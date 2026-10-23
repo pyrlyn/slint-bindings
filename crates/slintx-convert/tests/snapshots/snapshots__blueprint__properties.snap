@@ -1,0 +1,161 @@
+---
+source: crates/slintx-convert/tests/snapshots.rs
+expression: "render(name, format, options)"
+---
+using Gtk 4.0;
+
+// Converted from properties.slint by slint-convert.
+
+Gtk.Window {
+  default-width: 320;
+  default-height: 480;
+  Gtk.Box {
+    margin-start: 8;
+    margin-end: 8;
+    margin-top: 8;
+    margin-bottom: 8;
+    orientation: vertical;
+    spacing: 4;
+    Gtk.Label {
+      label: "<span foreground=\"#336699ff\" size=\"15360\" weight=\"700\">Styled</span>";
+      xalign: 0.5;
+      yalign: 0.5;
+      use-markup: true;
+    }
+    Gtk.Label {
+      label: "<span weight=\"300\" style=\"italic\">Light italic</span>";
+      wrap: true;
+      xalign: 0;
+      yalign: 0;
+      use-markup: true;
+    }
+    Gtk.Label {
+      label: "<span font_family=\"Georgia\">Serif</span>";
+      ellipsize: end;
+      yalign: 1;
+      xalign: 0;
+      use-markup: true;
+    }
+    Gtk.Button {
+      label: "Disabled";
+      sensitive: false;
+    }
+    Gtk.Button {
+      label: "Hidden";
+      visible: false;
+      opacity: 0.5;
+      accessibility {
+        label: "Hidden button";
+      }
+    }
+    Gtk.Entry {
+      visibility: false;
+      placeholder-text: "Password";
+      // accepted => { debug("go"); }
+      activate => $on_lineedit_accepted();
+    }
+    Gtk.TextView {
+      vexpand: true;
+      editable: false;
+      buffer: Gtk.TextBuffer {
+        text: "Read only";
+      };
+    }
+    // indeterminate: call pulse() from code
+    Gtk.ProgressBar {
+    }
+    Gtk.Spinner {
+      spinning: true;
+    }
+    Gtk.Picture {
+      height-request: 40;
+      file: "photo.png";
+      content-fit: contain;
+    }
+    Gtk.Box {
+      vexpand: true;
+      orientation: horizontal;
+      Gtk.Button {
+        label: "S";
+      }
+    }
+    Gtk.Box {
+      vexpand: true;
+      orientation: horizontal;
+      halign: center;
+      Gtk.Button {
+        label: "C1";
+      }
+      Gtk.Button {
+        label: "C2";
+      }
+    }
+    Gtk.Box {
+      vexpand: true;
+      orientation: horizontal;
+      halign: end;
+      Gtk.Button {
+        label: "E";
+      }
+    }
+    Gtk.Box {
+      vexpand: true;
+      orientation: horizontal;
+      Gtk.Button {
+        label: "A1";
+      }
+      Gtk.Button {
+        label: "A2";
+      }
+    }
+    Gtk.Box {
+      vexpand: true;
+      orientation: horizontal;
+      Gtk.Button {
+        label: "V1";
+      }
+      Gtk.Button {
+        label: "V2";
+      }
+    }
+    Gtk.Overlay {
+      vexpand: true;
+      Gtk.GestureClick {
+        // clicked => { debug("tap"); }
+        released => $on_toucharea_clicked();
+      }
+      [overlay] Gtk.Box {
+        halign: fill;
+        valign: fill;
+      }
+    }
+    Gtk.ScrolledWindow {
+      vexpand: true;
+      Gtk.Box {
+        orientation: vertical;
+        Gtk.Label {
+          label: "Scrolled";
+          vexpand: true;
+          xalign: 0;
+          yalign: 0;
+        }
+      }
+    }
+    Gtk.Frame {
+      vexpand: true;
+      label: "Group";
+      Gtk.Label {
+        label: "Inside";
+        xalign: 0;
+        yalign: 0;
+      }
+    }
+  }
+}
+
+--- warnings ---
+properties.slint:8:5: warning: property `background` of `Window` has no GTK equivalent
+properties.slint:33:9: warning: alignment space-around has no Gtk.Box equivalent
+properties.slint:34:9: warning: alignment space-evenly has no Gtk.Box equivalent
+properties.slint:37:25: warning: property `border-radius` of `Rectangle` has no GTK equivalent
+properties.slint:37:45: warning: property `background` of `Rectangle` has no GTK equivalent

@@ -1,0 +1,49 @@
+---
+source: crates/slintx-convert/tests/snapshots.rs
+expression: "render(name, format, options)"
+---
+<?xml version="1.0" encoding="UTF-8"?>
+<slint file="components.slint">
+  <component name="Card" base="Rectangle" exported="false" at="2:1">
+    <declare name="title" type="string" visibility="in" kind="string" value="Untitled" at="3:5"/>
+    <declare name="gap" type="length" visibility="in" kind="measure" value="4" unit="px" at="4:5"/>
+  </component>
+  <component name="Badge" base="Text" exported="false" at="13:1"/>
+  <component name="Components" base="Window" exported="true" at="17:8"/>
+  <Window component="Components" at="17:8">
+    <VerticalLayout at="18:5">
+      <layout kind="vertical"/>
+      <Rectangle component="Card" at="19:9">
+        <declare name="title" type="string" visibility="in" kind="string" value="First" at="3:5"/>
+        <declare name="gap" type="length" visibility="in" kind="measure" value="4" unit="px" at="4:5"/>
+        <property name="background" kind="color" value="#fafafa" at="5:5"/>
+        <VerticalLayout at="6:5">
+          <layout kind="vertical" spacing="4px"/>
+          <Text at="8:9">
+            <property name="text" kind="string" value="First" at="8:16"/>
+            <property name="font-size" kind="measure" value="16" unit="px" at="8:34"/>
+          </Text>
+          <Text component="Badge" at="21:13">
+            <property name="color" kind="color" value="white" at="14:5"/>
+            <property name="text" kind="string" value="new" at="21:21"/>
+          </Text>
+        </VerticalLayout>
+      </Rectangle>
+      <Rectangle id="second" component="Card" at="23:9">
+        <declare name="title" type="string" visibility="in" kind="string" value="Untitled" at="3:5"/>
+        <declare name="gap" type="length" visibility="in" kind="measure" value="8" unit="px" at="4:5"/>
+        <property name="background" kind="color" value="#fafafa" at="5:5"/>
+        <VerticalLayout at="6:5">
+          <layout kind="vertical" spacing="8px"/>
+          <Text at="8:9">
+            <property name="text" kind="string" value="Untitled" at="8:16"/>
+            <property name="font-size" kind="measure" value="16" unit="px" at="8:34"/>
+          </Text>
+          <Text at="25:13">
+            <property name="text" kind="string" value="Body" at="25:20"/>
+          </Text>
+        </VerticalLayout>
+      </Rectangle>
+    </VerticalLayout>
+  </Window>
+</slint>

@@ -1,0 +1,3 @@
+bin.name = "slint-convert"
+args = ["unsupported.slint", "--to", "blueprint"]
+fs.cwd = "../fixtures"

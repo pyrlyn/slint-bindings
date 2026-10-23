@@ -1,0 +1,61 @@
+---
+source: crates/slintx-convert/tests/snapshots.rs
+expression: "render(name, format, options)"
+---
+using Gtk 4.0;
+
+// Converted from components.slint by slint-convert.
+
+Gtk.Window {
+  Gtk.Box {
+    orientation: vertical;
+    Gtk.Overlay {
+      vexpand: true;
+      [overlay] Gtk.Box {
+        halign: fill;
+        valign: fill;
+        orientation: vertical;
+        spacing: 4;
+        Gtk.Label {
+          label: "<span size=\"12288\">First</span>";
+          vexpand: true;
+          xalign: 0;
+          yalign: 0;
+          use-markup: true;
+        }
+        Gtk.Label {
+          label: "<span foreground=\"#ffffffff\">new</span>";
+          vexpand: true;
+          xalign: 0;
+          yalign: 0;
+          use-markup: true;
+        }
+      }
+    }
+    Gtk.Overlay second {
+      vexpand: true;
+      [overlay] Gtk.Box {
+        halign: fill;
+        valign: fill;
+        orientation: vertical;
+        spacing: 8;
+        Gtk.Label {
+          label: "<span size=\"12288\">Untitled</span>";
+          vexpand: true;
+          xalign: 0;
+          yalign: 0;
+          use-markup: true;
+        }
+        Gtk.Label {
+          label: "Body";
+          vexpand: true;
+          xalign: 0;
+          yalign: 0;
+        }
+      }
+    }
+  }
+}
+
+--- warnings ---
+components.slint:5:5: warning: property `background` of `Rectangle` has no GTK equivalent

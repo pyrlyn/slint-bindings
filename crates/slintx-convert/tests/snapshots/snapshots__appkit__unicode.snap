@@ -1,0 +1,94 @@
+---
+source: crates/slintx-convert/tests/snapshots.rs
+expression: "render(name, format, options)"
+---
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Converted from unicode.slint by slint-convert. -->
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="23504" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="s00-00-001">
+  <dependencies>
+    <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="23504"/>
+  </dependencies>
+  <scenes>
+    <scene sceneID="s00-00-000">
+      <objects>
+        <viewController id="s00-00-001" customClass="UnicodeViewController" sceneMemberID="viewController" title="Привет, мир">
+          <view key="view" id="s00-00-002">
+            <rect key="frame" x="0.0" y="0.0" width="480" height="270"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <subviews>
+              <stackView orientation="vertical" alignment="centerX" spacing="0" detachesHiddenViews="YES" distribution="fill" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-003">
+                <subviews>
+                  <textField focusRingType="none" verticalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-004">
+                    <textFieldCell key="cell" lineBreakMode="clipping" title="Привет, мир" id="s00-00-005">
+                      <font key="font" metaFont="system" size="14"/>
+                      <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                      <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                  </textField>
+                  <textField focusRingType="none" verticalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-006">
+                    <textFieldCell key="cell" lineBreakMode="clipping" title="こんにちは世界" id="s00-00-007">
+                      <font key="font" metaFont="system" size="14"/>
+                      <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                      <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                  </textField>
+                  <textField focusRingType="none" verticalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-008">
+                    <textFieldCell key="cell" lineBreakMode="clipping" title="Emoji: 👋🌍" id="s00-00-009">
+                      <font key="font" metaFont="system" size="14"/>
+                      <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                      <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                  </textField>
+                  <textField focusRingType="none" verticalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-010">
+                    <textFieldCell key="cell" lineBreakMode="clipping" title="مرحبا بالعالم" alignment="right" id="s00-00-011">
+                      <font key="font" metaFont="system" size="14"/>
+                      <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                      <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                  </textField>
+                  <textField focusRingType="none" verticalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-012">
+                    <textFieldCell key="cell" lineBreakMode="clipping" id="s00-00-013">
+                      <string key="title">Quote &quot; backslash \ newline
+end ☺</string>
+                      <font key="font" metaFont="system" size="14"/>
+                      <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                      <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                  </textField>
+                  <textField focusRingType="none" verticalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-014">
+                    <textFieldCell key="cell" lineBreakMode="clipping" title="Translated &lt;&amp;&gt;" id="s00-00-015">
+                      <font key="font" metaFont="system" size="14"/>
+                      <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                      <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                  </textField>
+                </subviews>
+                <constraints>
+                  <constraint firstItem="s00-00-006" firstAttribute="height" secondItem="s00-00-004" secondAttribute="height" priority="999" id="s00-00-016"/>
+                  <constraint firstItem="s00-00-008" firstAttribute="height" secondItem="s00-00-004" secondAttribute="height" priority="999" id="s00-00-017"/>
+                  <constraint firstItem="s00-00-010" firstAttribute="height" secondItem="s00-00-004" secondAttribute="height" priority="999" id="s00-00-018"/>
+                  <constraint firstItem="s00-00-012" firstAttribute="height" secondItem="s00-00-004" secondAttribute="height" priority="999" id="s00-00-019"/>
+                  <constraint firstItem="s00-00-014" firstAttribute="height" secondItem="s00-00-004" secondAttribute="height" priority="999" id="s00-00-020"/>
+                  <constraint firstItem="s00-00-004" firstAttribute="width" secondItem="s00-00-003" secondAttribute="width" id="s00-00-021"/>
+                  <constraint firstItem="s00-00-006" firstAttribute="width" secondItem="s00-00-003" secondAttribute="width" id="s00-00-022"/>
+                  <constraint firstItem="s00-00-008" firstAttribute="width" secondItem="s00-00-003" secondAttribute="width" id="s00-00-023"/>
+                  <constraint firstItem="s00-00-010" firstAttribute="width" secondItem="s00-00-003" secondAttribute="width" id="s00-00-024"/>
+                  <constraint firstItem="s00-00-012" firstAttribute="width" secondItem="s00-00-003" secondAttribute="width" id="s00-00-025"/>
+                  <constraint firstItem="s00-00-014" firstAttribute="width" secondItem="s00-00-003" secondAttribute="width" id="s00-00-026"/>
+                </constraints>
+              </stackView>
+            </subviews>
+            <constraints>
+              <constraint firstItem="s00-00-003" firstAttribute="leading" secondItem="s00-00-002" secondAttribute="leading" id="s00-00-027"/>
+              <constraint firstItem="s00-00-002" firstAttribute="trailing" secondItem="s00-00-003" secondAttribute="trailing" id="s00-00-028"/>
+              <constraint firstItem="s00-00-003" firstAttribute="top" secondItem="s00-00-002" secondAttribute="top" id="s00-00-029"/>
+              <constraint firstItem="s00-00-002" firstAttribute="bottom" secondItem="s00-00-003" secondAttribute="bottom" id="s00-00-030"/>
+            </constraints>
+          </view>
+        </viewController>
+        <customObject id="s00-00-031" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+      </objects>
+      <point key="canvasLocation" x="0" y="0"/>
+    </scene>
+  </scenes>
+</document>

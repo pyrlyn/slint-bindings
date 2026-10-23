@@ -1,0 +1,96 @@
+---
+source: crates/slintx-convert/tests/snapshots.rs
+expression: "render(name, format, options)"
+---
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Converted from bindings.slint by slint-convert. -->
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="23504" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="s00-00-001">
+  <dependencies>
+    <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="23504"/>
+  </dependencies>
+  <scenes>
+    <scene sceneID="s00-00-000">
+      <objects>
+        <viewController id="s00-00-001" customClass="BindingsViewController" sceneMemberID="viewController">
+          <!-- Interface of Bindings: -->
+          <!-- in-out property <int> counter = 0 -->
+          <!-- in-out property <string> name -->
+          <!-- callback submit(string) -->
+          <view key="view" id="s00-00-002">
+            <rect key="frame" x="0.0" y="0.0" width="480" height="270"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <subviews>
+              <stackView orientation="vertical" alignment="centerX" spacing="0" detachesHiddenViews="YES" distribution="fill" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-003">
+                <subviews>
+                  <textField focusRingType="none" verticalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-004">
+                    <!-- binding text : "Count: \{root.counter}" -->
+                    <!-- binding color : root.counter > 3 ? red : black -->
+                    <textFieldCell key="cell" lineBreakMode="clipping" title="" id="s00-00-005">
+                      <font key="font" metaFont="system" size="14"/>
+                      <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                      <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                  </textField>
+                  <textField verticalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-007">
+                    <!-- not converted: edited(value) => { root.name = value; } -->
+                    <!-- binding text <=> root.name -->
+                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" title="" drawsBackground="YES" id="s00-00-008">
+                      <font key="font" metaFont="system" size="14"/>
+                      <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                      <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                  </textField>
+                  <button verticalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-010">
+                    <!-- clicked => { root.counter += 1; root.submit(input.text); } -->
+                    <buttonCell key="cell" type="push" title="Add" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="s00-00-011">
+                      <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                      <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                      <action selector="buttonClicked:" target="s00-00-001" id="s00-00-012"/>
+                    </connections>
+                  </button>
+                  <textField focusRingType="none" verticalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-013">
+                    <!-- changed text => { debug(self.text); } -->
+                    <!-- binding text : label.text -->
+                    <textFieldCell key="cell" lineBreakMode="clipping" title="" id="s00-00-014">
+                      <font key="font" metaFont="system" size="14"/>
+                      <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                      <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                  </textField>
+                </subviews>
+                <constraints>
+                  <constraint firstItem="s00-00-007" firstAttribute="height" secondItem="s00-00-004" secondAttribute="height" priority="999" id="s00-00-016"/>
+                  <constraint firstItem="s00-00-010" firstAttribute="height" secondItem="s00-00-004" secondAttribute="height" priority="999" id="s00-00-017"/>
+                  <constraint firstItem="s00-00-013" firstAttribute="height" secondItem="s00-00-004" secondAttribute="height" priority="999" id="s00-00-018"/>
+                  <constraint firstItem="s00-00-004" firstAttribute="width" secondItem="s00-00-003" secondAttribute="width" id="s00-00-019"/>
+                  <constraint firstItem="s00-00-007" firstAttribute="width" secondItem="s00-00-003" secondAttribute="width" id="s00-00-020"/>
+                  <constraint firstItem="s00-00-010" firstAttribute="width" secondItem="s00-00-003" secondAttribute="width" id="s00-00-021"/>
+                  <constraint firstItem="s00-00-013" firstAttribute="width" secondItem="s00-00-003" secondAttribute="width" id="s00-00-022"/>
+                </constraints>
+              </stackView>
+            </subviews>
+            <constraints>
+              <constraint firstItem="s00-00-003" firstAttribute="leading" secondItem="s00-00-002" secondAttribute="leading" id="s00-00-023"/>
+              <constraint firstItem="s00-00-002" firstAttribute="trailing" secondItem="s00-00-003" secondAttribute="trailing" id="s00-00-024"/>
+              <constraint firstItem="s00-00-003" firstAttribute="top" secondItem="s00-00-002" secondAttribute="top" id="s00-00-025"/>
+              <constraint firstItem="s00-00-002" firstAttribute="bottom" secondItem="s00-00-003" secondAttribute="bottom" id="s00-00-026"/>
+            </constraints>
+          </view>
+          <connections>
+            <outlet property="label" destination="s00-00-004" id="s00-00-006"/>
+            <outlet property="input" destination="s00-00-007" id="s00-00-009"/>
+            <outlet property="text" destination="s00-00-013" id="s00-00-015"/>
+          </connections>
+        </viewController>
+        <customObject id="s00-00-027" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+      </objects>
+      <point key="canvasLocation" x="0" y="0"/>
+    </scene>
+  </scenes>
+</document>
+
+--- warnings ---
+bindings.slint:16:13: warning: callback `edited` of `LineEdit` is not converted: no AppKit event
+bindings.slint:27:13: warning: `changed text` needs code: observe the outlet in the controller

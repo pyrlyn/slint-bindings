@@ -1,0 +1,40 @@
+---
+source: crates/slintx-convert/tests/snapshots.rs
+expression: "render(name, format, options)"
+---
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <meta name="generator" content="slint-convert"/>
+    <title>Widgets</title>
+    <style>html,body{margin:0;height:100%}body{font-family:system-ui,sans-serif;font-size:14px}[data-slint]{box-sizing:border-box;margin:0}[data-slint=Text]{display:flex;flex-direction:column;white-space:pre}</style>
+  </head>
+  <body>
+    <main data-slint="Window" data-component="Widgets" data-at="4:8" style="width:100%;height:100%;position:relative">
+      <div data-slint="VerticalLayout" data-at="5:5" style="position:absolute;left:0;right:0;top:0;bottom:0;display:flex;flex-direction:column;gap:6px">
+        <button id="ok" data-slint="Button" data-at="7:9" type="button" style="flex:0 1 auto">OK</button>
+        <label data-slint="CheckBox" data-at="8:9" style="flex:0 1 auto">
+          <input type="checkbox" checked=""/>
+          Remember me
+        </label>
+        <label data-slint="Switch" data-at="9:9" style="flex:0 1 auto">
+          <input type="checkbox" role="switch"/>
+          Wi-Fi
+        </label>
+        <input data-slint="LineEdit" data-at="10:9" placeholder="Name" value="Ivan" type="text" style="flex:0 1 auto"/>
+        <textarea data-slint="TextEdit" data-at="11:9" style="flex:1 1 auto">Multi
+line</textarea>
+        <input data-slint="Slider" data-at="12:9" min="0" max="100" value="40" type="range" style="flex:0 1 auto"/>
+        <progress data-slint="ProgressIndicator" data-at="13:9" value="0.25" max="1" style="flex:0 1 auto"></progress>
+        <input data-slint="SpinBox" data-at="14:9" min="1" max="9" value="3" type="number" style="flex:0 1 auto"/>
+        <select data-slint="ComboBox" data-at="15:9" style="flex:0 1 auto">
+          <option>Red</option>
+          <option selected="">Green</option>
+          <option>Blue</option>
+        </select>
+        <img data-slint="Image" data-at="16:9" src="icon.png" alt="" style="flex:0 0 32px;width:32px;height:32px"/>
+      </div>
+    </main>
+  </body>
+</html>

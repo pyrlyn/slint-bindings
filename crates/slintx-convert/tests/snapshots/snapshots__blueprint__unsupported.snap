@@ -1,0 +1,33 @@
+---
+source: crates/slintx-convert/tests/snapshots.rs
+expression: "render(name, format, options)"
+---
+using Gtk 4.0;
+
+// Converted from unsupported.slint by slint-convert.
+
+// not converted: states at 13:5
+Gtk.Window {
+  Gtk.Box {
+    orientation: vertical;
+    // not converted: animation at 8:13
+    Gtk.Box r {
+      vexpand: true;
+    }
+    // not converted: element `Fancy` imported from "fancy.slint" at 10:9
+    Gtk.Box {
+      vexpand: true;
+    }
+    // not converted: unknown element `Mystery` at 11:9
+    Gtk.Box {
+      vexpand: true;
+    }
+  }
+}
+
+--- warnings ---
+unsupported.slint:7:13: warning: property `background` of `Rectangle` has no GTK equivalent
+unsupported.slint:8:13: warning: not converted: animation
+unsupported.slint:10:9: warning: not converted: element `Fancy` imported from "fancy.slint"
+unsupported.slint:11:9: warning: not converted: unknown element `Mystery`
+unsupported.slint:13:5: warning: not converted: states

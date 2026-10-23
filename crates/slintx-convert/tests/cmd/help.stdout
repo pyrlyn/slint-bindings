@@ -1,0 +1,14 @@
+Convert a .slint file to XML, HTML, an Apple Storyboard or GTK Blueprint
+
+Usage: slint-convert [OPTIONS] --to <TO> <INPUT>
+
+Arguments:
+  <INPUT>  The .slint file to convert
+
+Options:
+      --to <TO>              Output format [possible values: xml, html, storyboard, blueprint]
+  -o, --output <OUTPUT>      Write here instead of standard output
+      --platform <PLATFORM>  Storyboard framework [default: uikit] [possible values: uikit, appkit]
+      --strict               Treat every warning as an error
+  -h, --help                 Print help
+  -V, --version              Print version

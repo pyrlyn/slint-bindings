@@ -1,0 +1,114 @@
+---
+source: crates/slintx-convert/tests/snapshots.rs
+expression: "render(name, format, options)"
+---
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Converted from components.slint by slint-convert. -->
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="23504" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="s00-00-001">
+  <dependencies>
+    <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="23504"/>
+  </dependencies>
+  <scenes>
+    <scene sceneID="s00-00-000">
+      <objects>
+        <viewController id="s00-00-001" customClass="ComponentsViewController" sceneMemberID="viewController">
+          <view key="view" id="s00-00-002">
+            <rect key="frame" x="0.0" y="0.0" width="480" height="270"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <subviews>
+              <stackView orientation="vertical" alignment="centerX" spacing="0" detachesHiddenViews="YES" distribution="fill" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-003">
+                <subviews>
+                  <customView verticalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-004">
+                    <subviews>
+                      <stackView orientation="vertical" alignment="centerX" spacing="4" detachesHiddenViews="YES" distribution="fill" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-005">
+                        <subviews>
+                          <textField focusRingType="none" verticalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-006">
+                            <textFieldCell key="cell" lineBreakMode="clipping" title="First" id="s00-00-007">
+                              <font key="font" metaFont="system" size="16"/>
+                              <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                              <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                            </textFieldCell>
+                          </textField>
+                          <textField focusRingType="none" verticalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-008">
+                            <textFieldCell key="cell" lineBreakMode="clipping" title="new" id="s00-00-009">
+                              <font key="font" metaFont="system" size="14"/>
+                              <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                              <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                            </textFieldCell>
+                          </textField>
+                        </subviews>
+                        <constraints>
+                          <constraint firstItem="s00-00-008" firstAttribute="height" secondItem="s00-00-006" secondAttribute="height" priority="999" id="s00-00-010"/>
+                          <constraint firstItem="s00-00-006" firstAttribute="width" secondItem="s00-00-005" secondAttribute="width" id="s00-00-011"/>
+                          <constraint firstItem="s00-00-008" firstAttribute="width" secondItem="s00-00-005" secondAttribute="width" id="s00-00-012"/>
+                        </constraints>
+                      </stackView>
+                    </subviews>
+                    <constraints>
+                      <constraint firstItem="s00-00-005" firstAttribute="leading" secondItem="s00-00-004" secondAttribute="leading" id="s00-00-013"/>
+                      <constraint firstItem="s00-00-004" firstAttribute="trailing" secondItem="s00-00-005" secondAttribute="trailing" id="s00-00-014"/>
+                      <constraint firstItem="s00-00-005" firstAttribute="top" secondItem="s00-00-004" secondAttribute="top" id="s00-00-015"/>
+                      <constraint firstItem="s00-00-004" firstAttribute="bottom" secondItem="s00-00-005" secondAttribute="bottom" id="s00-00-016"/>
+                    </constraints>
+                  </customView>
+                  <customView verticalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-017">
+                    <subviews>
+                      <stackView orientation="vertical" alignment="centerX" spacing="8" detachesHiddenViews="YES" distribution="fill" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-019">
+                        <subviews>
+                          <textField focusRingType="none" verticalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-020">
+                            <textFieldCell key="cell" lineBreakMode="clipping" title="Untitled" id="s00-00-021">
+                              <font key="font" metaFont="system" size="16"/>
+                              <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                              <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                            </textFieldCell>
+                          </textField>
+                          <textField focusRingType="none" verticalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-022">
+                            <textFieldCell key="cell" lineBreakMode="clipping" title="Body" id="s00-00-023">
+                              <font key="font" metaFont="system" size="14"/>
+                              <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                              <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                            </textFieldCell>
+                          </textField>
+                        </subviews>
+                        <constraints>
+                          <constraint firstItem="s00-00-022" firstAttribute="height" secondItem="s00-00-020" secondAttribute="height" priority="999" id="s00-00-024"/>
+                          <constraint firstItem="s00-00-020" firstAttribute="width" secondItem="s00-00-019" secondAttribute="width" id="s00-00-025"/>
+                          <constraint firstItem="s00-00-022" firstAttribute="width" secondItem="s00-00-019" secondAttribute="width" id="s00-00-026"/>
+                        </constraints>
+                      </stackView>
+                    </subviews>
+                    <constraints>
+                      <constraint firstItem="s00-00-019" firstAttribute="leading" secondItem="s00-00-017" secondAttribute="leading" id="s00-00-027"/>
+                      <constraint firstItem="s00-00-017" firstAttribute="trailing" secondItem="s00-00-019" secondAttribute="trailing" id="s00-00-028"/>
+                      <constraint firstItem="s00-00-019" firstAttribute="top" secondItem="s00-00-017" secondAttribute="top" id="s00-00-029"/>
+                      <constraint firstItem="s00-00-017" firstAttribute="bottom" secondItem="s00-00-019" secondAttribute="bottom" id="s00-00-030"/>
+                    </constraints>
+                  </customView>
+                </subviews>
+                <constraints>
+                  <constraint firstItem="s00-00-017" firstAttribute="height" secondItem="s00-00-004" secondAttribute="height" priority="999" id="s00-00-031"/>
+                  <constraint firstItem="s00-00-004" firstAttribute="width" secondItem="s00-00-003" secondAttribute="width" id="s00-00-032"/>
+                  <constraint firstItem="s00-00-017" firstAttribute="width" secondItem="s00-00-003" secondAttribute="width" id="s00-00-033"/>
+                </constraints>
+              </stackView>
+            </subviews>
+            <constraints>
+              <constraint firstItem="s00-00-003" firstAttribute="leading" secondItem="s00-00-002" secondAttribute="leading" id="s00-00-034"/>
+              <constraint firstItem="s00-00-002" firstAttribute="trailing" secondItem="s00-00-003" secondAttribute="trailing" id="s00-00-035"/>
+              <constraint firstItem="s00-00-003" firstAttribute="top" secondItem="s00-00-002" secondAttribute="top" id="s00-00-036"/>
+              <constraint firstItem="s00-00-002" firstAttribute="bottom" secondItem="s00-00-003" secondAttribute="bottom" id="s00-00-037"/>
+            </constraints>
+          </view>
+          <connections>
+            <outlet property="second" destination="s00-00-017" id="s00-00-018"/>
+          </connections>
+        </viewController>
+        <customObject id="s00-00-038" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+      </objects>
+      <point key="canvasLocation" x="0" y="0"/>
+    </scene>
+  </scenes>
+</document>
+
+--- warnings ---
+components.slint:5:5: warning: property `background` of `Rectangle` has no AppKit equivalent

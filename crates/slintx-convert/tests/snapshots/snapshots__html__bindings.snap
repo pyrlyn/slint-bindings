@@ -1,0 +1,23 @@
+---
+source: crates/slintx-convert/tests/snapshots.rs
+expression: "render(name, format, options)"
+---
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <meta name="generator" content="slint-convert"/>
+    <title>Bindings</title>
+    <style>html,body{margin:0;height:100%}body{font-family:system-ui,sans-serif;font-size:14px}[data-slint]{box-sizing:border-box;margin:0}[data-slint=Text]{display:flex;flex-direction:column;white-space:pre}</style>
+  </head>
+  <body>
+    <main data-slint="Window" data-component="Bindings" data-at="4:8" data-prop-counter="0" data-prop-name="" data-callbacks="submit" style="width:100%;height:100%;position:relative">
+      <div data-slint="VerticalLayout" data-at="9:5" style="position:absolute;left:0;right:0;top:0;bottom:0;display:flex;flex-direction:column">
+        <span id="label" data-slint="Text" data-at="10:9" data-bind-text="&quot;Count: \{root.counter}&quot;" data-bind-color="root.counter &gt; 3 ? red : black" style="flex:1 1 auto"></span>
+        <input id="input" data-slint="LineEdit" data-at="14:9" data-sync-text="root.name" type="text" data-params-edited="value" data-on-edited="{ root.name = value; }" style="flex:1 1 auto"/>
+        <button data-slint="Button" data-at="18:9" type="button" data-on-clicked="{ root.counter += 1; root.submit(input.text); }" style="flex:1 1 auto">Add</button>
+        <span data-slint="Text" data-at="25:9" data-bind-text="label.text" data-changed-text="{ debug(self.text); }" style="flex:1 1 auto"></span>
+      </div>
+    </main>
+  </body>
+</html>
