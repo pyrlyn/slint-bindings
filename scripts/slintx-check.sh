@@ -24,10 +24,12 @@ manifest="${2:-Cargo.toml}"
 # wasm: slintx-wgpu's tests need a native GPU adapter; its wasm32 path comes with T85.
 # wasm: slintx-conformance (T74) is a native-only harness: a native Slint oracle and a corpus
 # read from disk. Not a removal task, it never ships for wasm32.
+# wasm: slintx-convert (T89) is a native CLI whose tests read fixtures from disk and run the
+# binary. Not a removal task either.
 # shellcheck disable=SC2034 # read through ${!list} in checked()
 exempt_license=" slintx-wgpu "
 # shellcheck disable=SC2034
-exempt_wasm=" slintx-wgpu slintx-conformance "
+exempt_wasm=" slintx-wgpu slintx-conformance slintx-convert "
 
 # Prints the slintx-* crates the current mode does not skip.
 checked() {
