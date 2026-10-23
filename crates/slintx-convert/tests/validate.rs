@@ -81,6 +81,7 @@ fn run(command: &mut Command) -> String {
     text
 }
 
+#[cfg(target_os = "macos")]
 const PLATFORMS: [(&str, Platform); 2] = [("uikit", Platform::UiKit), ("appkit", Platform::AppKit)];
 
 #[cfg(target_os = "macos")]
@@ -122,6 +123,7 @@ fn storyboards_compile_with_ibtool() {
     }
 }
 
+#[cfg(target_os = "macos")]
 /// Attributes Interface Builder leaves out when it saves, because they hold
 /// its default (or, for stack margins, because it derives them).
 const IB_DEFAULTS: &[(&str, &str)] = &[
@@ -148,6 +150,7 @@ const IB_DEFAULTS: &[(&str, &str)] = &[
     ("verticalHuggingPriority", "250"),
 ];
 
+#[cfg(target_os = "macos")]
 /// Every element with an `id`, with its attributes.
 fn attributes_by_id(text: &str) -> Vec<(String, Vec<(String, String)>)> {
     let mut reader = Reader::from_str(text);
