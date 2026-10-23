@@ -360,7 +360,10 @@ Dropped, not done. Weft builds its desktop editor itself (weft T69,
 WeftStudio) on these bindings; a second app here would duplicate it. Approved
 with T12 (weft T69.1, decision 3).
 
-### T89. Screenshot helpers from the shared rgba-png crate
+### T90. Screenshot helpers from the shared rgba-png crate
+
+Merged as 5e8fae1 under the id T89, which the open slintx-convert PR had already
+taken; renumbered so that id stays with it.
 
 `crates/pixel-diff` (T72) is the same code as `rgba-png` in pyrlyn/crates
 (`rust/rgba-png`), which scull also uses. The workspace rule moves code shared by
