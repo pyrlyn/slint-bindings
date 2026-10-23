@@ -10,3 +10,4 @@
 /.serena
 .env
 .env.local
+.rtok/
