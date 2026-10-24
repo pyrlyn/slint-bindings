@@ -25,6 +25,7 @@ mod scene;
 mod types;
 
 pub use lyon_tessellation::path;
+pub use parley;
 pub use wgpu;
 
 pub use crate::adapter::WgpuRenderer;

@@ -3922,6 +3922,7 @@ dependencies = [
  "bytemuck",
  "i-slint-core",
  "lyon_tessellation",
+ "parley",
  "pollster",
  "rgba-png",
  "slint",

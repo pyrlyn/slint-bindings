@@ -2,12 +2,12 @@
 
 use std::rc::Rc;
 
-use i_slint_core::textlayout::sharedparley::{fontique, parley};
 use lyon_tessellation::path::PathEvent;
 use lyon_tessellation::{
     BuffersBuilder, FillOptions, FillTessellator, FillVertex, StrokeOptions, StrokeTessellator,
     StrokeVertex, VertexBuffers,
 };
+use parley::fontique;
 
 use crate::glyphs::{GlyphCache, RunStyle};
 use crate::images::{GpuImage, ImageCache, Uploader};
@@ -411,6 +411,33 @@ impl<'a> Canvas<'a> {
                 (entry.y + entry.height) as f32,
             ];
             self.scene.push_quad(bounds, uv, index, None);
+        }
+    }
+
+    /// Draws the glyphs of a parley layout `offset` from the origin, each run
+    /// with its style's brush. Lay it out with the device scale as parley's
+    /// display scale. Decorations, selection and inline boxes are the
+    /// caller's to draw.
+    pub fn draw_layout(&mut self, layout: &parley::Layout<Brush>, offset: [f32; 2]) {
+        for line in layout.lines() {
+            for item in line.items() {
+                let parley::PositionedLayoutItem::GlyphRun(glyph_run) = item else {
+                    continue;
+                };
+                let Some(paint) = self.paint(&glyph_run.style().brush) else {
+                    continue;
+                };
+                let run = glyph_run.run();
+                let synthesis = run.synthesis();
+                let desc = GlyphRun {
+                    font: run.font(),
+                    font_size: run.font_size(),
+                    normalized_coords: run.normalized_coords(),
+                    synthesis: &synthesis,
+                    stroke: None,
+                };
+                self.draw_glyph_run(&desc, paint, offset, glyph_run.positioned_glyphs());
+            }
         }
     }
 

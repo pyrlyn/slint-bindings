@@ -15,6 +15,7 @@ i-slint-core = { workspace = true, features = ["std", "shared-parley", "path"] }
 wgpu = { workspace = true }
 swash = { workspace = true }
 lyon_tessellation = { workspace = true }
+parley = { workspace = true }
 bytemuck = { workspace = true }
 pollster = { workspace = true }
 thiserror = { workspace = true }
@@ -24,6 +25,8 @@ slint = { workspace = true }
 slint-embed = { workspace = true }
 slint-interpreter = { workspace = true }
 rgba-png = { workspace = true }
+# System fonts for the text test.
+parley = { workspace = true, features = ["system"] }
 
 [lints]
 workspace = true
