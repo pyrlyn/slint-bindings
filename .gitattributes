@@ -1,3 +1,5 @@
 # T82: Windows runners check out with `core.autocrlf=true`; goldens, fixtures and the skill
 # files are compared byte for byte, so every text file is LF in the working tree everywhere.
 * text=auto eol=lf
+# lexical.slint keeps its CRLF line endings on purpose (lexer coverage).
+crates/slintx-syntax/tests/fixtures/lexical.slint -text
