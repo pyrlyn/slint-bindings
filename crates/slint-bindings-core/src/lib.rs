@@ -4,7 +4,7 @@
 //! and the input. This crate installs a Slint platform with no event loop of
 //! its own: the host resizes, forwards input, ticks timers and asks for a
 //! frame whenever it wants one. The CPU path paints into a buffer the host
-//! owns. On macOS and Windows, FemtoVG can paint into a host surface instead.
+//! owns. On macOS and Windows, slintx-wgpu can paint into a host surface instead.
 
 pub mod a11y;
 #[cfg(any(target_os = "macos", target_os = "windows"))]
