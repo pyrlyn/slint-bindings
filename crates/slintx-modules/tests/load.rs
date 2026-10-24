@@ -50,11 +50,7 @@ fn imports_resolve_relative_to_the_importer_then_include_paths() {
     };
     let graph = load(&fs, &config, Path::new("app/main.slint"));
     assert_eq!(errors(&graph), Vec::<&str>::new());
-    let paths: Vec<_> = graph
-        .modules
-        .iter()
-        .map(|m| m.path.to_string_lossy())
-        .collect();
+    let paths: Vec<_> = graph.modules.iter().map(|m| m.path.as_path()).collect();
     assert_eq!(
         paths,
         [
@@ -63,6 +59,7 @@ fn imports_resolve_relative_to_the_importer_then_include_paths() {
             "app/c.slint",
             "shared/b.slint"
         ]
+        .map(Path::new)
     );
     let a = Symbol {
         module: 1,

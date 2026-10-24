@@ -12,7 +12,7 @@
 
 #![allow(non_camel_case_types)]
 
-use std::cell::RefCell;
+use std::cell::{Cell, Ref, RefCell, RefMut};
 use std::ffi::{CStr, CString, c_char, c_void};
 use std::panic::{AssertUnwindSafe, catch_unwind};
 use std::path::Path;
@@ -29,6 +29,7 @@ use slint_bindings_core::{
 };
 
 thread_local! {
+    static CALL_DEPTH: Cell<usize> = const { Cell::new(0) };
     static LAST_ERROR: RefCell<Option<CString>> = const { RefCell::new(None) };
 }
 
@@ -43,7 +44,7 @@ pub struct SbDefinition(ComponentDefinition);
 pub struct SbHost {
     // Declared first so the bridge's handle drops before the host's window.
     component: Instance,
-    host: Backend,
+    host: RefCell<Backend>,
     /// VoiceOver adapter once the view attached ([`sb_host_accessibility_attach`]).
     #[cfg(target_os = "macos")]
     accessibility: RefCell<Option<MacAccessibility>>,
@@ -69,7 +70,7 @@ impl SbHost {
         })?;
         Ok(Self {
             component,
-            host: Backend::Cpu(host),
+            host: RefCell::new(Backend::Cpu(host)),
             #[cfg(target_os = "macos")]
             accessibility: RefCell::default(),
         })
@@ -97,9 +98,21 @@ impl SbHost {
         })?;
         Ok(Self {
             component,
-            host: Backend::Gpu(host),
+            host: RefCell::new(Backend::Gpu(host)),
             #[cfg(target_os = "macos")]
             accessibility: RefCell::default(),
+        })
+    }
+
+    fn backend(&self) -> Result<Ref<'_, Backend>, Error> {
+        self.host
+            .try_borrow()
+            .map_err(|_| Error::InvalidArgument("the host is busy rendering or resizing"))
+    }
+
+    fn backend_mut(&self) -> Result<RefMut<'_, Backend>, Error> {
+        self.host.try_borrow_mut().map_err(|_| {
+            Error::InvalidArgument("the host is busy dispatching, rendering or resizing")
         })
     }
 
@@ -329,6 +342,7 @@ fn guard<T>(fail: T, body: impl FnOnce() -> Result<T, Error>) -> T {
         set_error(err.to_string());
         return fail;
     }
+    let _call = ActiveCall::enter();
     match catch_unwind(AssertUnwindSafe(body)) {
         Ok(Ok(value)) => value,
         Ok(Err(err)) => {
@@ -340,6 +354,33 @@ fn guard<T>(fail: T, body: impl FnOnce() -> Result<T, Error>) -> T {
             fail
         }
     }
+}
+
+struct ActiveCall;
+
+impl ActiveCall {
+    fn enter() -> Self {
+        CALL_DEPTH.with(|depth| depth.set(depth.get() + 1));
+        Self
+    }
+}
+
+impl Drop for ActiveCall {
+    fn drop(&mut self) {
+        CALL_DEPTH.with(|depth| depth.set(depth.get() - 1));
+    }
+}
+
+fn cleanup(body: impl FnOnce() -> Result<(), Error>) {
+    // Wrappers release a definition after a failed constructor, then read its
+    // error. Successful cleanup must preserve that diagnostic.
+    let previous = LAST_ERROR.with_borrow_mut(Option::take);
+    guard((), body);
+    LAST_ERROR.with_borrow_mut(|slot| {
+        if slot.is_none() {
+            *slot = previous;
+        }
+    });
 }
 
 /// # Safety
@@ -421,10 +462,13 @@ pub unsafe extern "C" fn sb_compile(
 /// `definition` is null or a pointer from [`sb_compile`] not freed before.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn sb_definition_free(definition: *mut SbDefinition) {
-    if !definition.is_null() {
-        // SAFETY: the pointer came from `Box::into_raw` in `sb_compile` and is freed once.
-        drop(unsafe { Box::from_raw(definition) });
-    }
+    cleanup(|| {
+        if !definition.is_null() {
+            // SAFETY: the pointer came from `Box::into_raw` in `sb_compile` and is freed once.
+            drop(unsafe { Box::from_raw(definition) });
+        }
+        Ok(())
+    });
 }
 
 /// # Safety
@@ -525,8 +569,13 @@ pub unsafe extern "C" fn sb_component_new_swapchain(
 /// `host` must be null or live.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn sb_host_is_gpu(host: *const SbHost) -> bool {
-    // SAFETY: forwarded caller contract.
-    unsafe { host_ref(host) }.is_some_and(|h| h.host.is_gpu())
+    guard(false, || {
+        // SAFETY: forwarded caller contract.
+        match unsafe { host_ref(host) } {
+            Some(h) => Ok(h.backend()?.is_gpu()),
+            None => Ok(false),
+        }
+    })
 }
 
 /// Presents one frame into the surface passed to `sb_component_new_metal` or
@@ -542,11 +591,11 @@ pub unsafe extern "C" fn sb_host_gpu_render(host: *mut SbHost) -> SbFrame {
             ..SbFrame::default()
         },
         || {
-            // SAFETY: forwarded caller contract; exclusive because the caller holds the only handle.
-            let Some(h) = (unsafe { host.as_mut() }) else {
+            // SAFETY: forwarded caller contract; backend access is checked by its RefCell.
+            let Some(h) = (unsafe { host_ref(host) }) else {
                 return Err(Error::InvalidArgument("a null host was passed"));
             };
-            let frame = h.host.render_gpu()?;
+            let frame = h.backend_mut()?.render_gpu()?;
             h.accessibility_frame_done(frame.redrawn);
             Ok(SbFrame {
                 redrawn: u8::from(frame.redrawn),
@@ -558,16 +607,27 @@ pub unsafe extern "C" fn sb_host_gpu_render(host: *mut SbHost) -> SbFrame {
 }
 
 /// Destroys a host. Null is ignored.
+/// A call from a different thread or from an active Slint callback is refused;
+/// the host stays live and `sb_last_error` describes the failure.
 ///
 /// # Safety
 /// `host` must be null or a pointer from `sb_component_new*` (or
 /// [`SbHost::into_raw`]) not freed before.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn sb_host_free(host: *mut SbHost) {
-    if !host.is_null() {
-        // SAFETY: the pointer came from `Box::into_raw` in `SbHost::into_raw` and is freed once.
-        drop(unsafe { Box::from_raw(host) });
-    }
+    cleanup(|| {
+        if !host.is_null() {
+            if CALL_DEPTH.with(Cell::get) > 1 {
+                return Err(Error::InvalidArgument(
+                    "cannot free a host from an active Slint call",
+                ));
+            }
+            // SAFETY: the pointer came from `Box::into_raw` in `SbHost::into_raw`
+            // and is freed once, outside any call that could still borrow it.
+            drop(unsafe { Box::from_raw(host) });
+        }
+        Ok(())
+    });
 }
 
 /// Bytes the buffer passed to [`sb_host_render`] must hold; 0 for a null host.
@@ -576,8 +636,13 @@ pub unsafe extern "C" fn sb_host_free(host: *mut SbHost) {
 /// `host` must be null or live.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn sb_host_frame_len(host: *const SbHost) -> usize {
-    // SAFETY: forwarded caller contract.
-    unsafe { host_ref(host) }.map_or(0, |h| h.host.frame_len())
+    guard(0, || {
+        // SAFETY: forwarded caller contract.
+        match unsafe { host_ref(host) } {
+            Some(h) => Ok(h.backend()?.frame_len()),
+            None => Ok(0),
+        }
+    })
 }
 
 /// Writes the frame size in physical pixels. A host made by another library
@@ -599,7 +664,7 @@ pub unsafe extern "C" fn sb_host_pixel_size(
         if width.is_null() || height.is_null() {
             return Err(Error::InvalidArgument("a null size pointer was passed"));
         }
-        let (w, h) = h.host.size();
+        let (w, h) = h.backend()?.size();
         // SAFETY: both pointers are non-null and writable per the caller's contract.
         unsafe {
             *width = w;
@@ -621,11 +686,11 @@ pub unsafe extern "C" fn sb_host_resize(
     scale: f32,
 ) -> bool {
     guard(false, || {
-        // SAFETY: forwarded caller contract; exclusive because the caller holds the only handle.
-        let Some(h) = (unsafe { host.as_mut() }) else {
+        // SAFETY: forwarded caller contract; backend access is checked by its RefCell.
+        let Some(h) = (unsafe { host_ref(host) }) else {
             return Err(Error::InvalidArgument("a null host was passed"));
         };
-        h.host.resize(width, height, scale)?;
+        h.backend_mut()?.resize(width, height, scale)?;
         Ok(true)
     })
 }
@@ -642,15 +707,17 @@ pub unsafe extern "C" fn sb_host_render(host: *mut SbHost, buf: *mut u8, len: us
     };
     guard(failed, || {
         // SAFETY: forwarded caller contract.
-        let Some(h) = (unsafe { host.as_mut() }) else {
+        let Some(h) = (unsafe { host_ref(host) }) else {
             return Err(Error::InvalidArgument("a null host was passed"));
         };
         if buf.is_null() {
             return Err(Error::InvalidArgument("a null pixel buffer was passed"));
         }
+        let mut backend = h.backend_mut()?;
         // SAFETY: the caller guarantees `buf` is valid for `len` writable bytes.
         let out = unsafe { std::slice::from_raw_parts_mut(buf, len) };
-        let frame = h.host.render(out)?;
+        let frame = backend.render(out)?;
+        drop(backend);
         h.accessibility_frame_done(frame.redrawn);
         Ok(SbFrame {
             redrawn: frame.redrawn.into(),
@@ -678,15 +745,17 @@ pub unsafe extern "C" fn sb_host_render_bgra(
     };
     guard(failed, || {
         // SAFETY: forwarded caller contract.
-        let Some(h) = (unsafe { host.as_mut() }) else {
+        let Some(h) = (unsafe { host_ref(host) }) else {
             return Err(Error::InvalidArgument("a null host was passed"));
         };
         if buf.is_null() {
             return Err(Error::InvalidArgument("a null pixel buffer was passed"));
         }
+        let mut backend = h.backend_mut()?;
         // SAFETY: the caller guarantees `buf` is valid for `len` writable bytes.
         let out = unsafe { std::slice::from_raw_parts_mut(buf, len) };
-        let frame = h.host.render_bgra(out)?;
+        let frame = backend.render_bgra(out)?;
+        drop(backend);
         h.accessibility_frame_done(frame.redrawn);
         Ok(SbFrame {
             redrawn: frame.redrawn.into(),
@@ -727,7 +796,7 @@ unsafe fn with_host(host: *const SbHost, f: impl FnOnce(&SbHost) -> Result<(), E
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn sb_host_pointer_moved(host: *const SbHost, x: f32, y: f32) -> bool {
     // SAFETY: forwarded caller contract.
-    unsafe { with_host(host, |h| h.host.pointer_moved(x, y)) }
+    unsafe { with_host(host, |h| h.backend()?.pointer_moved(x, y)) }
 }
 
 /// Pointer button pressed, in logical points. `button` is 0 left, 1 right, 2 middle.
@@ -744,7 +813,7 @@ pub unsafe extern "C" fn sb_host_pointer_pressed(
     // SAFETY: forwarded caller contract.
     unsafe {
         with_host(host, |h| {
-            h.host.pointer_pressed(x, y, pointer_button(button)?)
+            h.backend()?.pointer_pressed(x, y, pointer_button(button)?)
         })
     }
 }
@@ -763,7 +832,7 @@ pub unsafe extern "C" fn sb_host_pointer_released(
     // SAFETY: forwarded caller contract.
     unsafe {
         with_host(host, |h| {
-            h.host.pointer_released(x, y, pointer_button(button)?)
+            h.backend()?.pointer_released(x, y, pointer_button(button)?)
         })
     }
 }
@@ -775,7 +844,7 @@ pub unsafe extern "C" fn sb_host_pointer_released(
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn sb_host_pointer_exited(host: *const SbHost) -> bool {
     // SAFETY: forwarded caller contract.
-    unsafe { with_host(host, |h| h.host.pointer_exited()) }
+    unsafe { with_host(host, |h| h.backend()?.pointer_exited()) }
 }
 
 /// Scroll delta at `x`,`y`, all in logical points.
@@ -791,7 +860,7 @@ pub unsafe extern "C" fn sb_host_pointer_scrolled(
     dy: f32,
 ) -> bool {
     // SAFETY: forwarded caller contract.
-    unsafe { with_host(host, |h| h.host.pointer_scrolled(x, y, dx, dy)) }
+    unsafe { with_host(host, |h| h.backend()?.pointer_scrolled(x, y, dx, dy)) }
 }
 
 /// The host view gained (true) or lost (false) keyboard focus.
@@ -803,7 +872,7 @@ pub unsafe extern "C" fn sb_host_focus_changed(host: *const SbHost, focused: boo
     // SAFETY: forwarded caller contract.
     unsafe {
         with_host(host, |h| {
-            h.host.focus_changed(focused)?;
+            h.backend()?.focus_changed(focused)?;
             h.accessibility_focus_changed(focused);
             Ok(())
         })
@@ -922,7 +991,7 @@ pub unsafe extern "C" fn sb_host_key_pressed(host: *const SbHost, text: *const c
             return Err(Error::InvalidArgument("a null host was passed"));
         };
         // SAFETY: forwarded caller contract.
-        h.host.key_pressed(unsafe { str_arg(text) }?)
+        h.backend()?.key_pressed(unsafe { str_arg(text) }?)
     })
 }
 
@@ -939,7 +1008,7 @@ pub unsafe extern "C" fn sb_host_key_released(host: *const SbHost, text: *const 
             return Err(Error::InvalidArgument("a null host was passed"));
         };
         // SAFETY: forwarded caller contract.
-        h.host.key_released(unsafe { str_arg(text) }?)?;
+        h.backend()?.key_released(unsafe { str_arg(text) }?)?;
         Ok(true)
     })
 }
@@ -956,7 +1025,7 @@ pub unsafe extern "C" fn sb_host_key_repeated(host: *const SbHost, text: *const 
             return Err(Error::InvalidArgument("a null host was passed"));
         };
         // SAFETY: forwarded caller contract.
-        h.host.key_repeated(unsafe { str_arg(text) }?)?;
+        h.backend()?.key_repeated(unsafe { str_arg(text) }?)?;
         Ok(true)
     })
 }
@@ -982,7 +1051,7 @@ pub unsafe extern "C" fn sb_host_composition_update(
             return Err(Error::InvalidArgument("a null host was passed"));
         };
         // SAFETY: forwarded caller contract.
-        h.host
+        h.backend()?
             .update_composition(unsafe { str_arg(preedit) }?, utf16_start, utf16_end)?;
         Ok(true)
     })
@@ -1005,7 +1074,7 @@ pub unsafe extern "C" fn sb_host_composition_commit(
             return Err(Error::InvalidArgument("a null host was passed"));
         };
         // SAFETY: forwarded caller contract.
-        h.host.commit_composition(unsafe { str_arg(text) }?)?;
+        h.backend()?.commit_composition(unsafe { str_arg(text) }?)?;
         Ok(true)
     })
 }
@@ -1016,7 +1085,7 @@ pub unsafe extern "C" fn sb_host_composition_commit(
 /// `host` must be null or live.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn sb_host_ime_started(host: *const SbHost) -> bool {
-    unsafe { with_host(host, |h| h.host.ime_started()) }
+    unsafe { with_host(host, |h| h.backend()?.ime_started()) }
 }
 
 /// 1 while a WinUI composition is open.
@@ -1033,7 +1102,7 @@ pub unsafe extern "C" fn sb_host_ime_composing(host: *const SbHost) -> bool {
         let Some(h) = (unsafe { host_ref(host) }) else {
             return Err(Error::InvalidArgument("a null host was passed"));
         };
-        Ok(h.host.ime_composing())
+        Ok(h.backend()?.ime_composing())
     })
 }
 
@@ -1052,7 +1121,7 @@ pub unsafe extern "C" fn sb_host_ime_text(
         let Some(h) = (unsafe { host_ref(host) }) else {
             return Err(Error::InvalidArgument("a null host was passed"));
         };
-        let text = h.host.ime_document();
+        let text = h.backend()?.ime_document();
         // SAFETY: forwarded caller contract.
         unsafe { write_utf8(out, out_len, &text) }?;
         Ok(true)
@@ -1079,7 +1148,7 @@ pub unsafe extern "C" fn sb_host_ime_selection(
                 "the IME selection pointers are missing",
             ));
         }
-        let (sel_start, sel_end) = h.host.ime_selection();
+        let (sel_start, sel_end) = h.backend()?.ime_selection();
         // SAFETY: both pointers are non-null and writable for one `i32`.
         unsafe {
             *start = sel_start;
@@ -1111,7 +1180,7 @@ pub unsafe extern "C" fn sb_host_ime_replace(
             return Err(Error::InvalidArgument("a null host was passed"));
         };
         // SAFETY: forwarded caller contract.
-        h.host.ime_replace(
+        h.backend()?.ime_replace(
             range_start,
             range_end,
             unsafe { str_arg(text) }?,
@@ -1128,7 +1197,8 @@ pub unsafe extern "C" fn sb_host_ime_replace(
 /// `host` must be null or live.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn sb_host_ime_select(host: *const SbHost, start: i32, end: i32) -> bool {
-    unsafe { with_host(host, |h| h.host.ime_select(start, end)) }
+    // SAFETY: forwarded caller contract.
+    unsafe { with_host(host, |h| h.backend()?.ime_select(start, end)) }
 }
 
 /// Applies `CompositionCompleted`. `canceled` drops the preedit.
@@ -1137,7 +1207,8 @@ pub unsafe extern "C" fn sb_host_ime_select(host: *const SbHost, start: i32, end
 /// `host` must be null or live.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn sb_host_ime_completed(host: *const SbHost, canceled: bool) -> bool {
-    unsafe { with_host(host, |h| h.host.ime_completed(canceled)) }
+    // SAFETY: forwarded caller contract.
+    unsafe { with_host(host, |h| h.backend()?.ime_completed(canceled)) }
 }
 
 /// Writes the Slint key text for one AppKit key event into `out`.
@@ -1371,10 +1442,13 @@ pub unsafe extern "C" fn sb_on_callback(
 /// `text` is null or a string from those calls, not freed before.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn sb_string_free(text: *mut c_char) {
-    if !text.is_null() {
-        // SAFETY: the pointer came from `CString::into_raw` and is freed once.
-        drop(unsafe { CString::from_raw(text) });
-    }
+    cleanup(|| {
+        if !text.is_null() {
+            // SAFETY: the pointer came from `CString::into_raw` and is freed once.
+            drop(unsafe { CString::from_raw(text) });
+        }
+        Ok(())
+    });
 }
 
 /// Runs `f` on a dedicated thread so parallel `cargo test` shares one Slint owner.
@@ -1531,6 +1605,53 @@ mod tests {
             assert!(!ok);
             // SAFETY: `host` is live and this is the owning thread.
             unsafe { sb_host_free(host) };
+        });
+    }
+
+    #[test]
+    fn queries_and_cleanup_refuse_the_wrong_thread() {
+        run_on_test_ui_thread(|| {
+            let host = new_host(WIDTH, HEIGHT, 1.0);
+            let addr = host as usize;
+            let joined = std::thread::spawn(move || {
+                // SAFETY: the owner waits for this thread; rejected calls must
+                // neither access nor destroy the host.
+                unsafe {
+                    let host = addr as *mut SbHost;
+                    assert_eq!(sb_host_frame_len(host), 0);
+                    assert!(!sb_last_error().is_null());
+                    assert!(!sb_host_is_gpu(host));
+                    assert!(!sb_last_error().is_null());
+                    sb_host_free(host);
+                    assert!(!sb_last_error().is_null());
+                }
+            })
+            .join();
+            assert!(joined.is_ok());
+            // SAFETY: the rejected free left the host owned by this thread.
+            unsafe {
+                assert_eq!(sb_host_frame_len(host), (WIDTH * HEIGHT * 4) as usize);
+                sb_host_free(host);
+            }
+        });
+    }
+
+    #[test]
+    #[allow(clippy::panic)]
+    fn cleanup_preserves_constructor_errors_and_catches_panics() {
+        run_on_test_ui_thread(|| {
+            assert!(new_host(WIDTH, HEIGHT, 0.0).is_null());
+            assert!(!sb_last_error().is_null());
+            // SAFETY: the failing constructor's error remains live after its
+            // definition was freed in new_host.
+            let message = unsafe { CStr::from_ptr(sb_last_error()) }.to_string_lossy();
+            assert!(message.contains("scale must be"));
+            cleanup(|| panic!("test destructor failure"));
+            assert!(!sb_last_error().is_null());
+            // SAFETY: cleanup caught the panic and stored a diagnostic.
+            let message = unsafe { CStr::from_ptr(sb_last_error()) }.to_string_lossy();
+            assert!(message.contains("panic inside"));
+            assert_eq!(CALL_DEPTH.with(Cell::get), 0);
         });
     }
 }

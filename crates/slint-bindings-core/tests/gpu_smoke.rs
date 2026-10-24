@@ -17,12 +17,22 @@ fn offscreen_frame_paints_when_a_device_exists() -> Result<(), Error> {
         None,
         Path::new(concat!(env!("CARGO_MANIFEST_DIR"), "/ui/demo.slint")),
     )?;
-    let host = match GpuHost::new_offscreen(|| definition.create(), 64, 64, 1.0) {
+    let mut host = match GpuHost::new_offscreen(|| definition.create(), 64, 64, 1.0) {
         Ok(host) => host,
         Err(Error::Gpu(_)) => return Ok(()),
         Err(err) => return Err(err),
     };
     let frame = host.render_offscreen()?;
     assert!(frame.redrawn);
+    assert!(matches!(
+        host.resize(u32::MAX, 64, 1.0),
+        Err(Error::InvalidArgument(_))
+    ));
+    assert!(matches!(
+        host.resize(64, 64, f32::MIN_POSITIVE),
+        Err(Error::InvalidArgument(_))
+    ));
+    assert_eq!(host.size(), (64, 64));
+    assert!(host.render_offscreen()?.redrawn);
     Ok(())
 }

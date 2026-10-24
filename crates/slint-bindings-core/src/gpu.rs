@@ -16,7 +16,8 @@ use slint::{ComponentHandle, LogicalPosition, PhysicalSize, SharedString};
 use slintx_wgpu::{WgpuRenderer, wgpu};
 
 use crate::host::{
-    check_scale, dispatch_composition_window, dispatch_window, move_focus_inside, send_window,
+    check_logical_size, check_scale, dispatch_composition_window, dispatch_window,
+    move_focus_inside, send_window,
 };
 use crate::ime::{ImeSession, ImeUpdate};
 use crate::keys::utf16_selection_to_utf8;
@@ -416,6 +417,13 @@ impl<C: ComponentHandle> GpuHost<C> {
         let (width, height) = (width.max(1), height.max(1));
         if width == self.width && height == self.height && scale == self.scale {
             return Ok(());
+        }
+        check_logical_size(width, height, scale)?;
+        let limit = self.window.session.device.limits().max_texture_dimension_2d;
+        if width > limit || height > limit {
+            return Err(Error::InvalidArgument(
+                "the frame size exceeds the GPU texture limit",
+            ));
         }
         if scale != self.scale || self.width == 0 {
             send_window(

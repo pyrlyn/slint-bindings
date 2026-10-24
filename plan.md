@@ -57,6 +57,59 @@ Not added: `slint_embed::events` is used only by slint_dart and stays there; `i-
 | T87 | todo | P2 | 5 | 0% | |
 | T88 | todo | P3 | 4 | 0% | |
 
+### T91. Project review and regression fixes
+
+Status: in progress (implementation verified, awaiting review). Priority: P1.
+Complexity: 4. Readiness: 100%. Agent: OpenAI / GPT-6.
+Branch: `codex/review-20261024`, based on `907c42c`.
+
+PR #59 CI follow-up: Windows exposed a platform-specific path assertion in
+the module loader test. Compare paths as Path values, rerun module tests and
+the PR checks, then merge after successful validation. The shared CI cancels
+the run after a failed test, so cancelled job steps must also be inspected.
+
+Execution: review the host/FFI, renderer, image utilities and compiler/test
+boundaries; run the workspace baseline; reproduce confirmed failures; apply
+narrow fixes; verify Rust, Swift, wasm and ABI/dependency gates. Preserve other
+sessions' work and dependency pins.
+
+Confirmed and fixed:
+
+- P1: reentrant FFI resize/render could construct an exclusive host reference
+  while input dispatch still held a shared one. Use checked backend borrows;
+  reject host destruction during active calls, including callbacks.
+- P1: size/GPU queries and destructors bypassed the UI-thread/panic guard.
+  Guard them, preserving an earlier constructor diagnostic after successful
+  cleanup. A rejected free leaves ownership with the original thread.
+- P1: excessive CPU dimensions panicked after changing host geometry; GPU
+  dimensions were submitted without checking the device limit. Validate buffer
+  arithmetic, allocation and finite logical sizes before publishing geometry.
+- P2: UTF-16 offsets inside a final surrogate pair were accepted by the IME
+  replacement path. Reject them and preserve the preedit and selection.
+- P2: glyphs too large for the atlas grew it from 1 MiB to 16 MiB and marked it
+  full, causing repeated cache resets. Reject them before growth, keeping useful
+  entries. Genuine capacity exhaustion still clears on the next frame.
+- Performance: WinUI creates a PixelBuffer stream only when a CPU frame changed.
+
+Reuse: retained the shared slint-embed platform, existing scale validation,
+FFI guard, IME conversion and glyph allocator. Used standard-library RefCell and
+fallible Vec allocation; no new project dependency or parallel implementation.
+The old checkout's pixel-diff decoder is no longer shipped: current main uses
+shared rgba-png. No change was made to that other repository.
+
+Validation: the baseline passed 188 tests. Three new regressions failed before
+fixes (IME boundary, atlas growth, impossible resize). Final workspace nextest:
+194 passed, 7 platform tests skipped. Swift build and all 20 tests passed; wasm
+build and all 45 tests passed. Formatting, clippy with warnings denied, renderer
+and licence gates (including gate fixtures), header regeneration/drift,
+P/Invoke export names and Swift package linkage checks passed.
+
+Limits: WinUI was inspected but not built/run on Windows. The seven ignored
+converter platform tests (external browser/GTK/Xcode/simulator environments)
+were not run. Vendored Flutter app/package suites were not run; its embedding
+and interpreter crates were exercised through the workspace host tests.
+No performance benchmark was used to claim an FPS improvement.
+
 ## Milestones
 
 Each milestone ends at a go/no-go checkpoint. A "no-go" stops the milestone's

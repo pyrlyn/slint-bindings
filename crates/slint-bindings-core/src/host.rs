@@ -57,6 +57,16 @@ pub(crate) fn check_scale(scale: f32) -> Result<(), Error> {
     }
 }
 
+pub(crate) fn check_logical_size(width: u32, height: u32, scale: f32) -> Result<(), Error> {
+    check_scale(scale)?;
+    if !(width as f32 / scale).is_finite() || !(height as f32 / scale).is_finite() {
+        return Err(Error::InvalidArgument(
+            "the logical frame size must be finite",
+        ));
+    }
+    Ok(())
+}
+
 /// Mouse buttons the host can forward.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u8)]
@@ -177,6 +187,25 @@ impl<C: ComponentHandle> EmbeddedHost<C> {
         if width == self.width && height == self.height && scale == self.scale {
             return Ok(());
         }
+        check_logical_size(width, height, scale)?;
+        let len = (width as usize)
+            .checked_mul(height as usize)
+            .filter(|len| *len <= isize::MAX as usize / BYTES_PER_PIXEL)
+            .ok_or(Error::InvalidArgument(
+                "the frame size exceeds the buffer limit",
+            ))?;
+        // Allocate before publishing geometry: a rejected resize must leave the
+        // previous frame and Slint's window size usable.
+        let pixels = if self.pixels.len() != len {
+            let mut pixels = Vec::new();
+            pixels
+                .try_reserve_exact(len)
+                .map_err(|_| Error::InvalidArgument("the frame buffer could not be allocated"))?;
+            pixels.resize(len, TRANSPARENT);
+            Some(pixels)
+        } else {
+            None
+        };
         if scale != self.scale || self.width == 0 {
             self.send(WindowEvent::ScaleFactorChanged {
                 scale_factor: scale,
@@ -189,12 +218,11 @@ impl<C: ComponentHandle> EmbeddedHost<C> {
         self.send(WindowEvent::Resized {
             size: LogicalSize::new(width as f32 / scale, height as f32 / scale),
         })?;
-        let len = width as usize * height as usize;
-        if self.pixels.len() == len {
+        if let Some(pixels) = pixels {
+            self.pixels = pixels;
+        } else {
             // Same pixel count (scale-only change): drop stale samples, keep the allocation.
             self.pixels.fill(TRANSPARENT);
-        } else {
-            self.pixels = vec![TRANSPARENT; len];
         }
         self.full_repaint = true;
         self.window.request_redraw();
@@ -726,6 +754,26 @@ mod tests {
         host.render(&mut buf)?;
         host.resize(WIDTH, HEIGHT, 1.0)?;
         assert!(!host.render(&mut buf)?.redrawn);
+        Ok(())
+    }
+
+    #[test]
+    fn impossible_resize_preserves_the_last_frame() -> Result<(), Error> {
+        let mut host = demo()?;
+        let mut buf = vec![0u8; host.frame_len()];
+        host.render(&mut buf)?;
+        for (width, height, scale) in [
+            (u32::MAX, u32::MAX, 1.0),
+            (WIDTH, HEIGHT, f32::MIN_POSITIVE),
+        ] {
+            let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+                host.resize(width, height, scale)
+            }));
+            assert!(matches!(result, Ok(Err(Error::InvalidArgument(_)))));
+            assert_eq!(host.size(), (WIDTH, HEIGHT));
+            assert_eq!(host.frame_len(), buf.len());
+            assert!(!host.render(&mut buf)?.redrawn);
+        }
         Ok(())
     }
 
