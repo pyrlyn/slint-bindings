@@ -125,8 +125,44 @@ jobs:
           path: weft-winui.png
           if-no-files-found: ignore
 
+  # Release builds of the shipped command-line tools. Test, example and demo apps
+  # (flutter/examples, swift SlintDemo, windows SlintDemo.WinUI) are not built here.
+  cli:
+    if: github.event_name != 'pull_request' || !github.event.pull_request.draft
+    needs: macos-runner
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [linux, macos]
+    # macOS: MACOS_RUNNER (pyrlyn/ci macos-runner), fork PRs keep the hosted label
+    runs-on: ${{ matrix.os == 'linux' && 'ubuntu-latest' || ((github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && fromJSON(needs.macos-runner.outputs.value)[0] || 'macos-26') }}
+    timeout-minutes: 45
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: jdx/mise-action@9b200bcecbfd6303e69a4a261b2e09e3757440a7 # v5.2.0
+        with:
+          install_args: rust
+      - name: Linux deps
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq libfontconfig1-dev pkg-config
+      - name: slintx-convert
+        run: cargo build --locked --release -p slintx-convert --bins
+      - name: slint-introspect
+        run: cargo build --locked --release --manifest-path flutter/Cargo.toml -p slint-introspect --bins
+      - name: Smoke
+        run: |
+          cargo run --locked --release -q -p slintx-convert -- --help
+          dir=$(cargo metadata --format-version 1 --no-deps --manifest-path flutter/Cargo.toml | python3 -c 'import json,sys; print(json.load(sys.stdin)["target_directory"])')
+          ls -l "$dir/release/slint-introspect"
+
   gate:
-    needs: [rust, macos, slintx, windows-host]
+    needs: [rust, macos, slintx, windows-host, cli]
     # always(): report failed or cancelled needs instead of reading a skipped gate as passing.
     if: >-
       always()
