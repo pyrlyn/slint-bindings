@@ -12,6 +12,9 @@
 - T81. Component instances and public API
 - T82. Layout engine
 - T83. slintx-wgpu without i-slint-core
+- T83.1. slintx-wgpu: own scene input types and a drawing API
+- T83.2. slintx-wgpu: text on parley
+- T83.3. slintx-wgpu: the i-slint-core adapter behind a feature
 - T84. Visual items on slintx-wgpu
 - T85. wasm32 build (slintx-web)
 - T86. Input and interactive items

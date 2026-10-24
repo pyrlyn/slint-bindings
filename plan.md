@@ -52,7 +52,10 @@ Not added: `slint_embed::events` is used only by slint_dart and stays there; `i-
 | T80 | todo | P1 | 5 | 0% | |
 | T81 | todo | P1 | 4 | 0% | |
 | T82 | todo | P1 | 5 | 0% | |
-| T83 | todo | P1 | 4 | 0% | |
+| T83 | in progress | P1 | 4 | 5% | Claude / opus-5.5 |
+| T83.1 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
+| T83.2 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
+| T83.3 | in progress | P1 | 3 | 0% | Claude / opus-5.5 |
 | T84 | todo | P1 | 4 | 0% | |
 | T85 | todo | P1 | 3 | 0% | |
 | T86 | todo | P2 | 5 | 0% | |
@@ -254,6 +257,56 @@ parley-based text, and keep the `i-slint-core` adapter behind a feature for
 today's hosts. Starts after T72 is on `main`, agreed with T72's owner. Done when
 the crate builds without `i-slint-core` and T72's comparison tests still pass
 through the adapter.
+
+Done in detail: `cargo build -p slintx-wgpu --no-default-features` works;
+`cargo tree -p slintx-wgpu --no-default-features -e normal,build` has no
+`slint`, `slint-*` or `i-slint-*`; `tests/compare.rs` passes through the adapter
+with every tolerance unchanged; `just renderer-check` passes; the `slintx-wgpu`
+entry in `exempt_license` (`scripts/slintx-check.sh`) is gone.
+
+Split into T83.1 (own scene types and a drawing API), T83.2 (text on parley)
+and T83.3 (the adapter behind a feature, the gate). One branch, one commit per
+subtask.
+
+Execution plan:
+
+1. T83.1: a public `Canvas` (record shapes, clips, opacity, images, paths into
+   the existing `Scene`) and a public `Renderer` (GPU, caches, render into a
+   texture or to pixels) on the crate's own `Color`, `Brush`, `GradientStop`
+   and `ImageSource` types. Brush geometry is resolved by the caller into
+   device pixels, so the core knows nothing of Slint's angle or default-centre
+   rules. `frame.rs` becomes a thin `ItemRenderer` over `Canvas`.
+2. T83.2: `parley` (the version Slint locks, `std` only) as a direct
+   dependency; `Canvas::draw_glyph_run` and `Canvas::draw_layout` take parley
+   types, and the glyph cache keys on them. The adapter's `GlyphRenderer`
+   forwards to them; Slint's `sharedparley` re-exports the same parley.
+3. T83.3: `i-slint-core` optional behind a non-default `slint` feature that
+   holds `WgpuRenderer` and the adapter; `slint-bindings-core` turns it on;
+   `compare.rs` requires it. Remove the licence exemption and its fixture
+   note, update `toolchain.md` and the workspace `rust.md`.
+
+Verify: the build and tree commands above; `cargo nextest run -p slintx-wgpu
+--features slint` with the same budgets; wgpu frames byte-identical to the
+ones `main` writes under `target/tmp/slintx-wgpu/`; `just license-check
+license-check-test renderer-check clippy nextest`.
+
+### T83.1. slintx-wgpu: own scene input types and a drawing API
+
+`Color`, `Brush`, `GradientStop`, image sources with an own cache key, and a
+`Canvas` and `Renderer` that take only these. The Slint item renderer draws
+through `Canvas`. Done when nothing outside the adapter names `i-slint-core`
+except text, and the compare tests produce the same frames.
+
+### T83.2. slintx-wgpu: text on parley
+
+Glyph runs and whole parley layouts drawn through `Canvas`, without
+`sharedparley`. Done when only the adapter names `i-slint-core` and a test
+draws a parley layout without Slint.
+
+### T83.3. slintx-wgpu: the i-slint-core adapter behind a feature
+
+The `slint` feature, `slint-bindings-core` enabling it, and the licence gate
+covering the crate. Done when every T83 check above holds.
 
 ### T84. Visual items on slintx-wgpu
 
