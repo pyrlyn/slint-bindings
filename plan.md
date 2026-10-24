@@ -44,7 +44,6 @@ Not added: `slint_embed::events` is used only by slint_dart and stays there; `i-
 | T14 | in progress | P2 | 5 | 90% | Claude / opus-5.5 |
 | T15 | todo | P3 | 3 | 0% | |
 | T17 | todo | P3 | 3 | 0% | |
-| T75 | todo | P1 | 3 | 0% | |
 | T76 | todo | P1 | 3 | 0% | |
 | T77 | todo | P1 | 5 | 0% | |
 | T78 | todo | P1 | 4 | 0% | |
@@ -182,14 +181,6 @@ Compile the core to `wasm32-unknown-unknown` with the software renderer
 drawing into a canvas (`ImageData`), or Slint's own web backend, and render Weft
 trees in the browser through the existing Weft WASM tooling. Done when the
 login sample renders in a browser from its `.weft` file.
-
-### T75. Modules, imports and exports
-
-Load a file graph: relative and include-path imports, `@lib` library paths,
-export lists and re-exports, duplicate and cyclic import errors, and a virtual
-file system so `wasm32` builds take sources from memory. The std-widgets import
-resolves to sources bundled in the crate. Done when import and export cases in
-the harness match Slint.
 
 ### T76. Name resolution
 

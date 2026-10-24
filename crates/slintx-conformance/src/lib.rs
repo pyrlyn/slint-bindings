@@ -11,9 +11,10 @@
 //! | --- | --- | --- |
 //! | 1. Verdict | Slint's accept/reject and diagnostic positions against `.expected` | live (`tests/stage1_slint.rs`) |
 //! | 2. Parse | Every case Slint accepts parses without syntax errors and round-trips | live (`tests/stage2_slintx.rs`, `slintx-syntax`) |
-//! | 3. Values | Property values after scripted steps | stub: needs the slintx evaluator and runtime |
-//! | 4. Geometry | Layout geometry of every element | stub: needs the slintx layout engine |
-//! | 5. Pixels | Rendered frames within a pixel budget (`rgba-png`) | stub: needs `slintx-wgpu` |
+//! | 3. Modules | Import and export errors: equal to Slint's under `imports/`, a subset elsewhere | live (`tests/stage3_modules.rs`, `slintx-modules`) |
+//! | 4. Values | Property values after scripted steps | stub: needs the slintx evaluator and runtime |
+//! | 5. Geometry | Layout geometry of every element | stub: needs the slintx layout engine |
+//! | 6. Pixels | Rendered frames within a pixel budget (`rgba-png`) | stub: needs `slintx-wgpu` |
 
 use std::fmt::Write as _;
 use std::fs;
@@ -227,9 +228,9 @@ pub trait Frontend {
     fn parse(&self, source: &str) -> Parsed;
 }
 
-/// Stage 2 result over the corpus.
+/// A stage's result over the corpus.
 #[derive(Debug, Default, PartialEq, Eq)]
-pub struct ParseReport {
+pub struct Report {
     pub checked: usize,
     pub failures: Vec<String>,
 }
@@ -237,8 +238,8 @@ pub struct ParseReport {
 /// Every file of every case Slint accepted must parse cleanly and round-trip.
 /// Rejected cases are not checked: their errors may be syntactic or semantic,
 /// and splitting them is the job of later stages.
-pub fn check_parse(frontend: &dyn Frontend, cases: &[Case]) -> io::Result<ParseReport> {
-    let mut report = ParseReport::default();
+pub fn check_parse(frontend: &dyn Frontend, cases: &[Case]) -> io::Result<Report> {
+    let mut report = Report::default();
     for case in cases {
         let expected = Expectation::parse(&fs::read_to_string(&case.expected)?)
             .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))?;
@@ -258,6 +259,50 @@ pub fn check_parse(frontend: &dyn Frontend, cases: &[Case]) -> io::Result<ParseR
             if parsed.text != source {
                 report.failures.push(format!("{name}: does not round-trip"));
             }
+        }
+    }
+    Ok(report)
+}
+
+/// The slintx side of stage 3: the errors its module loader reports for a
+/// case, positioned like Slint's. Warnings belong to later passes.
+pub trait Loader {
+    fn errors(&self, case: &Case) -> Vec<Diagnostic>;
+}
+
+/// Where the import and export cases live; only there must slintx find every
+/// error Slint does.
+pub const IMPORTS_DIR: &str = "imports/";
+
+/// Every loader error must be one Slint reported at the same place; under
+/// [`IMPORTS_DIR`] the loader must also report all of Slint's errors.
+pub fn check_modules(loader: &dyn Loader, cases: &[Case]) -> io::Result<Report> {
+    let mut report = Report::default();
+    for case in cases {
+        let expected = Expectation::parse(&fs::read_to_string(&case.expected)?)
+            .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))?;
+        let position = |d: &Diagnostic| (d.file.clone(), d.line, d.column);
+        let mut slint: Vec<_> = expected
+            .diagnostics
+            .iter()
+            .filter(|d| d.level == Level::Error)
+            .map(position)
+            .collect();
+        let mut slintx: Vec<_> = loader.errors(case).iter().map(position).collect();
+        slint.sort();
+        slintx.sort();
+        report.checked += 1;
+        let extra: Vec<_> = slintx.iter().filter(|p| !slint.contains(p)).collect();
+        if !extra.is_empty() {
+            report.failures.push(format!(
+                "{}: errors Slint does not report: {extra:?}",
+                case.name
+            ));
+        } else if case.name.starts_with(IMPORTS_DIR) && slintx != slint {
+            report.failures.push(format!(
+                "{}: slintx reports {slintx:?}, Slint {slint:?}",
+                case.name
+            ));
         }
     }
     Ok(report)

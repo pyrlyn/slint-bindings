@@ -1,0 +1,18 @@
+[package]
+name = "slintx-modules"
+description = "Loads a Slint file graph: import resolution, include and library paths, exports and re-exports, over a pluggable file system."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+[dependencies]
+slintx-syntax = { path = "../slintx-syntax" }
+
+[target.'cfg(target_arch = "wasm32")'.dev-dependencies]
+wasm-bindgen-test = { workspace = true }
+
+[lints]
+workspace = true

@@ -373,6 +373,30 @@ lists without `;`). penpotx has no Slint emitter yet (checked at penpotx
 `f090cc4`), so no emitter outputs are in the corpus; they join it when one
 exists.
 
+### T75. Modules, imports and exports
+
+Load a file graph: relative and include-path imports, `@lib` library paths,
+export lists and re-exports, duplicate and cyclic import errors, and a virtual
+file system so `wasm32` builds take sources from memory. The std-widgets import
+resolves to sources bundled in the crate. Done when import and export cases in
+the harness match Slint.
+
+Execution: a new `slintx-modules` crate loads the graph through a `FileSystem`
+trait (disk and in-memory), resolves relative, include-path and `@lib` paths,
+then the bundled `std-widgets.slint` (names only; T87 fills it in), and
+collects each file's exports. A new harness stage runs it on the corpus: its
+errors must equal Slint's errors in `imports/` and be a subset of them
+elsewhere. Verify with `cargo nextest run -p slintx-modules -p
+slintx-conformance` and `scripts/slintx-check.sh license|wasm`.
+
+Result: `crates/slintx-modules` loads the graph over `DiskFs` or `MemoryFs`
+and runs on wasm32. Stage 3 of the harness is live: on every corpus case its
+errors are a subset of Slint's, and under `imports/` they are exactly Slint's.
+Three cases were added and recorded with Slint (an unknown name in
+`export { }`, a duplicate import, which Slint accepts, and a nested relative
+path). `@lib` and include paths are tested in the crate only, since stage 1
+runs Slint without library or include paths.
+
 ### T19. Drop Intel macOS leftovers from the Flutter copy
 
 `flutter/` still listed Intel targets after the workspace dropped Intel macOS:

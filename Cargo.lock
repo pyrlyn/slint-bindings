@@ -3891,6 +3891,7 @@ version = "0.1.0"
 dependencies = [
  "pollster",
  "slint-interpreter",
+ "slintx-modules",
  "slintx-syntax",
 ]
 
@@ -3905,6 +3906,14 @@ dependencies = [
  "slintx-syntax",
  "thiserror 2.0.21",
  "trycmd",
+]
+
+[[package]]
+name = "slintx-modules"
+version = "0.1.0"
+dependencies = [
+ "slintx-syntax",
+ "wasm-bindgen-test",
 ]
 
 [[package]]

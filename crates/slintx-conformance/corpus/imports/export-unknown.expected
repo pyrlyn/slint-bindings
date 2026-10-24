@@ -1,0 +1,2 @@
+verdict: reject
+error export-unknown.slint:3:10: 'Nope' not found

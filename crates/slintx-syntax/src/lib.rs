@@ -16,6 +16,7 @@ use std::fmt;
 use std::ops::Range;
 
 pub use kind::{SlintLanguage, SyntaxKind};
+pub use parser::normalize_name;
 pub use rowan::{NodeOrToken, TextRange, TextSize};
 
 pub type SyntaxNode = rowan::SyntaxNode<SlintLanguage>;
