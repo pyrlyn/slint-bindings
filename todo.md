@@ -4,6 +4,7 @@
 - T15. iOS host
 - T17. Web build
 - T76. Name resolution
+- T76.2. Scopes and lookup
 - T77. Type checker
 - T78. Lowering to an IR
 - T79. Expression evaluator

@@ -44,7 +44,8 @@ Not added: `slint_embed::events` is used only by slint_dart and stays there; `i-
 | T14 | in progress | P2 | 5 | 90% | Claude / opus-5.5 |
 | T15 | todo | P3 | 3 | 0% | |
 | T17 | todo | P3 | 3 | 0% | |
-| T76 | todo | P1 | 3 | 0% | |
+| T76 | in progress | P1 | 3 | 50% | Claude / opus-5.5 |
+| T76.2 | todo | P1 | 3 | 0% | |
 | T77 | todo | P1 | 5 | 0% | |
 | T78 | todo | P1 | 4 | 0% | |
 | T79 | todo | P1 | 4 | 0% | |
@@ -182,7 +183,14 @@ Scopes and lookup per `research.md` §8.4.1: element ids, `self`, `parent`,
 `root`, properties of enclosing elements, globals, built-in namespaces
 (`Colors`, `Math`, `Key`, `Platform`, ...), enum short names by expected type,
 and `-`/`_` identifier equivalence. Done when the resolution cases in the
-harness match Slint, including its errors.
+harness match Slint, including its errors. Split into T76.1 and T76.2.
+
+### T76.2. Scopes and lookup
+
+Name resolution on top of `slintx-modules` and the T76.1 catalog: the rest of
+T76 (scopes, ids, `self`/`parent`/`root`, enclosing properties, globals,
+namespaces, enum short names, `-`/`_` equivalence) and its errors. Done when
+the resolution cases in the harness match Slint, including its errors.
 
 ### T77. Type checker
 
