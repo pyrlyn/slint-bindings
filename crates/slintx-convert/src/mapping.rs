@@ -363,7 +363,8 @@ mod tests {
 
     #[test]
     fn docs_mapping_table_is_current() {
-        let doc = include_str!("../docs/mapping.md");
+        // A Windows checkout may turn the file's line endings into CRLF.
+        let doc = include_str!("../docs/mapping.md").replace("\r\n", "\n");
         assert!(
             doc.contains(&markdown_table()),
             "docs/mapping.md is stale; paste mapping::markdown_table() into it:\n{}",
