@@ -157,8 +157,9 @@ jobs:
         run: cargo build --locked --release --manifest-path flutter/Cargo.toml -p slint-introspect --bins
       - name: Smoke
         run: |
-          target/release/slintx-convert --help
-          ls -l flutter/target/release/slint-introspect
+          cargo run --locked --release -q -p slintx-convert -- --help
+          dir=$(cargo metadata --format-version 1 --no-deps --manifest-path flutter/Cargo.toml | python3 -c 'import json,sys; print(json.load(sys.stdin)["target_directory"])')
+          ls -l "$dir/release/slint-introspect"
 
   gate:
     needs: [rust, macos, slintx, windows-host, cli]
