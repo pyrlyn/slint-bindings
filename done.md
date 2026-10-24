@@ -579,7 +579,7 @@ build graph); it is exempt from the wasm32 check, as a native CLI. GTK and HTML
 screenshot tests run in one Docker image, locally on Colima and in Linux CI;
 `ibtool` runs on the macOS runner.
 
-Result: done in PR #43 (0f5ec0b) and the T89.5 PR. `crates/slintx-convert`
+Result: done in PR #43 (0f5ec0b) and https://github.com/pyrlyn/slint-bindings/pull/56. `crates/slintx-convert`
 ships the library and the `slint-convert` binary with the four backends on one
 `Backend` trait, the README support table and limits, and `docs/mapping.md`
 (generated widget table, checked by a test). Every fixture is green under
@@ -683,7 +683,7 @@ Plan:
 Check: `cargo nextest run -p slintx-convert` stays green without the tools;
 the ignored tests pass in the Docker image (Colima) and on macOS.
 
-Result: done in T89.5.1 and T89.5.2. Measured against Slint 1.18.1:
+Result: done in T89.5.1 and T89.5.2 (https://github.com/pyrlyn/slint-bindings/pull/56). Measured against Slint 1.18.1:
 
 - Default stretch: every widget in the table matches Slint's except
   `TextInput`, which is (0, 0), not (1, 0) (text and image items keep
