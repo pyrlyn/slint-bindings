@@ -13,6 +13,8 @@ just = "1.58.0"
 # match the `wasm-bindgen` version in Cargo.lock exactly.
 "github:wasm-bindgen/wasm-bindgen" = "0.2.129"
 node = "24.22.0" # Active LTS
+"npm:agent-browser" = "0.39.2" # browser automation CLI for agents: drives the flutter/site docs site in a real browser
+"npm:agent-device" = "0.21.31" # mobile automation CLI for agents (Callstack): drives iOS/Android simulators for the Flutter packages
 
 [env]
 # mold as the Linux linker only where mise has installed it (clang is the driver): without mold
