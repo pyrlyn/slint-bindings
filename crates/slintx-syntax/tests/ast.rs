@@ -406,3 +406,19 @@ fn views_reject_other_kinds_and_skip_errors() {
     let items: Vec<SyntaxKind> = file.items().map(|i| i.syntax().kind()).collect();
     assert_eq!(items, [SyntaxKind::Component]);
 }
+
+#[test]
+fn legacy_component_names_the_ident_before_colon_equal() {
+    let root = parse("Main := Window { Text {} }\ncomponent Other inherits Main {}\n").syntax();
+    let names: Vec<String> = root
+        .children()
+        .filter_map(ast::Component::cast)
+        .map(|c| text(c.name()))
+        .collect();
+    assert_eq!(names, ["Main", "Other"]);
+    let legacy: ast::Component = first(&root);
+    assert_eq!(
+        text(legacy.base().and_then(|b| b.segments().next())),
+        "Window"
+    );
+}
