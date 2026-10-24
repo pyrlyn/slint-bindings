@@ -52,7 +52,6 @@ Not added: `slint_embed::events` is used only by slint_dart and stays there; `i-
 | T80 | todo | P1 | 5 | 0% | |
 | T81 | todo | P1 | 4 | 0% | |
 | T82 | todo | P1 | 5 | 0% | |
-| T83 | todo | P1 | 4 | 0% | |
 | T84 | todo | P1 | 4 | 0% | |
 | T85 | todo | P1 | 3 | 0% | |
 | T86 | todo | P2 | 5 | 0% | |
@@ -245,15 +244,6 @@ the same scripts through slintx and Slint with equal results.
 `cross-axis-self-alignment`, `layout-order`, implicit sizes and text measuring
 with parley. Try taffy for `FlexboxLayout` and keep it only if its results match
 Slint. Done when the harness geometry cases match Slint.
-
-### T83. slintx-wgpu without i-slint-core
-
-`slintx-wgpu` (T72) takes Slint's renderer traits, `Brush`/`Color` and
-`sharedparley` text from `i-slint-core`. Give it its own scene input types and
-parley-based text, and keep the `i-slint-core` adapter behind a feature for
-today's hosts. Starts after T72 is on `main`, agreed with T72's owner. Done when
-the crate builds without `i-slint-core` and T72's comparison tests still pass
-through the adapter.
 
 ### T84. Visual items on slintx-wgpu
 

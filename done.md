@@ -555,3 +555,52 @@ Result: `cargo nextest run` passes all 131 tests, including the FFI e2e snapshot
 and the slintx-wgpu comparisons that call the crate; clippy with warnings denied,
 the format check and `just license-check` pass (`rgba-png` is a dev-dependency,
 outside the gate's normal and build graph).
+
+### T83. slintx-wgpu without i-slint-core
+
+PR: https://github.com/pyrlyn/slint-bindings/pull/54 (split into T83.1–T83.3).
+
+slintx-wgpu now has its own scene input types, a `Canvas` drawing API and
+parley text, so it builds and draws without any Slint crate. The Slint
+renderer (`WgpuRenderer`) is an adapter over `Canvas` behind the non-default
+`slint` feature (`dep:i-slint-core`), which slint-bindings-core enables. The
+slintx-wgpu licence exemption in `scripts/slintx-check.sh` is gone.
+
+Checked: `cargo build -p slintx-wgpu --no-default-features` builds and
+`cargo tree -p slintx-wgpu --no-default-features -e normal,build` has no
+slint, slint-* or i-slint-* crate; `tests/compare.rs` passes through the
+adapter with every tolerance unchanged, and all 14 frames are byte-identical
+to `main`'s; `just renderer-check`, `just license-check`,
+`just license-check-test`, `just clippy`, `just nextest`, the format check,
+wasm-check, pinvoke-check, swift-package-check, swift-build and swift-test
+pass. `just header-check` was not run: cbindgen is not installed on that
+machine.
+
+### T83.1. slintx-wgpu: own scene input types and a drawing API
+
+`src/types.rs` holds `Color`, `GradientStop`, `Brush` (solid, linear, radial,
+conic), `Pixels`, `Image`, `ImageFit`, `Tiling`, `FillRule`, `LineCap`,
+`LineJoin`, `PathPlacement` and `Stroke`. `src/canvas.rs` is `Canvas`: a
+save/restore stack of origin, clip (rounded or not) and opacity, with
+`paint`, `fill_rect`, `stroke_rect`, `box_shadow`, `draw_image`, `fill_path`,
+`stroke_path` and `draw_glyph_run`. `Renderer` (`render`,
+`render_to_pixels`, `headless`) draws a closure on it; the image cache is keyed
+by the caller's `u64`. Checked by `tests/canvas.rs` and the unchanged
+comparison tests.
+
+### T83.2. slintx-wgpu: text on parley
+
+`Canvas::draw_layout` draws a `parley::Layout<Brush>` line by line through
+`draw_glyph_run`, with no sharedparley. parley is a workspace dependency at
+0.11.1, the version Slint 1.18.1 locks, so the adapter passes Slint's layouts
+through unchanged. Checked by `tests/text.rs` (ink stays inside the layout,
+covered pixels take the brush) and the comparison text frames.
+
+### T83.3. slintx-wgpu: the i-slint-core adapter behind a feature
+
+`src/adapter/` (`WgpuRenderer`, `Frame` as `ItemRenderer` over `Canvas`)
+compiles only with `slint = ["dep:i-slint-core"]`; a self dev-dependency keeps
+the comparison tests built. The license-check fixtures gain a host enabling the
+feature (passes) and `feature-default`, a crate turning it on by default
+(fails). The image cache also skips pixels larger than the device's
+`max_texture_dimension_2d`, which would otherwise fail the whole frame.

@@ -1,0 +1,8 @@
+[package]
+name = "host"
+version = "0.0.0"
+edition = "2024"
+publish = false
+
+[dependencies]
+slintx-wgpu = { path = "../slintx-wgpu", features = ["slint"] }

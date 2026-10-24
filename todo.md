@@ -11,7 +11,6 @@
 - T80. Reactive property runtime
 - T81. Component instances and public API
 - T82. Layout engine
-- T83. slintx-wgpu without i-slint-core
 - T84. Visual items on slintx-wgpu
 - T85. wasm32 build (slintx-web)
 - T86. Input and interactive items

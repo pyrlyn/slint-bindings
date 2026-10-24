@@ -5,10 +5,9 @@
 use std::rc::Rc;
 
 use bytemuck::{Pod, Zeroable};
-use i_slint_core::graphics::euclid;
-use i_slint_core::graphics::{Brush, Color, GradientStop};
 
 use crate::images::GpuImage;
+use crate::types::{Brush, Color, GradientStop, Rect};
 
 pub(crate) const KIND_FILL: u32 = 0;
 pub(crate) const KIND_RING: u32 = 1;
@@ -30,9 +29,6 @@ const BRUSH_CONIC: u32 = 3;
 pub(crate) const RAMP_WIDTH: usize = 256;
 /// Gradient rows one frame can hold; later gradients fall back to a solid color.
 pub(crate) const RAMP_ROWS: usize = 256;
-
-/// A device-pixel rectangle as `[x0, y0, x1, y1]`.
-pub(crate) type Rect = [f32; 4];
 
 pub(crate) const NO_CLIP: Rect = [-1e6, -1e6, 1e6, 1e6];
 
@@ -118,66 +114,39 @@ impl Scene {
     }
 
     /// Returns the brush index, or `None` for a brush that paints nothing.
-    /// Gradient geometry is in device pixels: `origin` is the top-left of the
-    /// box the brush fills and `size` its size.
-    pub fn push_brush(
-        &mut self,
-        brush: &Brush,
-        origin: [f32; 2],
-        size: [f32; 2],
-        scale: f32,
-    ) -> Option<u32> {
+    /// `origin` is the device-pixel point brush geometry is relative to.
+    pub fn push_brush(&mut self, brush: &Brush, origin: [f32; 2]) -> Option<u32> {
         if brush.is_transparent() {
             return None;
         }
+        let [ox, oy] = origin;
         let gpu = match brush {
-            Brush::SolidColor(color) => solid(*color),
-            Brush::LinearGradient(gradient) => {
-                let (start, end) = i_slint_core::graphics::line_for_angle(
-                    gradient.angle(),
-                    euclid::Size2D::new(size[0], size[1]),
-                );
-                self.gradient(
-                    BRUSH_LINEAR,
-                    [
-                        origin[0] + start.x,
-                        origin[1] + start.y,
-                        origin[0] + end.x,
-                        origin[1] + end.y,
-                    ],
-                    gradient.stops(),
-                )
-            }
-            Brush::RadialGradient(gradient) => {
-                let (cx, cy) = gradient.center_or_default_scaled(size[0], size[1], scale);
-                let radius = gradient.radius_or_default_scaled(size[0], size[1], scale);
-                self.gradient(
-                    BRUSH_RADIAL,
-                    [origin[0] + cx, origin[1] + cy, radius, 0.0],
-                    gradient.stops(),
-                )
-            }
-            Brush::ConicGradient(gradient) => {
-                let (cx, cy) = gradient.center_or_default_scaled(size[0], size[1], scale);
-                self.gradient(
-                    BRUSH_CONIC,
-                    [origin[0] + cx, origin[1] + cy, 0.0, 0.0],
-                    gradient.stops(),
-                )
-            }
-            _ => solid(brush.color()),
+            Brush::Solid(color) => solid(*color),
+            Brush::Linear { start, end, stops } => self.gradient(
+                BRUSH_LINEAR,
+                [ox + start[0], oy + start[1], ox + end[0], oy + end[1]],
+                stops,
+            ),
+            Brush::Radial {
+                center,
+                radius,
+                stops,
+            } => self.gradient(
+                BRUSH_RADIAL,
+                [ox + center[0], oy + center[1], *radius, 0.0],
+                stops,
+            ),
+            Brush::Conic { center, stops } => self.gradient(
+                BRUSH_CONIC,
+                [ox + center[0], oy + center[1], 0.0, 0.0],
+                stops,
+            ),
         };
         self.brushes.push(gpu);
         Some((self.brushes.len() - 1) as u32)
     }
 
-    fn gradient<'a>(
-        &mut self,
-        kind: u32,
-        geom: [f32; 4],
-        stops: impl Iterator<Item = &'a GradientStop>,
-    ) -> GpuBrush {
-        let stops: Vec<GradientStop> = stops.copied().collect();
+    fn gradient(&mut self, kind: u32, geom: [f32; 4], stops: &[GradientStop]) -> GpuBrush {
         let Some(first) = stops.first() else {
             return solid(Color::default());
         };
@@ -185,9 +154,9 @@ impl Scene {
         if row >= RAMP_ROWS {
             return solid(first.color);
         }
-        self.ramps.extend(ramp_row(&stops));
+        self.ramps.extend(ramp_row(stops));
         GpuBrush {
-            color: premultiplied(first.color),
+            color: first.color.premultiplied(),
             geom,
             kind,
             ramp: row as u32,
@@ -258,20 +227,10 @@ impl Scene {
 
 fn solid(color: Color) -> GpuBrush {
     GpuBrush {
-        color: premultiplied(color),
+        color: color.premultiplied(),
         kind: BRUSH_SOLID,
         ..GpuBrush::default()
     }
-}
-
-pub(crate) fn premultiplied(color: Color) -> [f32; 4] {
-    let a = color.alpha() as f32 / 255.0;
-    [
-        color.red() as f32 / 255.0 * a,
-        color.green() as f32 / 255.0 * a,
-        color.blue() as f32 / 255.0 * a,
-        a,
-    ]
 }
 
 /// Interpolates in premultiplied space, so a fade to transparent does not
@@ -279,7 +238,7 @@ pub(crate) fn premultiplied(color: Color) -> [f32; 4] {
 fn ramp_row(stops: &[GradientStop]) -> Vec<u8> {
     let colors: Vec<(f32, [f32; 4])> = stops
         .iter()
-        .map(|stop| (stop.position, premultiplied(stop.color)))
+        .map(|stop| (stop.position, stop.color.premultiplied()))
         .collect();
     let mut row = Vec::with_capacity(RAMP_WIDTH * 4);
     for i in 0..RAMP_WIDTH {
@@ -338,11 +297,11 @@ mod tests {
     fn ramp_interpolates_premultiplied() {
         let stops = [
             GradientStop {
-                color: Color::from_argb_u8(255, 255, 0, 0),
+                color: Color::rgba(255, 0, 0, 255),
                 position: 0.0,
             },
             GradientStop {
-                color: Color::from_argb_u8(0, 0, 0, 0),
+                color: Color::TRANSPARENT,
                 position: 1.0,
             },
         ];

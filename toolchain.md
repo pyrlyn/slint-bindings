@@ -22,14 +22,15 @@
 | slint-interpreter | local | https://github.com/slint-ui/slint | Compiles `.slint` at run time (`sb_compile`); the oracle in `slintx-conformance`'s tests (dev only) |
 | pollster | local | https://github.com/zesterer/pollster | Blocks on wgpu adapter and device requests (`slint-bindings-core`, `slintx-wgpu`) and on Slint's async compiler API (`slintx-conformance` tests, dev only) |
 | slint-dart-interpreter | local (path, `flutter/packages/slint_build/interpreter`) | https://github.com/listepo/slint_dart | Shared compile helper and JSON value bridge for properties and callbacks |
-| i-slint-core | local | https://github.com/slint-ui/slint | Image and SVG decoding without a backend; the renderer traits and shared parley text layout slintx-wgpu implements |
-| thiserror | local | https://github.com/dtolnay/thiserror | Core error enum |
+| i-slint-core | local | https://github.com/slint-ui/slint | Image and SVG decoding without a backend; the renderer traits and shared parley text layout behind slintx-wgpu's `slint` feature |
+| thiserror | local | https://github.com/dtolnay/thiserror | Core and slintx-wgpu error enums |
 | accesskit | local | https://github.com/AccessKit/accesskit | Platform-neutral accessibility tree built from the Slint item tree (T14) |
 | accesskit_macos | local (macOS) | https://github.com/AccessKit/accesskit | VoiceOver adapter behind the host `NSView` (T14) |
 | slintx-wgpu | local (path, `crates/slintx-wgpu`) | this repository | Our Slint renderer on wgpu; the only GPU renderer in the build |
 | wgpu | local | https://github.com/gfx-rs/wgpu | GPU API slintx-wgpu draws with; Metal and D3D12 surfaces in the core |
 | swash | local | https://github.com/dfrg/swash | Glyph rasterizing in slintx-wgpu |
 | lyon_tessellation | local | https://github.com/nical/lyon | Path fill and stroke tessellation in slintx-wgpu |
+| parley | local | https://github.com/linebender/parley | Text glyph runs and layouts slintx-wgpu draws, the same parley Slint locks |
 | bytemuck | local | https://github.com/Lokathor/bytemuck | Plain-data vertex and storage buffers in slintx-wgpu |
 | rgba-png | local (dev, git rev) | https://github.com/pyrlyn/crates | PNG snapshots and pixel comparison in the screenshot tests; shared with scull |
 | png | local (via rgba-png) | https://github.com/image-rs/image-png | Encode and decode the frame snapshots |

@@ -30,7 +30,9 @@ expect() {
 
 expect pass none       # no slintx-* crate: a no-op
 expect pass clean      # Slint only as a dev-dependency, or in a crate that is not slintx-*
-expect pass exempt     # slintx-wgpu until T83; slintx-conformance has Slint as a dev-dependency only
+expect pass exempt     # slintx-wgpu: i-slint-core behind a feature only the host turns on (the
+                       # gate must not take it from the workspace); slintx-conformance: dev-only
+expect fail feature-default # the same feature, on by default
 expect fail direct     # i-slint-core as a normal dependency
 expect fail transitive # slint through a helper crate
 expect fail build      # slint-build as a build dependency

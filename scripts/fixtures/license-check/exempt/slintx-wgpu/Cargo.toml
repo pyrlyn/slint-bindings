@@ -4,5 +4,8 @@ version = "0.0.0"
 edition = "2024"
 publish = false
 
+[features]
+slint = ["dep:i-slint-core"]
+
 [dependencies]
-i-slint-core = { path = "../../stubs/i-slint-core" }
+i-slint-core = { path = "../../stubs/i-slint-core", optional = true }
