@@ -6,15 +6,17 @@
 //! in one WGSL pipeline.
 //!
 //! [`Renderer::render`] hands a [`Canvas`] to the caller, which draws with the
-//! crate's own [`Brush`], [`Image`] and path types. [`WgpuRenderer`] does the
-//! same for a Slint window: Slint walks the item tree and lays text out
-//! (`sharedparley`), and the items are drawn through a [`Canvas`].
+//! crate's own [`Brush`], [`Image`], path and parley types. With the `slint`
+//! feature, `WgpuRenderer` does the same for a Slint window: Slint walks the
+//! item tree and lays text out (`sharedparley`), and the items are drawn
+//! through a [`Canvas`]. Without it, no Slint crate is in the build.
 //!
 //! Not supported yet: rotation and scaling (like Slint's software renderer,
-//! [`WgpuRenderer`] reports no support for transformations), layers (children
+//! `WgpuRenderer` reports no support for transformations), layers (children
 //! of an `Opacity` fade one by one), inset box shadows, and more than one
 //! rounded clip at a time.
 
+#[cfg(feature = "slint")]
 mod adapter;
 mod canvas;
 mod glyphs;
@@ -28,6 +30,7 @@ pub use lyon_tessellation::path;
 pub use parley;
 pub use wgpu;
 
+#[cfg(feature = "slint")]
 pub use crate::adapter::WgpuRenderer;
 pub use crate::canvas::{Canvas, GlyphRun, ImageStyle, Paint};
 pub use crate::renderer::{Error, Renderer};

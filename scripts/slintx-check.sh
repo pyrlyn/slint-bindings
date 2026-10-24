@@ -20,14 +20,13 @@ manifest="${2:-Cargo.toml}"
 [ -f "$manifest" ] || { echo "no manifest at $manifest" >&2; exit 2; }
 
 # Crates a check skips for now. Each entry names the task that removes it.
-# license: slintx-wgpu (T72) implements i-slint-core's renderer traits until T83.
 # wasm: slintx-wgpu's tests need a native GPU adapter; its wasm32 path comes with T85.
 # wasm: slintx-conformance (T74) is a native-only harness: a native Slint oracle and a corpus
 # read from disk. Not a removal task, it never ships for wasm32.
 # wasm: slintx-convert (T89) is a native CLI whose tests read fixtures from disk and run the
 # binary. Not a removal task either.
 # shellcheck disable=SC2034 # read through ${!list} in checked()
-exempt_license=" slintx-wgpu "
+exempt_license=" "
 # shellcheck disable=SC2034
 exempt_wasm=" slintx-wgpu slintx-conformance slintx-convert "
 

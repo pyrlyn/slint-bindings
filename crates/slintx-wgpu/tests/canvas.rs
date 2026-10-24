@@ -209,6 +209,36 @@ fn images_with_the_wrong_pixel_count_are_skipped() -> TestResult {
 }
 
 #[test]
+fn images_larger_than_the_device_allows_are_skipped() -> TestResult {
+    let Some(renderer) = renderer() else {
+        return Ok(());
+    };
+    let width = renderer.device().limits().max_texture_dimension_2d + 1;
+    let image = Image {
+        key: None,
+        size: [width, 1],
+        texture_size: [width, 1],
+    };
+    let fit = ImageFit {
+        size: [40.0, 40.0],
+        source_clip: [0.0, 0.0, width as f32, 1.0],
+        source_to_target: [40.0 / width as f32, 40.0],
+        ..ImageFit::default()
+    };
+    let pixels = renderer.render_to_pixels(SIZE, |canvas| {
+        canvas.draw_image(&image, &[fit], ImageStyle::default(), || {
+            Some(Pixels {
+                width,
+                height: 1,
+                data: vec![255; width as usize * 4],
+            })
+        });
+    })?;
+    assert!(pixels.iter().all(|&c| c == 0));
+    Ok(())
+}
+
+#[test]
 fn paths_fill_in_their_own_units() -> TestResult {
     // A right triangle in units of 10 device pixels.
     let mut builder = Path::builder();

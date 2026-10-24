@@ -102,8 +102,9 @@ impl ImageCache {
     }
 
     /// Returns the cached texture for `key` at `size`, or uploads what
-    /// `pixels` returns. An image without a key is uploaded every time, and
-    /// pixels whose length does not match their size are not drawn.
+    /// `pixels` returns. An image without a key is uploaded every time.
+    /// Pixels whose length does not match their size, or larger than the
+    /// device's textures, are not drawn: wgpu would fail the whole frame.
     pub fn get(
         &mut self,
         uploader: &Uploader<'_>,
@@ -117,7 +118,8 @@ impl ImageCache {
             *used = self.frame;
             return Some(image.clone());
         }
-        let pixels = pixels().filter(Pixels::is_valid)?;
+        let max = uploader.device.limits().max_texture_dimension_2d;
+        let pixels = pixels().filter(|p| p.is_valid() && p.width.max(p.height) <= max)?;
         let image = uploader.upload(pixels.width, pixels.height, &pixels.data);
         if let Some(key) = key {
             self.entries
