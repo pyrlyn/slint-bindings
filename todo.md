@@ -3,7 +3,6 @@
 - T14. Accessibility spike
 - T15. iOS host
 - T17. Web build
-- T75. Modules, imports and exports
 - T76. Name resolution
 - T77. Type checker
 - T78. Lowering to an IR

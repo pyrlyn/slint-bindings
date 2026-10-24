@@ -35,7 +35,7 @@
 | rgba-png | local (dev, git rev) | https://github.com/pyrlyn/crates | PNG snapshots and pixel comparison in the screenshot tests; shared with scull |
 | png | local (via rgba-png) | https://github.com/image-rs/image-png | Encode and decode the frame snapshots |
 | rowan | local | https://github.com/rust-analyzer/rowan | Lossless syntax tree of `slintx-syntax` |
-| wasm-bindgen-test | local | https://github.com/wasm-bindgen/wasm-bindgen | Runs the `slintx-syntax` tests on `wasm32-unknown-unknown` |
+| wasm-bindgen-test | local | https://github.com/wasm-bindgen/wasm-bindgen | Runs the `slintx-syntax` and `slintx-modules` tests on `wasm32-unknown-unknown` |
 | quick-xml | local | https://github.com/tafia/quick-xml | Escaping in `slintx-convert`'s XML, HTML and storyboard output; well-formedness checks in its tests |
 | clap | local | https://github.com/clap-rs/clap | Arguments of the `slint-convert` binary |
 | anyhow | local | https://github.com/dtolnay/anyhow | The one error that reaches `slint-convert`'s `main` |

@@ -218,11 +218,20 @@ impl<'a> Parser<'a> {
 /// Compares identifiers the way Slint does: `_` after the first character
 /// equals `-`.
 pub(crate) fn same_name(a: &str, b: &str) -> bool {
-    let normalize = |(i, c): (usize, char)| if i > 0 && c == '_' { '-' } else { c };
     a.chars()
         .enumerate()
         .map(normalize)
         .eq(b.chars().enumerate().map(normalize))
+}
+
+/// `name` spelled so that names [`same_name`] treats as equal are equal
+/// strings, for use as a map key.
+pub fn normalize_name(name: &str) -> String {
+    name.chars().enumerate().map(normalize).collect()
+}
+
+fn normalize((i, c): (usize, char)) -> char {
+    if i > 0 && c == '_' { '-' } else { c }
 }
 
 type GreenElement = NodeOrToken<GreenNode, GreenToken>;
