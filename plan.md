@@ -63,6 +63,11 @@ Status: in progress (implementation verified, awaiting review). Priority: P1.
 Complexity: 4. Readiness: 100%. Agent: OpenAI / GPT-6.
 Branch: `codex/review-20261024`, based on `907c42c`.
 
+PR #59 CI follow-up: Windows exposed a platform-specific path assertion in
+the module loader test. Compare paths as Path values, rerun module tests and
+the PR checks, then merge after successful validation. The shared CI cancels
+the run after a failed test, so cancelled job steps must also be inspected.
+
 Execution: review the host/FFI, renderer, image utilities and compiler/test
 boundaries; run the workspace baseline; reproduce confirmed failures; apply
 narrow fixes; verify Rust, Swift, wasm and ABI/dependency gates. Preserve other
