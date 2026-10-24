@@ -10,7 +10,7 @@
 //! | Stage | What is compared | State |
 //! | --- | --- | --- |
 //! | 1. Verdict | Slint's accept/reject and diagnostic positions against `.expected` | live (`tests/stage1_slint.rs`) |
-//! | 2. Parse | Every case Slint accepts parses without syntax errors and round-trips | hook ready, [`Frontend`] stubbed until `slintx-syntax` lands |
+//! | 2. Parse | Every case Slint accepts parses without syntax errors and round-trips | live (`tests/stage2_slintx.rs`, `slintx-syntax`) |
 //! | 3. Values | Property values after scripted steps | stub: needs the slintx evaluator and runtime |
 //! | 4. Geometry | Layout geometry of every element | stub: needs the slintx layout engine |
 //! | 5. Pixels | Rendered frames within a pixel budget (`rgba-png`) | stub: needs `slintx-wgpu` |
@@ -221,27 +221,16 @@ pub struct Parsed {
     pub text: String,
 }
 
-/// The slintx side of stage 2. `slintx-syntax` implements it once it lands.
+/// The slintx side of stage 2. The tests implement it for `slintx-syntax`;
+/// it stays a trait so the stage's own plumbing can be tested with fakes.
 pub trait Frontend {
-    /// `None` while the front end does not exist, so the stage reports
-    /// itself as skipped instead of failing.
-    fn parse(&self, source: &str) -> Option<Parsed>;
-}
-
-/// Stand-in until `slintx-syntax` (T73.1) is on `main`.
-pub struct NoFrontend;
-
-impl Frontend for NoFrontend {
-    fn parse(&self, _source: &str) -> Option<Parsed> {
-        None
-    }
+    fn parse(&self, source: &str) -> Parsed;
 }
 
 /// Stage 2 result over the corpus.
 #[derive(Debug, Default, PartialEq, Eq)]
 pub struct ParseReport {
     pub checked: usize,
-    pub skipped: bool,
     pub failures: Vec<String>,
 }
 
@@ -258,10 +247,7 @@ pub fn check_parse(frontend: &dyn Frontend, cases: &[Case]) -> io::Result<ParseR
         }
         for file in &case.files {
             let source = fs::read_to_string(file)?;
-            let Some(parsed) = frontend.parse(&source) else {
-                report.skipped = true;
-                return Ok(report);
-            };
+            let parsed = frontend.parse(&source);
             report.checked += 1;
             let name = relative(&corpus_root(), file);
             if !parsed.errors.is_empty() {

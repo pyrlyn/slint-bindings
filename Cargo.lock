@@ -3891,6 +3891,7 @@ version = "0.1.0"
 dependencies = [
  "pollster",
  "slint-interpreter",
+ "slintx-syntax",
 ]
 
 [[package]]
