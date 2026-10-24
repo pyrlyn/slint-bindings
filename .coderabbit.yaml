@@ -1,10 +1,12 @@
 # yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+# Central CodeRabbit configuration for the pyrlyn organization. It applies to every repository
+# that has no .coderabbit.yaml of its own (https://docs.coderabbit.ai/configuration/central-configuration).
 # CodeRabbit speaks only through review findings: no summary, walkthrough extras, poem, status
-# or fortune comments, no unprompted chat replies. Reviews, tools and their findings are
-# unchanged; actionable inline findings become issues (.github/workflows/coderabbit-issues.yml
-# where Actions run). Settings not listed here come from the CodeRabbit UI (`inheritance`).
-inheritance: true
+# or fortune comments, no unprompted chat replies. Reviews stay on demand. Reviews, tools and
+# their findings are unchanged.
 reviews:
+  auto_review:
+    enabled: false
   high_level_summary: false
   review_status: false
   in_progress_fortune: false
