@@ -168,12 +168,12 @@ fn utf16_to_byte(text: &str, utf16_offset: i32) -> Result<usize, Error> {
         if units == target {
             return Ok(byte);
         }
+        units += ch.len_utf16();
         if units > target {
             return Err(Error::InvalidArgument(
                 "the IME caret falls inside a Unicode scalar",
             ));
         }
-        units += ch.len_utf16();
     }
     Ok(text.len())
 }
@@ -241,5 +241,22 @@ mod tests {
         let mut ime = ImeSession::default();
         assert_eq!(ime.completed(false), ImeUpdate::Ignored);
         assert_eq!(ime.set_selection(0, 1), ImeUpdate::Ignored);
+    }
+
+    #[test]
+    fn replacement_rejects_a_caret_inside_the_final_surrogate_pair() -> Result<(), Error> {
+        let mut ime = ImeSession::default();
+        ime.started();
+        ime.replace(0, 0, "a😀", 1, 3)?;
+        for (start, end) in [(2, 2), (1, 2), (2, 3)] {
+            assert!(ime.replace(start, end, "x", 0, 0).is_err());
+            assert_eq!(ime.document(), "a😀");
+            assert_eq!(ime.selection(), (1, 3));
+        }
+        ime.replace(1, 3, "b", 2, 2)?;
+        assert_eq!(ime.document(), "ab");
+        ime.replace(99, 99, "c", 3, 3)?;
+        assert_eq!(ime.document(), "abc");
+        Ok(())
     }
 }
