@@ -78,7 +78,9 @@ Not added: `slint_embed::events` is used only by slint_dart and stays there; `i-
 | T89.2 | in progress | P1 | 3 | 95% | Claude / opus-5.5 |
 | T89.3 | in progress | P1 | 3 | 95% | Claude / opus-5.5 |
 | T89.4 | in progress | P1 | 4 | 95% | Claude / opus-5.5 |
-| T89.5 | todo | P2 | 5 | 0% | |
+| T89.5 | in progress | P2 | 5 | 5% | Claude / opus-5.5 |
+| T89.5.1 | in progress | P2 | 4 | 0% | Claude / opus-5.5 |
+| T89.5.2 | in progress | P2 | 4 | 0% | Claude / opus-5.5 |
 
 ## Milestones
 
@@ -645,3 +647,44 @@ the GTK 4 typelibs, so the image starts from Debian. Still unproven and to be
 measured here: the default stretch the backends assume per widget, and whether
 UIKit stack views apply their margins (`layoutMarginsRelativeArrangement`,
 which Interface Builder drops on save) — check in the iOS Simulator.
+
+Split at claim time (more than 500 lines): T89.5.1 is the Linux side and
+the shared harness, T89.5.2 the Apple side. Done when both are.
+
+Plan:
+
+1. Every converted element gets a key both sides can see at run time: its
+   `.slint` line and column. HTML already has `data-at`; an opt-in
+   `Options::source_tags` (CLI `--source-tags`) adds it to the Blueprint
+   widget `name` and to the storyboard view identifier.
+2. `tests/geometry.rs`: the Slint reference. Each fixture is built with
+   `slint-interpreter` (dev-dependency only), drawn by the software platform
+   `slint-embed` already provides, and each element's rectangle is read back
+   through the interpreter's source-position lookup.
+3. One measurer per target writes `{key: rect}` JSON and a PNG; the test
+   compares rectangles within a tolerance and reports the `rgba-png` pixel
+   share against a soft threshold. Known gaps are a listed, reasoned
+   allow-list, and a listed gap that no longer diverges fails too.
+4. Measurement results go into this card.
+
+Check: `cargo nextest run -p slintx-convert` stays green without the tools;
+the ignored tests pass in the Docker image (Colima) and on macOS.
+
+### T89.5.1. slintx-convert: Linux screenshot and geometry tests
+
+Source tags (step 1), the Slint reference (step 2), the HTML measurer
+(headless Chromium dumps `getBoundingClientRect` and takes a screenshot) and
+the GTK measurer (a PyGObject loader under xvfb reads `compute_bounds` and
+renders a `Gtk.WidgetPaintable`). `docker/convert-platforms/Dockerfile`:
+Debian trixie with Rust, GTK 4, `blueprint-compiler`, xvfb and Chromium;
+`just convert-platforms` runs the ignored tests in it on Colima; a Linux CI
+job runs the same image. Records the default stretch per widget.
+
+### T89.5.2. slintx-convert: AppKit geometry tests and the UIKit check
+
+The AppKit measurer: `ibtool --compile`, then a Swift loader instantiates
+the scene, lays it out at the reference size and dumps view frames by
+identifier and a 1x bitmap. `cfg(target_os = "macos")` and `#[ignore]`, run
+by the macOS `just check` job. In the iOS Simulator: whether `UIStackView`
+keeps `layoutMarginsRelativeArrangement` after `ibtool` and what the UIKit
+frames are; results recorded here.

@@ -33,3 +33,5 @@
 - T89.3. slintx-convert: `blueprint` backend
 - T89.4. slintx-convert: `storyboard` backend
 - T89.5. slintx-convert: screenshot and geometry tests
+- T89.5.1. slintx-convert: Linux screenshot and geometry tests
+- T89.5.2. slintx-convert: AppKit geometry tests and the UIKit check
