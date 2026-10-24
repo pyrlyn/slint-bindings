@@ -38,6 +38,7 @@ Gtk.Window {
       column-spacing: 6;
       Gtk.Label {
         label: "Name";
+        vexpand: true;
         xalign: 0;
         yalign: 0;
         layout {
@@ -46,7 +47,6 @@ Gtk.Window {
         }
       }
       Gtk.Box {
-        hexpand: true;
         vexpand: true;
         layout {
           row: 0;
@@ -55,6 +55,7 @@ Gtk.Window {
       }
       Gtk.Label {
         label: "Mail";
+        vexpand: true;
         xalign: 0;
         yalign: 0;
         layout {
@@ -73,6 +74,7 @@ Gtk.Window {
       }
       Gtk.Label {
         label: "Notes";
+        vexpand: true;
         xalign: 0;
         yalign: 0;
         layout {
@@ -82,13 +84,13 @@ Gtk.Window {
       }
     }
     Gtk.Box {
-      vexpand: true;
       margin-top: 4;
       orientation: horizontal;
       halign: end;
       Gtk.Box {
         width-request: 80;
         height-request: 24;
+        valign: start;
       }
     }
   }

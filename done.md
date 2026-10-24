@@ -580,6 +580,188 @@ and the slintx-wgpu comparisons that call the crate; clippy with warnings denied
 the format check and `just license-check` pass (`rgba-png` is a dev-dependency,
 outside the gate's normal and build graph).
 
+### T89. slint-convert: `.slint` to XML, HTML, Storyboard and Blueprint
+
+A converter that keeps the structure and meaning of a `.slint` file, not its
+pixels: the element tree, the layouts (`HorizontalLayout`, `VerticalLayout`,
+`GridLayout`), alignment, stretch, texts, bindings and handlers. It parses with
+`slintx-syntax` only (never `i-slint-compiler`); type checking, import
+resolution and layout are the converter's own job. Slint logic is never run:
+bindings become outlets and actions (Storyboard), signal handlers (Blueprint),
+ids and `data-*` attributes (HTML). Missing AST features go into
+`slintx-syntax` as their own change, never around it by reading source text.
+
+Done when `crates/slintx-convert` ships a library and the `slint-convert`
+binary (`slint-convert <input> --to xml|html|storyboard|blueprint -o <out>`,
+`--strict`), four backends on one `Backend` trait over a format-free IR, the
+fixtures and tests below are green under `just check`, and the README support
+table, its limits and `docs/mapping.md` are written.
+
+Decisions: the crate lives in this workspace as `slintx-convert` so the
+licence gate covers it (no `slint`, `slint-*` or `i-slint-*` in its normal or
+build graph); it is exempt from the wasm32 check, as a native CLI. GTK and HTML
+screenshot tests run in one Docker image, locally on Colima and in Linux CI;
+`ibtool` runs on the macOS runner.
+
+Result: done in PR #43 (0f5ec0b) and https://github.com/pyrlyn/slint-bindings/pull/56. `crates/slintx-convert`
+ships the library and the `slint-convert` binary with the four backends on one
+`Backend` trait, the README support table and limits, and `docs/mapping.md`
+(generated widget table, checked by a test). Every fixture is green under
+`cargo nextest run -p slintx-convert`, and the platform tests are green on
+Colima, macOS and the iOS Simulator.
+
+### T89.1. slintx-convert: IR, `Backend`, CLI and the `xml` backend
+
+Blocker for T89.2-T89.5.
+
+Plan:
+
+1. `crates/slintx-convert`: `Cargo.toml` (lib + `[[bin]] slint-convert`),
+   deps `slintx-syntax` (path), `thiserror`, `quick-xml` (escaping and XML
+   writing), `clap` and `anyhow` for the binary only; dev-deps `insta`,
+   `trycmd`.
+2. `ir.rs`: `Document` → components → `Node` (base widget, id, properties with
+   units, bindings, handlers, `for`/`if` markers, children, `Origin` with file,
+   line and column from the `TextRange`). `Layout` model: kind, spacing,
+   padding, alignment; per child stretch, min/max/preferred size and grid
+   cells (`Row`, `row`, `col`, `rowspan`, `colspan`).
+3. `lower.rs`: AST → IR. Parse diagnostics are printed with positions and
+   stop the run. Local components are kept as definitions and inlined at use
+   sites with their origin; the root is the last exported component.
+4. `mapping.rs`: the widget table as plain data (Slint widget → XML element,
+   HTML tag, UIKit/AppKit class, GTK class). `docs/mapping.md` is generated
+   from it; a test fails when the doc is stale.
+5. `diag.rs`: warnings with positions; unsupported input becomes a warning
+   plus a comment stub, an error under `--strict`.
+6. `backend/mod.rs` (`Backend` trait, `Format`), `backend/xml.rs`.
+7. `src/bin/slint-convert.rs`: clap front end only.
+8. Fixtures in `crates/slintx-convert/tests/fixtures/`: nested layouts,
+   stretch, Unicode, `for`, `if`, components, a broken file, an unsupported
+   widget. `insta` snapshots of IR and XML; `trycmd` for the CLI; XML checked
+   well-formed by re-parsing with `quick-xml`.
+9. `scripts/slintx-check.sh`: add `slintx-convert` to `exempt_wasm`;
+   `toolchain.md` and `rust.md` rows for new crates.
+
+Check: `cargo fmt --check`, `cargo clippy -p slintx-convert --all-targets --
+-D warnings`, `cargo nextest run -p slintx-convert`, `just license-check`.
+
+Result: done in PR #43 (0f5ec0b).
+
+### T89.2. slintx-convert: `html` backend
+
+HTML plus CSS flex (box layouts) and grid (`GridLayout`); ids, `data-*` for
+bindings and handlers. Snapshots, and the output validated as well-formed.
+
+Result: done in PR #43 (0f5ec0b); the T89.5 geometry tests later corrected its stretch and alignment rules.
+
+### T89.3. slintx-convert: `blueprint` backend
+
+GTK 4 Blueprint: `Gtk.Box`/`Gtk.Grid`, `hexpand`/`vexpand`, `halign`/`valign`,
+signal handlers for callbacks. Snapshots; `blueprint-compiler` validation as a
+platform test (`#[ignore]` without the tool).
+
+Result: done in PR #43 (0f5ec0b); the T89.5 geometry tests later corrected its stretch and alignment rules.
+
+### T89.4. slintx-convert: `storyboard` backend
+
+UIKit or AppKit by flag, Auto Layout with `UIStackView`/`NSStackView` and
+constraints, outlets and actions for bindings and callbacks. Snapshots;
+`ibtool --compile` validation on macOS only (`cfg`).
+
+Result: done in PR #43 (0f5ec0b); the T89.5 geometry tests later corrected its stretch and alignment rules.
+
+### T89.5. slintx-convert: screenshot and geometry tests
+
+One Docker image (GTK 4, `blueprint-compiler`, xvfb, headless Chromium) run on
+Colima and in Linux CI; `ibtool` and an AppKit loader on macOS; Slint
+reference geometry from `slint-viewer` or the `slintx-conformance` oracle
+(dev-only). Compare element rectangles with a tolerance and a soft perceptual
+threshold through `pixel-diff`. Platform tests are `#[ignore]` or `cfg`-gated.
+
+Known so far: the Blueprint output compiles with `blueprint-compiler` 0.16.0
+and the GTK 4 typelibs on Debian trixie; Fedora's 0.20.4 package does not find
+the GTK 4 typelibs, so the image starts from Debian. Still unproven and to be
+measured here: the default stretch the backends assume per widget, and whether
+UIKit stack views apply their margins (`layoutMarginsRelativeArrangement`,
+which Interface Builder drops on save) — check in the iOS Simulator.
+
+Split at claim time (more than 500 lines): T89.5.1 is the Linux side and
+the shared harness, T89.5.2 the Apple side. Done when both are.
+
+Plan:
+
+1. Every converted element gets a key both sides can see at run time: its
+   `.slint` line and column. HTML already has `data-at`; an opt-in
+   `Options::source_tags` (CLI `--source-tags`) adds it to the Blueprint
+   widget `name` and to the storyboard view identifier.
+2. `tests/geometry.rs`: the Slint reference. Each fixture is built with
+   `slint-interpreter` (dev-dependency only), drawn by the software platform
+   `slint-embed` already provides, and each element's rectangle is read back
+   through the interpreter's source-position lookup.
+3. One measurer per target writes `{key: rect}` JSON and a PNG; the test
+   compares rectangles within a tolerance and reports the `rgba-png` pixel
+   share against a soft threshold. Known gaps are a listed, reasoned
+   allow-list, and a listed gap that no longer diverges fails too.
+4. Measurement results go into this card.
+
+Check: `cargo nextest run -p slintx-convert` stays green without the tools;
+the ignored tests pass in the Docker image (Colima) and on macOS.
+
+Result: done in T89.5.1 and T89.5.2 (https://github.com/pyrlyn/slint-bindings/pull/56). Measured against Slint 1.18.1:
+
+- Default stretch: every widget in the table matches Slint's except
+  `TextInput`, which is (0, 0), not (1, 0) (text and image items keep
+  stretch 0). `Empty` is not public in 1.18, and `GroupBox` takes its
+  stretch from its content, so neither is probed. A layout's stretch is
+  derived from its children, a grid line's from its single-span cells.
+- UIKit: after `ibtool --compile` a padded `UIStackView` keeps
+  `layoutMarginsRelativeArrangement` and applies its margins (iOS 27.1
+  Simulator); its frames equal AppKit's.
+- AppKit: controls must be measured by their alignment rectangle (the frame
+  adds the bezel). `NSStackView` keeps hidden views' space by default, as
+  Slint does, and Interface Builder drops an explicit
+  `detachesHiddenViews="NO"`; it also writes UIKit's `leading` as `top`.
+- Known differences, listed per fixture in `tests/geometry.rs`: storyboards
+  make equal-stretch items the same size where Slint grows them by the same
+  amount, and native controls have their own heights (24 px AppKit, 21 px
+  HTML, 34 px GTK, Fluent 32 px); GTK loses stretch ratios, `space-between`
+  and per-column growth under a span; HTML and GTK fonts set texts a few
+  pixels wider; a `for` is emitted once.
+
+### T89.5.1. slintx-convert: Linux screenshot and geometry tests
+
+Source tags (step 1), the Slint reference (step 2), the HTML measurer
+(headless Chromium dumps `getBoundingClientRect` and takes a screenshot) and
+the GTK measurer (a PyGObject loader under xvfb reads `compute_bounds` and
+renders a `Gtk.WidgetPaintable`). `crates/slintx-convert/tests/platform/Dockerfile`:
+Debian trixie with Rust, GTK 4, `blueprint-compiler`, xvfb and Chromium;
+`just convert-platforms` runs the ignored tests in it on Colima; a Linux CI
+job runs the same image. Records the default stretch per widget.
+
+Result: dcb937e. `--source-tags`, `tests/geometry.rs` with the Slint
+reference, the Chromium and GTK measurers, and the image in
+`crates/slintx-convert/tests/platform/Dockerfile` (`just convert-platforms`,
+the `convert-platforms` CI job). The measurements fixed `TextInput`'s
+stretch, the equal-growth rule (children that keep their size do not count;
+a non-stretch box never keeps its size), grid line stretch in HTML and GTK,
+and start placement across a GTK box. Checked: all 37 tests, ignored ones
+included, pass in the image on Colima.
+
+### T89.5.2. slintx-convert: AppKit geometry tests and the UIKit check
+
+The AppKit measurer: `ibtool --compile`, then a Swift loader instantiates
+the scene, lays it out at the reference size and dumps view frames by
+identifier and a 1x bitmap. `cfg(target_os = "macos")` and `#[ignore]`, run
+by the macOS `just check` job. In the iOS Simulator: whether `UIStackView`
+keeps `layoutMarginsRelativeArrangement` after `ibtool` and what the UIKit
+frames are; results recorded here.
+
+Result: 033647b. The AppKit loader runs from `just convert-apple`, which the
+macOS CI job runs after `just check` (not inside it). The UIKit app needs a
+booted simulator, so `uikit_matches_slint` runs by hand. Checked:
+`appkit_matches_slint`, `uikit_matches_slint` (iPhone Duo, iOS 27.1) and
+both ibtool tests pass.
+
 ### T83. slintx-wgpu without i-slint-core
 
 PR: https://github.com/pyrlyn/slint-bindings/pull/54 (split into T83.1–T83.3).

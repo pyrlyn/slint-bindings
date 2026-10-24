@@ -24,6 +24,14 @@ anyhow = "1.0.104"
 [dev-dependencies]
 insta = "1.49.0"
 trycmd = "1.2.1"
+# The geometry tests' reference: each fixture laid out and drawn by Slint
+# itself. Dev-only, so the licence gate's normal and build graph stays clean.
+# `internal-highlight` maps a source position to the element's rectangle.
+slint = { workspace = true }
+slint-interpreter = { workspace = true, features = ["internal-highlight"] }
+slint-embed = { workspace = true }
+pollster = { workspace = true }
+rgba-png = { workspace = true }
 
 [lints]
 workspace = true

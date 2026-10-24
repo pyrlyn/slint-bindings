@@ -90,6 +90,11 @@ layout, property and handler.
   vertically.
 - Blueprint: GTK expands children equally, so stretch ratios other than 0 and
   1 are lost. `max-*` and `preferred-*` sizes have no equivalent.
+- Slint grows equal-stretch children by the same amount past their own size;
+  storyboards make them the same size instead. Native controls keep their
+  own sizes (an `NSButton` is 24 px high, Fluent's `Button` 32 px).
+- A hidden element keeps its place in Slint, HTML and AppKit. UIKit stack
+  views and GTK boxes drop it.
 
 ## Tests
 
@@ -104,9 +109,26 @@ cargo nextest run -p slintx-convert
   `ibtool` and survive an Interface Builder round trip with every attribute
   kept. Blueprint compiles with `blueprint-compiler`.
 
+- `tests/geometry.rs`: every fixture laid out by Slint itself (through
+  `slint-interpreter`, a dev-dependency only) and by the converted output on
+  its real target, compared element by element. Elements are matched by
+  their `.slint` line and column (`--source-tags`); rectangles must agree
+  within 2 px, and the share of differing pixels is reported, not failed.
+  Known differences are listed per fixture with the reason, and a listed
+  fixture that agrees again fails. Frames and diffs are written under
+  `target/tmp/slintx-convert-geometry/`. The default stretch of every widget
+  is checked against Slint here too.
+
 The external tools are not installed everywhere, so these tests are
-`#[ignore]`d. Run them with:
+`#[ignore]`d. The geometry tests need `cargo nextest`: Slint takes one
+platform per process.
 
 ```bash
-cargo nextest run -p slintx-convert --run-ignored all
+# Blueprint and GTK 4 under xvfb, HTML in headless Chromium: the Docker image
+# in tests/platform, on Colima.
+just convert-platforms
+# ibtool and the AppKit geometry, on macOS.
+just convert-apple
+# The UIKit geometry, in a booted iOS Simulator.
+cargo nextest run -p slintx-convert --run-ignored only -E 'test(uikit)'
 ```

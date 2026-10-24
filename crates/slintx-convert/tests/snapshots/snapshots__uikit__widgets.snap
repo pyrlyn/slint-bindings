@@ -20,12 +20,12 @@ expression: "render(name, format, options)"
             <viewLayoutGuide key="safeArea" id="s00-00-003"/>
             <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
             <subviews>
-              <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="6" distribution="fill" alignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-004">
+              <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="6" distribution="fill" alignment="top" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-004">
                 <subviews>
                   <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-005">
                     <state key="normal" title="OK"/>
                   </button>
-                  <stackView opaque="NO" contentMode="scaleToFill" axis="horizontal" spacing="8" distribution="fill" alignment="center" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-009">
+                  <stackView opaque="NO" contentMode="scaleToFill" axis="horizontal" spacing="8" distribution="fill" alignment="top" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-009">
                     <subviews>
                       <switch opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-007"/>
                       <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="Remember me" horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-008">
@@ -38,7 +38,7 @@ expression: "render(name, format, options)"
                       <constraint firstItem="s00-00-010" firstAttribute="height" secondItem="s00-00-009" secondAttribute="height" id="s00-00-011"/>
                     </constraints>
                   </stackView>
-                  <stackView opaque="NO" contentMode="scaleToFill" axis="horizontal" spacing="8" distribution="fill" alignment="center" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-014">
+                  <stackView opaque="NO" contentMode="scaleToFill" axis="horizontal" spacing="8" distribution="fill" alignment="top" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-014">
                     <subviews>
                       <switch opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="NO" horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-012"/>
                       <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="Wi-Fi" horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-013">
@@ -63,7 +63,7 @@ line</string>
                   </textView>
                   <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="40" minValue="0" maxValue="100" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-019"/>
                   <progressView opaque="NO" contentMode="scaleToFill" progressViewStyle="default" progress="0.25" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-020"/>
-                  <stackView opaque="NO" contentMode="scaleToFill" axis="horizontal" spacing="8" distribution="fill" alignment="center" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-023">
+                  <stackView opaque="NO" contentMode="scaleToFill" axis="horizontal" spacing="8" distribution="fill" alignment="top" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-023">
                     <subviews>
                       <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="3" horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-022">
                         <fontDescription key="fontDescription" type="system" pointSize="14"/>

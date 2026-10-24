@@ -18,7 +18,7 @@ expression: "render(name, format, options)"
           <div data-slint="Rectangle" data-at="9:13" style="flex:2 1 auto;background:green"></div>
           <div data-slint="Rectangle" data-at="10:13" style="flex:0 1 auto;min-width:40px;background:blue"></div>
         </div>
-        <div data-slint="HorizontalLayout" data-at="12:9" style="flex:1 1 auto;display:flex;flex-direction:row;justify-content:center">
+        <div data-slint="HorizontalLayout" data-at="12:9" style="flex:0 1 auto;display:flex;flex-direction:row;justify-content:center">
           <div data-slint="Rectangle" data-at="14:13" style="flex:0 1 50px;max-width:80px;background:#336699"></div>
           <div data-slint="Rectangle" data-at="15:13" style="flex:0 1 50px;background:#996633"></div>
         </div>

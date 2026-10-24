@@ -10,5 +10,6 @@ Options:
   -o, --output <OUTPUT>      Write here instead of standard output
       --platform <PLATFORM>  Storyboard framework [default: uikit] [possible values: uikit, appkit]
       --strict               Treat every warning as an error
+      --source-tags          Tag every element with its .slint line and column (GTK widget name, AppKit identifier, UIKit accessibility identifier)
   -h, --help                 Print help
   -V, --version              Print version

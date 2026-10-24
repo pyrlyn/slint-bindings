@@ -6,7 +6,7 @@
 
 use std::collections::HashSet;
 
-use super::{Backend, Markup, escape, number, value_text};
+use super::{Backend, Markup, escape, number, source_tag, value_text};
 use crate::diag::Diagnostics;
 use crate::ir::*;
 use crate::mapping::{self, Role, Widget, stretch};
@@ -151,7 +151,7 @@ impl Emitter<'_> {
         if let Some(c) = &n.component {
             el.attr("data-component", c.clone());
         }
-        el.attr("data-at", format!("{}:{}", n.origin.line, n.origin.column));
+        el.attr("data-at", source_tag(&n.origin));
         match &n.structure {
             Some(Structure::Repeat { item, index, model }) => {
                 el.attr("data-for", model.expr.clone());
@@ -261,7 +261,7 @@ impl Emitter<'_> {
                 } else {
                     &item.height
                 };
-                let grow = if !stretches || main.fixed.is_some() {
+                let grow = if !stretches || mapping::fixed(n, horizontal) {
                     0.0
                 } else if all_zero {
                     1.0
@@ -638,52 +638,31 @@ fn child_parent(n: &Node) -> Parent {
             Parent::Flex {
                 horizontal,
                 stretches: matches!(l.alignment, None | Some(Alignment::Stretch)),
-                all_zero: n.children.iter().all(|c| stretch(c, horizontal) == 0.0),
+                all_zero: mapping::all_stretch_zero(&n.children, horizontal),
             }
         }
         None => Parent::Free,
     }
 }
 
-/// `grid-template-columns` (or rows): a track per column, `Nfr` when a
-/// single-span child in it stretches, `auto` otherwise.
+/// `grid-template-columns` (or rows): a track per line, `Nfr` for a line
+/// with a stretch, `auto` otherwise, and `0px` for a line no cell covers.
+/// CSS grows `auto` tracks alike when no track has an `fr`, as Slint grows
+/// its lines when none has a stretch.
 fn tracks(n: &Node, horizontal: bool) -> String {
-    let cells = n
-        .children
-        .iter()
-        .filter_map(|c| c.item.cell.map(|cell| (c, cell)));
-    let count = cells
-        .clone()
-        .map(|(_, c)| {
-            if horizontal {
-                c.col + c.colspan
-            } else {
-                c.row + c.rowspan
-            }
-        })
-        .max()
-        .unwrap_or(1);
-    let mut out = Vec::new();
-    for track in 0..count {
-        let factor = cells
-            .clone()
-            .filter(|(_, c)| {
-                let (start, span) = if horizontal {
-                    (c.col, c.colspan)
-                } else {
-                    (c.row, c.rowspan)
-                };
-                start == track && span == 1
-            })
-            .map(|(child, _)| stretch(child, horizontal))
-            .fold(0.0, f64::max);
-        out.push(if factor > 0.0 {
-            format!("{}fr", number(factor))
-        } else {
-            "auto".to_owned()
-        });
+    let lines = mapping::grid_tracks(n, horizontal);
+    if lines.is_empty() {
+        return "auto".to_owned();
     }
-    out.join(" ")
+    lines
+        .iter()
+        .map(|line| match line {
+            Some(s) if *s > 0.0 => format!("{}fr", number(*s)),
+            Some(_) => "auto".to_owned(),
+            None => "0px".to_owned(),
+        })
+        .collect::<Vec<_>>()
+        .join(" ")
 }
 
 /// Visual properties every widget understands. Returns whether `p` was taken.

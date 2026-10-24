@@ -15,9 +15,3 @@
 - T86. Input and interactive items
 - T87. std-widgets
 - T88. Hosts on slintx
-- T89. slint-convert: `.slint` to XML, HTML, Storyboard and Blueprint
-- T89.1. slintx-convert: IR, `Backend`, CLI and the `xml` backend
-- T89.2. slintx-convert: `html` backend
-- T89.3. slintx-convert: `blueprint` backend
-- T89.4. slintx-convert: `storyboard` backend
-- T89.5. slintx-convert: screenshot and geometry tests

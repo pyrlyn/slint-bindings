@@ -7,12 +7,14 @@
 use std::collections::HashSet;
 use std::fmt::Write as _;
 
-use super::{Backend, number, value_text};
+use super::{Backend, number, source_tag, value_text};
 use crate::diag::{Diagnostics, Origin};
 use crate::ir::*;
 use crate::mapping::{self, Role, stretch};
 
-pub struct Blueprint;
+pub struct Blueprint {
+    pub source_tags: bool,
+}
 
 impl Backend for Blueprint {
     fn emit(&self, document: &Document, diagnostics: &mut Diagnostics) -> String {
@@ -22,6 +24,7 @@ impl Backend for Blueprint {
             diagnostics,
             ids: HashSet::new(),
             handlers: HashSet::new(),
+            source_tags: self.source_tags,
         };
         e.line("using Gtk 4.0;");
         e.line("");
@@ -53,7 +56,11 @@ enum Parent {
         stretches: bool,
         all_zero: bool,
     },
-    Grid,
+    /// A grid cell, and whether a line it covers grows on either axis.
+    Grid {
+        hexpand: bool,
+        vexpand: bool,
+    },
     Overlay,
 }
 
@@ -63,6 +70,7 @@ struct Emitter<'a> {
     diagnostics: &'a mut Diagnostics,
     ids: HashSet<String>,
     handlers: HashSet<String>,
+    source_tags: bool,
 }
 
 /// Blueprint lines for one object, collected before it is written.
@@ -243,6 +251,9 @@ impl Emitter<'_> {
             None => {}
         }
 
+        if self.source_tags {
+            obj.prop("name", quote(&source_tag(&n.origin)));
+        }
         self.placement(&mut obj, n, parent, widget.is_none_or(|w| w.fills_parent));
         if let Some(l) = &n.layout {
             self.layout(&mut obj, l, n);
@@ -306,13 +317,33 @@ impl Emitter<'_> {
             return;
         }
         let parent = match &n.layout {
-            Some(l) if l.kind == LayoutKind::Grid => Parent::Grid,
+            Some(l) if l.kind == LayoutKind::Grid => {
+                let columns = mapping::grid_growth(n, true);
+                let rows = mapping::grid_growth(n, false);
+                for c in &n.children {
+                    let grows = |lines: &[bool], start: u32, span: u32| {
+                        lines
+                            .iter()
+                            .skip(start as usize)
+                            .take(span.max(1) as usize)
+                            .any(|g| *g)
+                    };
+                    let (hexpand, vexpand) = c.item.cell.map_or((false, false), |cell| {
+                        (
+                            grows(&columns, cell.col, cell.colspan),
+                            grows(&rows, cell.row, cell.rowspan),
+                        )
+                    });
+                    self.node(c, Parent::Grid { hexpand, vexpand }, "");
+                }
+                return;
+            }
             Some(l) => {
                 let horizontal = l.kind == LayoutKind::Horizontal;
                 Parent::Box {
                     horizontal,
                     stretches: matches!(l.alignment, None | Some(Alignment::Stretch)),
-                    all_zero: n.children.iter().all(|c| stretch(c, horizontal) == 0.0),
+                    all_zero: mapping::all_stretch_zero(&n.children, horizontal),
                 }
             }
             None => {
@@ -387,18 +418,18 @@ impl Emitter<'_> {
                 stretches,
                 all_zero,
             } => {
-                let main = if horizontal {
-                    &item.width
-                } else {
-                    &item.height
-                };
-                let expands =
-                    stretches && main.fixed.is_none() && (all_zero || stretch(n, horizontal) > 0.0);
+                let expands = stretches
+                    && !mapping::fixed(n, horizontal)
+                    && (all_zero || stretch(n, horizontal) > 0.0);
                 if expands {
                     obj.prop(if horizontal { "hexpand" } else { "vexpand" }, "true");
                 }
+                // Slint places what keeps its size across a box at the start.
+                if mapping::fixed(n, !horizontal) {
+                    obj.prop(if horizontal { "valign" } else { "halign" }, "start");
+                }
             }
-            Parent::Grid => {
+            Parent::Grid { hexpand, vexpand } => {
                 if let Some(c) = item.cell {
                     let mut block = format!("layout {{\n  row: {};\n  column: {};\n", c.row, c.col);
                     if c.rowspan > 1 {
@@ -410,10 +441,11 @@ impl Emitter<'_> {
                     block.push('}');
                     obj.extra.push(block);
                 }
-                if stretch(n, true) > 0.0 && item.width.fixed.is_none() {
+                // GTK grows a line when a cell in it expands.
+                if hexpand && !mapping::fixed(n, true) {
                     obj.prop("hexpand", "true");
                 }
-                if stretch(n, false) > 0.0 && item.height.fixed.is_none() {
+                if vexpand && !mapping::fixed(n, false) {
                     obj.prop("vexpand", "true");
                 }
             }

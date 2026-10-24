@@ -9,7 +9,15 @@ output. `--strict` turns those warnings into errors.
 
 The table is generated from `src/mapping.rs`, and a unit test fails when it
 goes stale. "Default stretch" is the `horizontal-stretch` and
-`vertical-stretch` the converter assumes when the source sets none.
+`vertical-stretch` the converter assumes when the source sets none;
+`tests/geometry.rs` measures each one in Slint 1.18.1 and fails when the
+table disagrees. A layout's own stretch is never taken from the table: as in
+Slint, a box sums its children's stretch along its axis and takes the
+smallest across it, and a grid sums its columns' (or rows') stretch. A
+column takes the smallest stretch of its single-span cells; one only spans
+cover starts at 1.
+`GroupBox` lays its children out in a grid, so its stretch comes from them
+too; `Empty` is not public in Slint 1.18.
 
 | Slint | HTML | UIKit | AppKit | GTK 4 | Default stretch (h, v) |
 | --- | --- | --- | --- | --- | --- |
@@ -29,7 +37,7 @@ goes stale. "Default stretch" is the `horizontal-stretch` and
 | `Row` | — | — | — | — | 1, 1 |
 | `Text` | `span` | `UILabel` | `NSTextField` | `Gtk.Label` | 0, 0 |
 | `Image` | `img` | `UIImageView` | `NSImageView` | `Gtk.Picture` | 0, 0 |
-| `TextInput` | `input` | `UITextField` | `NSTextField` | `Gtk.Entry` | 1, 0 |
+| `TextInput` | `input` | `UITextField` | `NSTextField` | `Gtk.Entry` | 0, 0 |
 | `Button` | `button` | `UIButton` | `NSButton` | `Gtk.Button` | 0, 0 |
 | `CheckBox` | `input` | `UISwitch` | `NSButton` | `Gtk.CheckButton` | 0, 0 |
 | `Switch` | `input` | `UISwitch` | `NSSwitch` | `Gtk.Switch` | 0, 0 |
@@ -73,9 +81,17 @@ as it is.
 | `preferred-*` | `flex-basis` | constraint at priority 700 | warning |
 | `x`, `y` outside layouts | `position:absolute` | leading and top constraints | `Gtk.Overlay` child with `halign`/`valign: start` and margins |
 
-Slint's stretch rule is kept: when every child of a box has stretch 0, they
-all grow. Elements outside a layout are centred when they have a size or
-their widget keeps its own size. Otherwise they fill their parent.
+Slint's stretch rule is kept: when every child of a box that can still grow
+has stretch 0, they all grow. A child with a fixed size, or a box its
+children fix, does not count. Across a box, a child a size limit stops is
+placed at the start, as Slint does. Elements outside a layout are centred
+when they have a size or their widget keeps its own size. Otherwise they
+fill their parent.
+
+In a grid the rule holds per column and row: when none has a stretch, every
+column a cell covers grows, and one no cell covers stays empty. HTML writes
+these tracks as `auto`, which CSS grows alike, and `0px`. GTK grows a column
+when a cell in it expands, so a spanning cell grows every column it covers.
 
 Stack views cannot span grid cells. A `rowspan` or `colspan` above 1 takes
 one slot in its row and warns.
@@ -97,6 +113,10 @@ one slot in its row and warns.
 | `minimum`, `maximum`, `value`, `step` | `min`, `max`, `value`, `step` | `minValue`/`maxValue`/`value` or stepper values | cell values | `Gtk.Adjustment` |
 | `model`, `current-index` (`ComboBox`) | `<option selected>` | button menu with `menuElementState` | `NSPopUpButton` menu | `Gtk.StringList`, `selected` |
 | `source`, `image-fit` (`Image`) | `src`, `object-fit` | `image`, `contentMode` | cell `image`, `imageScaling` | `file`, `content-fit` |
+
+A hidden element keeps its place in Slint, in HTML (`visibility:hidden`)
+and in AppKit, whose stack views keep hidden views by default. UIKit stack
+views and GTK boxes drop it.
 
 Lengths in `px`, `phx`, `pt`, `in`, `cm` and `mm` are converted to logical
 pixels. Interface Builder points and GTK pixels are taken as equal to Slint
