@@ -182,6 +182,10 @@ impl GlyphCache {
     }
 
     fn allocate(&mut self, width: u32, height: u32) -> Option<(u32, u32)> {
+        // An unrenderable glyph must not flush useful entries every frame.
+        if width > MAX_SIZE - PADDING || height > MAX_SIZE - PADDING {
+            return None;
+        }
         let (w, h) = (width + PADDING, height + PADDING);
         loop {
             if let Some(found) = self.place(w, h) {
@@ -275,10 +279,29 @@ mod tests {
     #[test]
     fn full_atlas_clears_on_the_next_frame() {
         let mut cache = GlyphCache::new();
-        assert_eq!(cache.allocate(MAX_SIZE + 1, 1), None);
+        assert_eq!(
+            cache.allocate(MAX_SIZE - PADDING, MAX_SIZE - PADDING),
+            Some((0, 0))
+        );
+        assert_eq!(cache.allocate(1, 1), None);
         assert!(cache.full);
         cache.begin_frame();
         assert!(!cache.full);
         assert_eq!(cache.allocate(4, 4), Some((0, 0)));
+    }
+
+    #[test]
+    fn oversized_glyphs_do_not_grow_or_flush_the_atlas() {
+        let mut cache = GlyphCache::new();
+        assert_eq!(cache.allocate(4, 4), Some((0, 0)));
+        cache.pixels[0] = 7;
+        for (width, height) in [(MAX_SIZE, 1), (1, MAX_SIZE), (u32::MAX, u32::MAX)] {
+            assert_eq!(cache.allocate(width, height), None);
+            assert_eq!(cache.size, START_SIZE);
+            assert!(!cache.full);
+        }
+        cache.begin_frame();
+        assert_eq!(cache.pixels[0], 7);
+        assert_eq!(cache.allocate(4, 4), Some((4 + PADDING, 0)));
     }
 }
