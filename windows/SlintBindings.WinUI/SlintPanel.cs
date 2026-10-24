@@ -203,11 +203,11 @@ public sealed class SlintPanel : UserControl
         if (_bitmap is null) return;
         try
         {
-            using var stream = _bitmap.PixelBuffer.AsStream();
             var needed = _bitmap.PixelWidth * _bitmap.PixelHeight * 4;
             if (_bgra.Length != needed) _bgra = new byte[needed];
             if (Host.RenderBgra(_bgra, out _))
             {
+                using var stream = _bitmap.PixelBuffer.AsStream();
                 stream.Write(_bgra, 0, _bgra.Length);
                 _bitmap.Invalidate();
             }
