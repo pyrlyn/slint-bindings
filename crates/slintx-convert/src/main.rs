@@ -26,6 +26,10 @@ struct Cli {
     /// Treat every warning as an error.
     #[arg(long)]
     strict: bool,
+    /// Tag every element with its .slint line and column (GTK widget name,
+    /// AppKit identifier, UIKit accessibility identifier).
+    #[arg(long)]
+    source_tags: bool,
 }
 
 #[derive(Debug, Clone, Copy, ValueEnum)]
@@ -67,6 +71,7 @@ fn run(cli: Cli) -> anyhow::Result<ExitCode> {
             Apple::Appkit => Platform::AppKit,
         },
         strict: cli.strict,
+        source_tags: cli.source_tags,
     };
     let file = cli.input.display().to_string();
     match slintx_convert::convert(&file, &source, format, &options) {

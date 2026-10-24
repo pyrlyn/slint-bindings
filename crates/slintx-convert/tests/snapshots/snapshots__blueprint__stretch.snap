@@ -25,7 +25,6 @@ Gtk.Window {
       }
     }
     Gtk.Box {
-      vexpand: true;
       orientation: horizontal;
       halign: center;
       Gtk.Box {

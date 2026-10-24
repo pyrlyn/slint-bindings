@@ -1,7 +1,8 @@
 //! Each output checked by something other than this crate: XML and the
 //! polyglot HTML by an XML parser, storyboards by Xcode's `ibtool`, Blueprint
 //! by `blueprint-compiler`. The external tools are not on every machine, so
-//! those tests are ignored by default; CI runs them with `--run-ignored`.
+//! those tests are ignored by default. CI runs them with `--run-ignored`:
+//! `just convert-apple` on macOS, the `tests/platform` image on Linux.
 
 mod common;
 

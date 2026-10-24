@@ -23,21 +23,21 @@ expression: "render(name, format, options)"
         <progress data-slint="ProgressIndicator" data-at="27:9" max="1" style="flex:0 1 auto"></progress>
         <div data-slint="Spinner" data-at="28:9" role="progressbar" aria-busy="true" style="flex:0 1 auto"></div>
         <img data-slint="Image" data-at="29:9" src="photo.png" alt="" style="flex:0 0 40px;height:40px;object-fit:contain"/>
-        <div data-slint="HorizontalLayout" data-at="30:9" style="flex:1 1 auto;display:flex;flex-direction:row">
+        <div data-slint="HorizontalLayout" data-at="30:9" style="flex:0 1 auto;display:flex;flex-direction:row">
           <button data-slint="Button" data-at="30:46" type="button" style="flex:0 1 auto">S</button>
         </div>
-        <div data-slint="HorizontalLayout" data-at="31:9" style="flex:1 1 auto;display:flex;flex-direction:row;justify-content:center">
+        <div data-slint="HorizontalLayout" data-at="31:9" style="flex:0 1 auto;display:flex;flex-direction:row;justify-content:center">
           <button data-slint="Button" data-at="31:47" type="button" style="flex:0 1 auto">C1</button>
           <button data-slint="Button" data-at="31:70" type="button" style="flex:0 1 auto">C2</button>
         </div>
-        <div data-slint="HorizontalLayout" data-at="32:9" style="flex:1 1 auto;display:flex;flex-direction:row;justify-content:flex-end">
+        <div data-slint="HorizontalLayout" data-at="32:9" style="flex:0 1 auto;display:flex;flex-direction:row;justify-content:flex-end">
           <button data-slint="Button" data-at="32:44" type="button" style="flex:0 1 auto">E</button>
         </div>
-        <div data-slint="HorizontalLayout" data-at="33:9" style="flex:1 1 auto;display:flex;flex-direction:row;justify-content:space-around">
+        <div data-slint="HorizontalLayout" data-at="33:9" style="flex:0 1 auto;display:flex;flex-direction:row;justify-content:space-around">
           <button data-slint="Button" data-at="33:53" type="button" style="flex:0 1 auto">A1</button>
           <button data-slint="Button" data-at="33:76" type="button" style="flex:0 1 auto">A2</button>
         </div>
-        <div data-slint="HorizontalLayout" data-at="34:9" style="flex:1 1 auto;display:flex;flex-direction:row;justify-content:space-evenly">
+        <div data-slint="HorizontalLayout" data-at="34:9" style="flex:0 1 auto;display:flex;flex-direction:row;justify-content:space-evenly">
           <button data-slint="Button" data-at="34:53" type="button" style="flex:0 1 auto">V1</button>
           <button data-slint="Button" data-at="34:76" type="button" style="flex:0 1 auto">V2</button>
         </div>

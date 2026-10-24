@@ -20,7 +20,7 @@ expression: "render(name, format, options)"
             <rect key="frame" x="0.0" y="0.0" width="480" height="270"/>
             <autoresizingMask key="autoresizingMask"/>
             <subviews>
-              <stackView orientation="vertical" alignment="centerX" spacing="0" detachesHiddenViews="YES" distribution="fill" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-003">
+              <stackView orientation="vertical" alignment="leading" spacing="0" distribution="fill" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-003">
                 <subviews>
                   <textField focusRingType="none" verticalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-004">
                     <!-- binding text : "Count: \{root.counter}" -->

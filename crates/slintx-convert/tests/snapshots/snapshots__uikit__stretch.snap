@@ -34,54 +34,54 @@ expression: "render(name, format, options)"
                         <color key="backgroundColor" red="0" green="0" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                           <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="40" id="s00-00-009"/>
+                          <constraint firstAttribute="width" constant="40" priority="750" id="s00-00-010"/>
                         </constraints>
                       </view>
                     </subviews>
                     <constraints>
-                      <constraint firstItem="s00-00-007" firstAttribute="width" secondItem="s00-00-006" secondAttribute="width" multiplier="2" priority="999" id="s00-00-010"/>
+                      <constraint firstItem="s00-00-007" firstAttribute="width" secondItem="s00-00-006" secondAttribute="width" multiplier="2" priority="999" id="s00-00-011"/>
                     </constraints>
                   </stackView>
-                  <stackView opaque="NO" contentMode="scaleToFill" axis="horizontal" spacing="0" distribution="fill" verticalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-011">
+                  <stackView opaque="NO" contentMode="scaleToFill" axis="horizontal" spacing="0" distribution="fill" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-012">
                     <subviews>
-                      <view contentMode="scaleToFill" userLabel="Spacer" horizontalHuggingPriority="1" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-017"/>
-                      <view contentMode="scaleToFill" horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-012">
+                      <view contentMode="scaleToFill" userLabel="Spacer" horizontalHuggingPriority="1" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-018"/>
+                      <view contentMode="scaleToFill" horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-013">
                         <color key="backgroundColor" red="0.2" green="0.4" blue="0.6" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
-                          <constraint firstAttribute="width" relation="lessThanOrEqual" constant="80" id="s00-00-013"/>
-                          <constraint firstAttribute="width" constant="50" priority="700" id="s00-00-014"/>
+                          <constraint firstAttribute="width" relation="lessThanOrEqual" constant="80" id="s00-00-014"/>
+                          <constraint firstAttribute="width" constant="50" priority="700" id="s00-00-015"/>
                         </constraints>
                       </view>
-                      <view contentMode="scaleToFill" horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-015">
+                      <view contentMode="scaleToFill" horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-016">
                         <color key="backgroundColor" red="0.6" green="0.4" blue="0.2" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
-                          <constraint firstAttribute="width" constant="50" priority="700" id="s00-00-016"/>
+                          <constraint firstAttribute="width" constant="50" priority="700" id="s00-00-017"/>
                         </constraints>
                       </view>
-                      <view contentMode="scaleToFill" userLabel="Spacer" horizontalHuggingPriority="1" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-018"/>
+                      <view contentMode="scaleToFill" userLabel="Spacer" horizontalHuggingPriority="1" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-019"/>
                     </subviews>
                     <constraints>
-                      <constraint firstItem="s00-00-018" firstAttribute="width" secondItem="s00-00-017" secondAttribute="width" id="s00-00-019"/>
+                      <constraint firstItem="s00-00-019" firstAttribute="width" secondItem="s00-00-018" secondAttribute="width" id="s00-00-020"/>
                     </constraints>
                   </stackView>
-                  <view contentMode="scaleToFill" verticalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-020">
+                  <view contentMode="scaleToFill" verticalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-021">
                     <subviews>
-                      <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-021">
+                      <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-022">
                         <color key="backgroundColor" red="0" green="0" blue="0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
-                          <constraint firstAttribute="width" constant="20" id="s00-00-022"/>
-                          <constraint firstAttribute="height" constant="20" id="s00-00-023"/>
+                          <constraint firstAttribute="width" constant="20" id="s00-00-023"/>
+                          <constraint firstAttribute="height" constant="20" id="s00-00-024"/>
                         </constraints>
                       </view>
                     </subviews>
                     <constraints>
-                      <constraint firstItem="s00-00-021" firstAttribute="leading" secondItem="s00-00-020" secondAttribute="leading" constant="10" id="s00-00-024"/>
-                      <constraint firstItem="s00-00-021" firstAttribute="top" secondItem="s00-00-020" secondAttribute="top" constant="4" id="s00-00-025"/>
+                      <constraint firstItem="s00-00-022" firstAttribute="leading" secondItem="s00-00-021" secondAttribute="leading" constant="10" id="s00-00-025"/>
+                      <constraint firstItem="s00-00-022" firstAttribute="top" secondItem="s00-00-021" secondAttribute="top" constant="4" id="s00-00-026"/>
                     </constraints>
                   </view>
                 </subviews>
                 <constraints>
-                  <constraint firstItem="s00-00-011" firstAttribute="height" secondItem="s00-00-005" secondAttribute="height" priority="999" id="s00-00-026"/>
-                  <constraint firstItem="s00-00-020" firstAttribute="height" secondItem="s00-00-005" secondAttribute="height" priority="999" id="s00-00-027"/>
+                  <constraint firstItem="s00-00-021" firstAttribute="height" secondItem="s00-00-005" secondAttribute="height" priority="999" id="s00-00-027"/>
                 </constraints>
               </stackView>
             </subviews>

@@ -9,7 +9,7 @@
 
 use std::collections::HashSet;
 
-use super::{Backend, Markup, Platform, number, value_text};
+use super::{Backend, Markup, Platform, number, source_tag, value_text};
 use crate::color;
 use crate::diag::{Diagnostics, Origin};
 use crate::ir::*;
@@ -17,6 +17,7 @@ use crate::mapping::{self, Role, stretch};
 
 pub struct Storyboard {
     pub platform: Platform,
+    pub source_tags: bool,
 }
 
 /// Interface Builder's default text size is 17pt; Slint's is the platform's,
@@ -35,6 +36,7 @@ impl Backend for Storyboard {
     fn emit(&self, document: &Document, diagnostics: &mut Diagnostics) -> String {
         let mut b = Builder {
             ui: self.platform == Platform::UiKit,
+            source_tags: self.source_tags,
             diagnostics,
             next: 0,
             vc: String::new(),
@@ -324,10 +326,29 @@ struct Arranged {
     fixed_main: bool,
     /// A fixed or maximum size across the stack, so it cannot fill it.
     fixed_cross: bool,
+    /// The size a plain view keeps along the stack when it does not grow; it
+    /// has no content to hug. See `held_size`.
+    hold: Option<f64>,
+}
+
+/// What a plain element without children keeps along a stack when it does
+/// not grow: Slint's preferred size, which is its minimum when the source
+/// sets neither (a set preferred size has its own constraint). `None` for
+/// views with content of their own to hug.
+fn held_size(n: &Node, horizontal: bool) -> Option<f64> {
+    let plain = n.children.is_empty()
+        && mapping::lookup(&n.widget).is_some_and(|w| w.role == Role::Container);
+    let extent = if horizontal {
+        &n.item.width
+    } else {
+        &n.item.height
+    };
+    (plain && extent.preferred.is_none()).then(|| extent.min.as_ref().and_then(px).unwrap_or(0.0))
 }
 
 struct Builder<'a> {
     ui: bool,
+    source_tags: bool,
     diagnostics: &'a mut Diagnostics,
     next: u32,
     vc: String,
@@ -658,6 +679,9 @@ impl Builder<'_> {
     fn build(&mut self, n: &Node) -> View {
         let role = mapping::lookup(&n.widget).map(|w| w.role);
         let (mut view, control) = self.control(n, role);
+        if self.source_tags {
+            self.tag(&mut view, n);
+        }
         self.decorate(&mut view, n, role);
         if needs_outlet(n) {
             self.outlet(n, &control);
@@ -693,6 +717,20 @@ impl Builder<'_> {
             },
         }
         view
+    }
+
+    /// The outer view, the one its parent places, carries the tag.
+    fn tag(&self, view: &mut View, n: &Node) {
+        let tag = source_tag(&n.origin);
+        if self.ui {
+            view.elem.children.push(
+                Elem::new("accessibility")
+                    .attr("key", "accessibilityConfiguration")
+                    .attr("identifier", tag),
+            );
+        } else {
+            view.elem.set("identifier", tag);
+        }
     }
 
     /// Comments, bindings and the properties every view shares.
@@ -923,6 +961,7 @@ impl Builder<'_> {
                 stretch: Some(0.0),
                 fixed_main: false,
                 fixed_cross: true,
+                hold: None,
             })
             .collect();
         self.arrange(&mut row, true, Alignment::Start, (0.0, 0.0), items);
@@ -1610,12 +1649,13 @@ impl Builder<'_> {
             }
             e
         } else {
+            // No `detachesHiddenViews`: a hidden Slint element keeps its place
+            // in the layout, as NSStackView's hidden views do by default.
             let mut e = Elem::new("stackView")
                 .attr("distribution", "fill")
                 .attr("orientation", axis)
-                .attr("alignment", if horizontal { "centerY" } else { "centerX" })
-                .attr("spacing", number(spacing))
-                .attr("detachesHiddenViews", "YES");
+                .attr("alignment", if horizontal { "top" } else { "leading" })
+                .attr("spacing", number(spacing));
             if padded {
                 e.children.push(
                     Elem::new("edgeInsets")
@@ -1650,16 +1690,17 @@ impl Builder<'_> {
             .children
             .iter()
             .map(|c| {
-                let (main, cross) = if horizontal {
-                    (&c.item.width, &c.item.height)
+                let cross = if horizontal {
+                    &c.item.height
                 } else {
-                    (&c.item.height, &c.item.width)
+                    &c.item.width
                 };
                 Arranged {
                     view: self.build(c),
                     stretch: Some(stretch(c, horizontal)),
-                    fixed_main: main.fixed.is_some(),
+                    fixed_main: mapping::fixed(c, horizontal),
                     fixed_cross: cross.fixed.is_some() || cross.max.is_some(),
+                    hold: held_size(c, horizontal),
                 }
             })
             .collect();
@@ -1693,7 +1734,12 @@ impl Builder<'_> {
             ("height", "width")
         };
         let stretches = alignment == Alignment::Stretch;
-        let all_zero = items.iter().filter_map(|i| i.stretch).all(|s| s == 0.0);
+        // Slint's rule, as `mapping::all_stretch_zero` has it.
+        let all_zero = items
+            .iter()
+            .filter(|i| !i.fixed_main)
+            .filter_map(|i| i.stretch)
+            .all(|s| s == 0.0);
         let mut expanding: Vec<(String, f64)> = Vec::new();
         let mut arranged: Vec<(View, bool)> = Vec::new();
         for mut item in items {
@@ -1704,6 +1750,15 @@ impl Builder<'_> {
                         expanding.push((item.view.id.clone(), if all_zero { 1.0 } else { s }));
                     }
                     item.view.hug(horizontal, if grows { EXPAND } else { HUG });
+                    if let Some(size) = item.hold.filter(|_| !grows && !item.fixed_main) {
+                        let c = self.rule(Rule {
+                            first_attr: main,
+                            constant: size,
+                            priority: Some(HUG),
+                            ..Rule::default()
+                        });
+                        item.view.constraints.push(c);
+                    }
                 }
                 None => item.view.hug(horizontal, SPACER),
             }
@@ -1776,13 +1831,15 @@ impl Builder<'_> {
             }
         }
 
-        // Across the stack Slint fills unless a size limit stops it. A fill
-        // alignment would break those limits, so a centred stack ties the
-        // other views to its size instead (AppKit always works this way).
-        let centred = !self.ui || views.iter().any(|(_, fills)| !fills);
-        if centred {
+        // Across the stack Slint fills unless a size limit stops it, and then
+        // places the view at the start. A fill alignment would break those
+        // limits, so a start-aligned stack ties the other views to its size
+        // instead (AppKit always works this way).
+        let limited = !self.ui || views.iter().any(|(_, fills)| !fills);
+        if limited {
             if self.ui {
-                stack.elem.set("alignment", "center");
+                // UIKit's leading; Interface Builder spells it `top` on either axis.
+                stack.elem.set("alignment", "top");
             }
             let constant = -(cross_insets.0 + cross_insets.1);
             for (v, fills) in &views {
@@ -1841,7 +1898,8 @@ impl Builder<'_> {
         for r in 0..rows {
             let mut row = self.stack(true, column_spacing, [0.0; 4]);
             let mut items = Vec::new();
-            let mut row_stretch: f64 = 0.0;
+            // As Slint has it: the smallest stretch of the row's cells.
+            let mut row_stretch: Option<f64> = None;
             let mut c = 0;
             while c < cols {
                 let found = cells
@@ -1855,6 +1913,7 @@ impl Builder<'_> {
                         stretch: None,
                         fixed_main: false,
                         fixed_cross: false,
+                        hold: None,
                     });
                     c += 1;
                     continue;
@@ -1872,21 +1931,24 @@ impl Builder<'_> {
                 if cell.colspan <= 1 {
                     columns[c as usize].push(v.id.clone());
                 }
-                row_stretch = row_stretch.max(stretch(node, false));
+                let s = stretch(node, false);
+                row_stretch = Some(row_stretch.map_or(s, |r| r.min(s)));
                 items.push(Arranged {
                     view: v,
                     stretch: Some(stretch(node, true)),
                     fixed_main: node.item.width.fixed.is_some(),
                     fixed_cross: node.item.height.fixed.is_some() || node.item.height.max.is_some(),
+                    hold: held_size(node, true),
                 });
                 c += cell.colspan.max(1);
             }
             self.arrange(&mut row, true, Alignment::Stretch, (0.0, 0.0), items);
             row_items.push(Arranged {
                 view: row,
-                stretch: Some(row_stretch),
+                stretch: Some(row_stretch.unwrap_or(0.0)),
                 fixed_main: false,
                 fixed_cross: false,
+                hold: None,
             });
         }
         let [_, leading, _, trailing] = insets(&l.padding);

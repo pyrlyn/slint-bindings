@@ -23,6 +23,11 @@ pub struct Options {
     pub platform: Platform,
     /// Turns every warning into an error.
     pub strict: bool,
+    /// Tags every element with its `.slint` line and column where the target
+    /// keeps it at run time: the GTK widget `name`, the AppKit view
+    /// `identifier`, the UIKit `accessibilityIdentifier`. HTML always has
+    /// `data-at`. Lets a test find each element on screen.
+    pub source_tags: bool,
 }
 
 #[derive(Debug, Clone)]
@@ -80,7 +85,7 @@ pub fn convert(
     options: &Options,
 ) -> Result<Conversion, ConvertError> {
     let (document, mut diagnostics) = to_ir(file, source)?;
-    let output = backend::backend(format, options.platform).emit(&document, &mut diagnostics);
+    let output = backend::backend(format, options).emit(&document, &mut diagnostics);
     let mut all = diagnostics.sorted();
     if options.strict {
         for d in &mut all {

@@ -8,10 +8,13 @@
 | cargo-nextest | mise (`cargo:cargo-nextest`) | Test runner (`just test`) | https://github.com/nextest-rs/nextest |
 | just | mise | Recipes (`justfile`) | https://github.com/casey/just |
 | cbindgen | global (`cargo install cbindgen`) | Generates the C header from the FFI crate (`just header`) | https://github.com/mozilla/cbindgen |
-| Xcode (swift, SwiftPM, ibtool) | Mac App Store | Builds the Swift package and the macOS demo; `ibtool` checks the storyboards `slintx-convert` writes (ignored tests) | https://developer.apple.com/xcode/ |
+| Xcode (swift, SwiftPM, ibtool, simctl, iOS Simulator) | Mac App Store | Builds the Swift package and the macOS demo; `ibtool` checks the storyboards `slintx-convert` writes, and `swiftc` and `simctl` run its AppKit and UIKit geometry tests (ignored tests, `just convert-apple`) | https://developer.apple.com/xcode/ |
 | jq | global (preinstalled on GitHub's macOS runners; `brew install jq`) | Reads `swift package dump-package` in `just swift-package-check` | https://github.com/jqlang/jq |
 | .NET SDK 10 | mise (`dotnet`, global) | Builds the WinUI projects (Windows only) | https://github.com/dotnet/sdk |
-| blueprint-compiler | global (`apt install blueprint-compiler`, `brew install blueprint-compiler`) | Checks the GTK Blueprint `slintx-convert` writes (ignored test) | https://gitlab.gnome.org/GNOME/blueprint-compiler |
+| blueprint-compiler | global (`apt install blueprint-compiler`, `brew install blueprint-compiler`); apt in the `slintx-convert` test image | Checks the GTK Blueprint `slintx-convert` writes (ignored test) | https://gitlab.gnome.org/GNOME/blueprint-compiler |
+| Docker on Colima | global (`brew install colima docker`) on macOS; preinstalled on GitHub's Ubuntu runners | Runs `slintx-convert`'s Linux platform tests in `crates/slintx-convert/tests/platform` (`just convert-platforms`) | https://github.com/abiosoft/colima |
+| Chromium | apt in the `slintx-convert` test image | Lays out and screenshots the HTML `slintx-convert` writes (geometry test) | https://www.chromium.org/ |
+| GTK 4, PyGObject, Xvfb | apt in the `slintx-convert` test image (`gir1.2-gtk-4.0`, `python3-gi`, `xvfb`) | Show the converted Blueprint as GTK windows and measure them (geometry test) | https://gitlab.gnome.org/GNOME/gtk |
 | dunnage | ketch | Post-test `target/` cleanup in `just test`; a no-op when missing | https://github.com/listepo/dunnage |
 
 ## cargo
@@ -19,8 +22,8 @@
 | Package | Where | Source | Why here |
 | --- | --- | --- | --- |
 | slint | local | https://github.com/slint-ui/slint | UI runtime; software renderer and custom platform API |
-| slint-interpreter | local | https://github.com/slint-ui/slint | Compiles `.slint` at run time (`sb_compile`); the oracle in `slintx-conformance`'s tests (dev only) |
-| pollster | local | https://github.com/zesterer/pollster | Blocks on wgpu adapter and device requests (`slint-bindings-core`, `slintx-wgpu`) and on Slint's async compiler API (`slintx-conformance` tests, dev only) |
+| slint-interpreter | local | https://github.com/slint-ui/slint | Compiles `.slint` at run time (`sb_compile`); the oracle in `slintx-conformance`'s tests and the reference layout in `slintx-convert`'s geometry tests (dev only) |
+| pollster | local | https://github.com/zesterer/pollster | Blocks on wgpu adapter and device requests (`slint-bindings-core`, `slintx-wgpu`) and on Slint's async compiler API (`slintx-conformance` and `slintx-convert` tests, dev only) |
 | slint-dart-interpreter | local (path, `flutter/packages/slint_build/interpreter`) | https://github.com/listepo/slint_dart | Shared compile helper and JSON value bridge for properties and callbacks |
 | i-slint-core | local | https://github.com/slint-ui/slint | Image and SVG decoding without a backend; the renderer traits and shared parley text layout slintx-wgpu implements |
 | thiserror | local | https://github.com/dtolnay/thiserror | Core error enum |
@@ -31,7 +34,7 @@
 | swash | local | https://github.com/dfrg/swash | Glyph rasterizing in slintx-wgpu |
 | lyon_tessellation | local | https://github.com/nical/lyon | Path fill and stroke tessellation in slintx-wgpu |
 | bytemuck | local | https://github.com/Lokathor/bytemuck | Plain-data vertex and storage buffers in slintx-wgpu |
-| rgba-png | local (dev, git rev) | https://github.com/pyrlyn/crates | PNG snapshots and pixel comparison in the screenshot tests; shared with scull |
+| rgba-png | local (dev, git rev) | https://github.com/pyrlyn/crates | PNG snapshots and pixel comparison in the screenshot tests and `slintx-convert`'s geometry tests; shared with scull |
 | png | local (via rgba-png) | https://github.com/image-rs/image-png | Encode and decode the frame snapshots |
 | rowan | local | https://github.com/rust-analyzer/rowan | Lossless syntax tree of `slintx-syntax` |
 | wasm-bindgen-test | local | https://github.com/wasm-bindgen/wasm-bindgen | Runs the `slintx-syntax` tests on `wasm32-unknown-unknown` |

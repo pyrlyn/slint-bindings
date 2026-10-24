@@ -60,14 +60,14 @@ expression: "render(name, format, options)"
                           </view>
                         </subviews>
                       </stackView>
-                      <stackView opaque="NO" contentMode="scaleToFill" axis="horizontal" spacing="6" distribution="fill" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-017">
+                      <stackView opaque="NO" contentMode="scaleToFill" axis="horizontal" spacing="6" distribution="fill" verticalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-017">
                         <subviews>
                           <view contentMode="scaleToFill" userLabel="Spacer" horizontalHuggingPriority="1" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-018"/>
                           <view contentMode="scaleToFill" userLabel="Spacer" horizontalHuggingPriority="1" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-019"/>
                           <view contentMode="scaleToFill" userLabel="Spacer" horizontalHuggingPriority="1" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-020"/>
                         </subviews>
                       </stackView>
-                      <stackView opaque="NO" contentMode="scaleToFill" axis="horizontal" spacing="6" distribution="fill" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-021">
+                      <stackView opaque="NO" contentMode="scaleToFill" axis="horizontal" spacing="6" distribution="fill" verticalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-021">
                         <subviews>
                           <view contentMode="scaleToFill" userLabel="Spacer" horizontalHuggingPriority="1" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-022"/>
                           <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="Notes" lineBreakMode="clip" horizontalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-023">
@@ -80,50 +80,51 @@ expression: "render(name, format, options)"
                     </subviews>
                     <constraints>
                       <constraint firstItem="s00-00-014" firstAttribute="height" secondItem="s00-00-010" secondAttribute="height" priority="999" id="s00-00-025"/>
-                      <constraint firstItem="s00-00-015" firstAttribute="width" secondItem="s00-00-011" secondAttribute="width" priority="999" id="s00-00-026"/>
-                      <constraint firstItem="s00-00-018" firstAttribute="width" secondItem="s00-00-011" secondAttribute="width" priority="999" id="s00-00-027"/>
-                      <constraint firstItem="s00-00-022" firstAttribute="width" secondItem="s00-00-011" secondAttribute="width" priority="999" id="s00-00-028"/>
-                      <constraint firstItem="s00-00-019" firstAttribute="width" secondItem="s00-00-012" secondAttribute="width" priority="999" id="s00-00-029"/>
-                      <constraint firstItem="s00-00-023" firstAttribute="width" secondItem="s00-00-012" secondAttribute="width" priority="999" id="s00-00-030"/>
-                      <constraint firstItem="s00-00-020" firstAttribute="width" secondItem="s00-00-013" secondAttribute="width" priority="999" id="s00-00-031"/>
-                      <constraint firstItem="s00-00-024" firstAttribute="width" secondItem="s00-00-013" secondAttribute="width" priority="999" id="s00-00-032"/>
+                      <constraint firstItem="s00-00-017" firstAttribute="height" secondItem="s00-00-010" secondAttribute="height" priority="999" id="s00-00-026"/>
+                      <constraint firstItem="s00-00-021" firstAttribute="height" secondItem="s00-00-010" secondAttribute="height" priority="999" id="s00-00-027"/>
+                      <constraint firstItem="s00-00-015" firstAttribute="width" secondItem="s00-00-011" secondAttribute="width" priority="999" id="s00-00-028"/>
+                      <constraint firstItem="s00-00-018" firstAttribute="width" secondItem="s00-00-011" secondAttribute="width" priority="999" id="s00-00-029"/>
+                      <constraint firstItem="s00-00-022" firstAttribute="width" secondItem="s00-00-011" secondAttribute="width" priority="999" id="s00-00-030"/>
+                      <constraint firstItem="s00-00-019" firstAttribute="width" secondItem="s00-00-012" secondAttribute="width" priority="999" id="s00-00-031"/>
+                      <constraint firstItem="s00-00-023" firstAttribute="width" secondItem="s00-00-012" secondAttribute="width" priority="999" id="s00-00-032"/>
+                      <constraint firstItem="s00-00-020" firstAttribute="width" secondItem="s00-00-013" secondAttribute="width" priority="999" id="s00-00-033"/>
+                      <constraint firstItem="s00-00-024" firstAttribute="width" secondItem="s00-00-013" secondAttribute="width" priority="999" id="s00-00-034"/>
                     </constraints>
                   </stackView>
-                  <stackView opaque="NO" contentMode="scaleToFill" axis="horizontal" spacing="0" layoutMarginsRelativeArrangement="YES" distribution="fill" alignment="center" verticalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-033">
+                  <stackView opaque="NO" contentMode="scaleToFill" axis="horizontal" spacing="0" layoutMarginsRelativeArrangement="YES" distribution="fill" alignment="top" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-035">
                     <directionalEdgeInsets key="directionalLayoutMargins" top="4" leading="0" bottom="0" trailing="0"/>
                     <subviews>
-                      <view contentMode="scaleToFill" userLabel="Spacer" horizontalHuggingPriority="1" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-037"/>
-                      <view contentMode="scaleToFill" horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-034">
+                      <view contentMode="scaleToFill" userLabel="Spacer" horizontalHuggingPriority="1" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-039"/>
+                      <view contentMode="scaleToFill" horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-036">
                         <color key="backgroundColor" red="0.275" green="0.51" blue="0.706" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
-                          <constraint firstAttribute="width" constant="80" id="s00-00-035"/>
-                          <constraint firstAttribute="height" constant="24" id="s00-00-036"/>
+                          <constraint firstAttribute="width" constant="80" id="s00-00-037"/>
+                          <constraint firstAttribute="height" constant="24" id="s00-00-038"/>
                         </constraints>
                       </view>
                     </subviews>
                     <constraints>
-                      <constraint firstItem="s00-00-037" firstAttribute="height" secondItem="s00-00-033" secondAttribute="height" constant="-4" id="s00-00-038"/>
+                      <constraint firstItem="s00-00-039" firstAttribute="height" secondItem="s00-00-035" secondAttribute="height" constant="-4" id="s00-00-040"/>
                     </constraints>
                   </stackView>
                 </subviews>
                 <constraints>
-                  <constraint firstItem="s00-00-009" firstAttribute="height" secondItem="s00-00-005" secondAttribute="height" priority="999" id="s00-00-039"/>
-                  <constraint firstItem="s00-00-033" firstAttribute="height" secondItem="s00-00-005" secondAttribute="height" priority="999" id="s00-00-040"/>
+                  <constraint firstItem="s00-00-009" firstAttribute="height" secondItem="s00-00-005" secondAttribute="height" priority="999" id="s00-00-041"/>
                 </constraints>
               </stackView>
             </subviews>
             <constraints>
-              <constraint firstItem="s00-00-004" firstAttribute="leading" secondItem="s00-00-003" secondAttribute="leading" id="s00-00-041"/>
-              <constraint firstItem="s00-00-003" firstAttribute="trailing" secondItem="s00-00-004" secondAttribute="trailing" id="s00-00-042"/>
-              <constraint firstItem="s00-00-004" firstAttribute="top" secondItem="s00-00-003" secondAttribute="top" id="s00-00-043"/>
-              <constraint firstItem="s00-00-003" firstAttribute="bottom" secondItem="s00-00-004" secondAttribute="bottom" id="s00-00-044"/>
+              <constraint firstItem="s00-00-004" firstAttribute="leading" secondItem="s00-00-003" secondAttribute="leading" id="s00-00-042"/>
+              <constraint firstItem="s00-00-003" firstAttribute="trailing" secondItem="s00-00-004" secondAttribute="trailing" id="s00-00-043"/>
+              <constraint firstItem="s00-00-004" firstAttribute="top" secondItem="s00-00-003" secondAttribute="top" id="s00-00-044"/>
+              <constraint firstItem="s00-00-003" firstAttribute="bottom" secondItem="s00-00-004" secondAttribute="bottom" id="s00-00-045"/>
             </constraints>
           </view>
           <connections>
             <outlet property="header" destination="s00-00-005" id="s00-00-006"/>
           </connections>
         </viewController>
-        <placeholder placeholderIdentifier="IBFirstResponder" id="s00-00-045" userLabel="First Responder" sceneMemberID="firstResponder"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="s00-00-046" userLabel="First Responder" sceneMemberID="firstResponder"/>
       </objects>
       <point key="canvasLocation" x="0" y="0"/>
     </scene>

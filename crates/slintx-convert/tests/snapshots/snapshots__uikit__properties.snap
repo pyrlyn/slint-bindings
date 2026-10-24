@@ -63,7 +63,7 @@ expression: "render(name, format, options)"
                       <constraint firstAttribute="height" constant="40" id="s00-00-016"/>
                     </constraints>
                   </imageView>
-                  <stackView opaque="NO" contentMode="scaleToFill" axis="horizontal" spacing="0" distribution="fill" verticalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-017">
+                  <stackView opaque="NO" contentMode="scaleToFill" axis="horizontal" spacing="0" distribution="fill" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-017">
                     <subviews>
                       <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-018">
                         <state key="normal" title="S"/>
@@ -71,7 +71,7 @@ expression: "render(name, format, options)"
                       <view contentMode="scaleToFill" userLabel="Spacer" horizontalHuggingPriority="1" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-019"/>
                     </subviews>
                   </stackView>
-                  <stackView opaque="NO" contentMode="scaleToFill" axis="horizontal" spacing="0" distribution="fill" verticalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-020">
+                  <stackView opaque="NO" contentMode="scaleToFill" axis="horizontal" spacing="0" distribution="fill" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-020">
                     <subviews>
                       <view contentMode="scaleToFill" userLabel="Spacer" horizontalHuggingPriority="1" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-023"/>
                       <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-021">
@@ -86,7 +86,7 @@ expression: "render(name, format, options)"
                       <constraint firstItem="s00-00-024" firstAttribute="width" secondItem="s00-00-023" secondAttribute="width" id="s00-00-025"/>
                     </constraints>
                   </stackView>
-                  <stackView opaque="NO" contentMode="scaleToFill" axis="horizontal" spacing="0" distribution="fill" verticalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-026">
+                  <stackView opaque="NO" contentMode="scaleToFill" axis="horizontal" spacing="0" distribution="fill" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-026">
                     <subviews>
                       <view contentMode="scaleToFill" userLabel="Spacer" horizontalHuggingPriority="1" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-028"/>
                       <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-027">
@@ -94,7 +94,7 @@ expression: "render(name, format, options)"
                       </button>
                     </subviews>
                   </stackView>
-                  <stackView opaque="NO" contentMode="scaleToFill" axis="horizontal" spacing="0" distribution="fill" verticalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-029">
+                  <stackView opaque="NO" contentMode="scaleToFill" axis="horizontal" spacing="0" distribution="fill" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-029">
                     <subviews>
                       <view contentMode="scaleToFill" userLabel="Spacer" horizontalHuggingPriority="1" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-032"/>
                       <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-030">
@@ -111,7 +111,7 @@ expression: "render(name, format, options)"
                       <constraint firstItem="s00-00-034" firstAttribute="width" secondItem="s00-00-032" secondAttribute="width" id="s00-00-036"/>
                     </constraints>
                   </stackView>
-                  <stackView opaque="NO" contentMode="scaleToFill" axis="horizontal" spacing="0" distribution="fill" verticalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-037">
+                  <stackView opaque="NO" contentMode="scaleToFill" axis="horizontal" spacing="0" distribution="fill" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-037">
                     <subviews>
                       <view contentMode="scaleToFill" userLabel="Spacer" horizontalHuggingPriority="1" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-040"/>
                       <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-038">
@@ -178,26 +178,21 @@ expression: "render(name, format, options)"
                   </view>
                 </subviews>
                 <constraints>
-                  <constraint firstItem="s00-00-017" firstAttribute="height" secondItem="s00-00-012" secondAttribute="height" priority="999" id="s00-00-066"/>
-                  <constraint firstItem="s00-00-020" firstAttribute="height" secondItem="s00-00-012" secondAttribute="height" priority="999" id="s00-00-067"/>
-                  <constraint firstItem="s00-00-026" firstAttribute="height" secondItem="s00-00-012" secondAttribute="height" priority="999" id="s00-00-068"/>
-                  <constraint firstItem="s00-00-029" firstAttribute="height" secondItem="s00-00-012" secondAttribute="height" priority="999" id="s00-00-069"/>
-                  <constraint firstItem="s00-00-037" firstAttribute="height" secondItem="s00-00-012" secondAttribute="height" priority="999" id="s00-00-070"/>
-                  <constraint firstItem="s00-00-045" firstAttribute="height" secondItem="s00-00-012" secondAttribute="height" priority="999" id="s00-00-071"/>
-                  <constraint firstItem="s00-00-054" firstAttribute="height" secondItem="s00-00-012" secondAttribute="height" priority="999" id="s00-00-072"/>
-                  <constraint firstItem="s00-00-062" firstAttribute="height" secondItem="s00-00-012" secondAttribute="height" priority="999" id="s00-00-073"/>
+                  <constraint firstItem="s00-00-045" firstAttribute="height" secondItem="s00-00-012" secondAttribute="height" priority="999" id="s00-00-066"/>
+                  <constraint firstItem="s00-00-054" firstAttribute="height" secondItem="s00-00-012" secondAttribute="height" priority="999" id="s00-00-067"/>
+                  <constraint firstItem="s00-00-062" firstAttribute="height" secondItem="s00-00-012" secondAttribute="height" priority="999" id="s00-00-068"/>
                 </constraints>
               </stackView>
             </subviews>
             <constraints>
-              <constraint firstItem="s00-00-004" firstAttribute="leading" secondItem="s00-00-003" secondAttribute="leading" id="s00-00-074"/>
-              <constraint firstItem="s00-00-003" firstAttribute="trailing" secondItem="s00-00-004" secondAttribute="trailing" id="s00-00-075"/>
-              <constraint firstItem="s00-00-004" firstAttribute="top" secondItem="s00-00-003" secondAttribute="top" id="s00-00-076"/>
-              <constraint firstItem="s00-00-003" firstAttribute="bottom" secondItem="s00-00-004" secondAttribute="bottom" id="s00-00-077"/>
+              <constraint firstItem="s00-00-004" firstAttribute="leading" secondItem="s00-00-003" secondAttribute="leading" id="s00-00-069"/>
+              <constraint firstItem="s00-00-003" firstAttribute="trailing" secondItem="s00-00-004" secondAttribute="trailing" id="s00-00-070"/>
+              <constraint firstItem="s00-00-004" firstAttribute="top" secondItem="s00-00-003" secondAttribute="top" id="s00-00-071"/>
+              <constraint firstItem="s00-00-003" firstAttribute="bottom" secondItem="s00-00-004" secondAttribute="bottom" id="s00-00-072"/>
             </constraints>
           </view>
         </viewController>
-        <placeholder placeholderIdentifier="IBFirstResponder" id="s00-00-078" userLabel="First Responder" sceneMemberID="firstResponder"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="s00-00-073" userLabel="First Responder" sceneMemberID="firstResponder"/>
         <tapGestureRecognizer id="s00-00-047">
           <connections>
             <!-- clicked => { debug("tap"); } -->

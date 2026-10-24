@@ -16,7 +16,7 @@ expression: "render(name, format, options)"
             <rect key="frame" x="0.0" y="0.0" width="480" height="270"/>
             <autoresizingMask key="autoresizingMask"/>
             <subviews>
-              <stackView orientation="vertical" alignment="centerX" spacing="6" detachesHiddenViews="YES" distribution="fill" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-003">
+              <stackView orientation="vertical" alignment="leading" spacing="6" distribution="fill" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-003">
                 <subviews>
                   <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-004">
                     <buttonCell key="cell" type="push" title="OK" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="s00-00-005">
@@ -30,7 +30,7 @@ expression: "render(name, format, options)"
                       <font key="font" metaFont="system"/>
                     </buttonCell>
                   </button>
-                  <stackView orientation="horizontal" alignment="centerY" spacing="8" detachesHiddenViews="YES" distribution="fill" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-012">
+                  <stackView orientation="horizontal" alignment="top" spacing="8" distribution="fill" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-012">
                     <subviews>
                       <switch baseWritingDirection="leftToRight" alignment="left" state="off" horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-009"/>
                       <textField focusRingType="none" horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-010">
@@ -66,7 +66,7 @@ line</string>
                     <sliderCell key="cell" continuous="YES" state="on" alignment="left" minValue="0" maxValue="100" doubleValue="40" tickMarkPosition="above" sliderType="linear" id="s00-00-020"/>
                   </slider>
                   <progressIndicator maxValue="1" doubleValue="0.25" style="bar" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-021"/>
-                  <stackView orientation="horizontal" alignment="centerY" spacing="8" detachesHiddenViews="YES" distribution="fill" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-026">
+                  <stackView orientation="horizontal" alignment="top" spacing="8" distribution="fill" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-026">
                     <subviews>
                       <textField focusRingType="none" horizontalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-024">
                         <textFieldCell key="cell" lineBreakMode="clipping" title="3" id="s00-00-025">

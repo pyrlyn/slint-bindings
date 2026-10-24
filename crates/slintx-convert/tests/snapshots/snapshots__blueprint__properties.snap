@@ -73,14 +73,12 @@ Gtk.Window {
       content-fit: contain;
     }
     Gtk.Box {
-      vexpand: true;
       orientation: horizontal;
       Gtk.Button {
         label: "S";
       }
     }
     Gtk.Box {
-      vexpand: true;
       orientation: horizontal;
       halign: center;
       Gtk.Button {
@@ -91,7 +89,6 @@ Gtk.Window {
       }
     }
     Gtk.Box {
-      vexpand: true;
       orientation: horizontal;
       halign: end;
       Gtk.Button {
@@ -99,7 +96,6 @@ Gtk.Window {
       }
     }
     Gtk.Box {
-      vexpand: true;
       orientation: horizontal;
       Gtk.Button {
         label: "A1";
@@ -109,7 +105,6 @@ Gtk.Window {
       }
     }
     Gtk.Box {
-      vexpand: true;
       orientation: horizontal;
       Gtk.Button {
         label: "V1";

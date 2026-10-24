@@ -9,6 +9,7 @@ mod xml;
 
 use std::fmt::Write as _;
 
+use crate::Options;
 use crate::diag::Diagnostics;
 use crate::ir::{Document, Value};
 
@@ -39,13 +40,23 @@ pub enum Platform {
     AppKit,
 }
 
-pub fn backend(format: Format, platform: Platform) -> Box<dyn Backend> {
+pub fn backend(format: Format, options: &Options) -> Box<dyn Backend> {
+    let source_tags = options.source_tags;
     match format {
         Format::Xml => Box::new(Xml),
         Format::Html => Box::new(Html),
-        Format::Storyboard => Box::new(Storyboard { platform }),
-        Format::Blueprint => Box::new(Blueprint),
+        Format::Storyboard => Box::new(Storyboard {
+            platform: options.platform,
+            source_tags,
+        }),
+        Format::Blueprint => Box::new(Blueprint { source_tags }),
     }
+}
+
+/// The key [`Options::source_tags`] writes: the element's line and column,
+/// as HTML's `data-at` has it.
+pub(crate) fn source_tag(origin: &crate::diag::Origin) -> String {
+    format!("{}:{}", origin.line, origin.column)
 }
 
 /// Integers without a fraction, everything else as Rust prints it: stable and

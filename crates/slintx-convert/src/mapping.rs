@@ -2,7 +2,7 @@
 //! every target, plus the layout defaults the converter needs. Kept as plain
 //! data so `docs/mapping.md` is generated from it and backends share one source.
 
-use crate::ir::{LayoutKind, Node};
+use crate::ir::{Alignment, LayoutKind, Node};
 
 /// What a widget is, independent of any target; backends pick properties and
 /// events by role, not by name.
@@ -204,7 +204,7 @@ pub const WIDGETS: &[Widget] = &[
     widget(
         "TextInput",
         LineEdit,
-        (1.0, 0.0),
+        (0.0, 0.0),
         false,
         Some("text"),
         ["input", "UITextField", "NSTextField", "Gtk.Entry"],
@@ -313,17 +313,137 @@ pub fn lookup(name: &str) -> Option<&'static Widget> {
     WIDGETS.iter().find(|w| w.slint == name)
 }
 
-/// The stretch factor of `node` along one axis: its own setting, else the
-/// widget's default, else 1 (Slint's default for elements without one).
+/// The stretch factor of `node` along one axis: its own setting; for a
+/// layout, what Slint derives from its children; else the widget's default,
+/// else 1 (Slint's default for elements without one).
 pub fn stretch(node: &Node, horizontal: bool) -> f64 {
     let explicit = if horizontal {
         node.item.width.stretch
     } else {
         node.item.height.stretch
     };
-    explicit.unwrap_or_else(|| {
-        lookup(&node.widget).map_or(1.0, |w| if horizontal { w.stretch.0 } else { w.stretch.1 })
-    })
+    explicit
+        .or_else(|| layout_stretch(node, horizontal))
+        .unwrap_or_else(|| {
+            lookup(&node.widget).map_or(1.0, |w| if horizontal { w.stretch.0 } else { w.stretch.1 })
+        })
+}
+
+/// Whether `node` keeps its size along one axis: it sets one, or it is a box
+/// its children stop. Along a box that takes every child keeping its size
+/// and the default alignment (any other leaves Slint's maximum open);
+/// across it one is enough, as Slint's layout info takes the smallest
+/// maximum there.
+pub fn fixed(node: &Node, horizontal: bool) -> bool {
+    let extent = if horizontal {
+        &node.item.width
+    } else {
+        &node.item.height
+    };
+    if extent.fixed.is_some() {
+        return true;
+    }
+    let Some(layout) = &node.layout else {
+        return false;
+    };
+    let mut children = node.children.iter().map(|c| fixed(c, horizontal));
+    let stretches = matches!(layout.alignment, None | Some(Alignment::Stretch));
+    match layout.kind {
+        Horizontal | Vertical if (layout.kind == Horizontal) == horizontal => {
+            stretches && !node.children.is_empty() && children.all(|f| f)
+        }
+        Horizontal | Vertical => children.any(|f| f),
+        Grid => false,
+    }
+}
+
+/// Slint's rule for a box: when the children that can still grow all have
+/// stretch 0, they grow alike. Children keeping their size do not count.
+pub fn all_stretch_zero(children: &[Node], horizontal: bool) -> bool {
+    children
+        .iter()
+        .filter(|c| !fixed(c, horizontal))
+        .all(|c| stretch(c, horizontal) == 0.0)
+}
+
+/// The stretch of each column (or row) of a grid, as Slint's
+/// `grid_layout_data` derives it: the smallest stretch of the single-span
+/// cells in it. A line only spans cover starts at 1, and a span whose lines
+/// add up to more than its own stretch scales them down. `None` for a line
+/// no cell covers: Slint gives it no room.
+pub fn grid_tracks(node: &Node, horizontal: bool) -> Vec<Option<f64>> {
+    let cells: Vec<(usize, usize, f64)> = node
+        .children
+        .iter()
+        .filter_map(|c| {
+            let cell = c.item.cell?;
+            let (start, span) = if horizontal {
+                (cell.col, cell.colspan)
+            } else {
+                (cell.row, cell.rowspan)
+            };
+            Some((start as usize, span.max(1) as usize, stretch(c, horizontal)))
+        })
+        .collect();
+    let count = cells
+        .iter()
+        .map(|&(start, span, _)| start + span)
+        .max()
+        .unwrap_or(0);
+    let mut lines: Vec<Option<f64>> = vec![None; count];
+    for &(start, span, s) in &cells {
+        for line in &mut lines[start..start + span] {
+            line.get_or_insert(1.0);
+        }
+        if span == 1
+            && let Some(line) = &mut lines[start]
+        {
+            *line = f64::min(*line, s);
+        }
+    }
+    for &(start, span, s) in cells.iter().filter(|c| c.1 > 1) {
+        let spanned = &mut lines[start..start + span];
+        let total: f64 = spanned.iter().flatten().sum();
+        if total > s {
+            for line in spanned.iter_mut().flatten() {
+                *line *= s / total;
+            }
+        }
+    }
+    lines
+}
+
+/// Which lines of a grid grow when it has room to spare: those with a
+/// stretch, or, when none has one, every line a cell covers.
+pub fn grid_growth(node: &Node, horizontal: bool) -> Vec<bool> {
+    let lines = grid_tracks(node, horizontal);
+    let any = lines.iter().flatten().any(|s| *s > 0.0);
+    lines
+        .iter()
+        .map(|l| l.is_some_and(|s| s > 0.0 || !any))
+        .collect()
+}
+
+/// As Slint's `box_layout_info` and its orthogonal twin derive it: along a
+/// box's own axis the sum of its children's stretch, across it the
+/// smallest. A grid sums its lines' stretch. `None` for an empty layout or
+/// a plain element.
+fn layout_stretch(node: &Node, horizontal: bool) -> Option<f64> {
+    let layout = node.layout.as_ref()?;
+    let children = node.children.iter().map(|c| (c, stretch(c, horizontal)));
+    let along = match layout.kind {
+        Horizontal => horizontal,
+        Vertical => !horizontal,
+        Grid => {
+            let lines = grid_tracks(node, horizontal);
+            return (!lines.is_empty()).then(|| lines.iter().flatten().sum());
+        }
+    };
+    if along {
+        children.map(|(_, s)| s).reduce(|a, b| a + b)
+    } else {
+        children.map(|(_, s)| s).reduce(f64::min)
+    }
 }
 
 /// The `docs/mapping.md` widget table, generated so it cannot drift.

@@ -57,6 +57,7 @@ Gtk.Window {
     Gtk.Picture {
       width-request: 32;
       height-request: 32;
+      halign: start;
       file: "icon.png";
     }
   }

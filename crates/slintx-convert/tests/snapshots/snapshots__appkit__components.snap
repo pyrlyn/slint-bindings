@@ -16,11 +16,11 @@ expression: "render(name, format, options)"
             <rect key="frame" x="0.0" y="0.0" width="480" height="270"/>
             <autoresizingMask key="autoresizingMask"/>
             <subviews>
-              <stackView orientation="vertical" alignment="centerX" spacing="0" detachesHiddenViews="YES" distribution="fill" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-003">
+              <stackView orientation="vertical" alignment="leading" spacing="0" distribution="fill" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-003">
                 <subviews>
                   <customView verticalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-004">
                     <subviews>
-                      <stackView orientation="vertical" alignment="centerX" spacing="4" detachesHiddenViews="YES" distribution="fill" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-005">
+                      <stackView orientation="vertical" alignment="leading" spacing="4" distribution="fill" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-005">
                         <subviews>
                           <textField focusRingType="none" verticalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-006">
                             <textFieldCell key="cell" lineBreakMode="clipping" title="First" id="s00-00-007">
@@ -53,7 +53,7 @@ expression: "render(name, format, options)"
                   </customView>
                   <customView verticalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-017">
                     <subviews>
-                      <stackView orientation="vertical" alignment="centerX" spacing="8" detachesHiddenViews="YES" distribution="fill" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-019">
+                      <stackView orientation="vertical" alignment="leading" spacing="8" distribution="fill" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-019">
                         <subviews>
                           <textField focusRingType="none" verticalHuggingPriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="s00-00-020">
                             <textFieldCell key="cell" lineBreakMode="clipping" title="Untitled" id="s00-00-021">
