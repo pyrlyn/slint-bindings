@@ -1,9 +1,9 @@
-//! Slint images uploaded as premultiplied RGBA8 textures.
+//! Images uploaded as premultiplied RGBA8 textures.
 
 use std::collections::HashMap;
 use std::rc::Rc;
 
-use i_slint_core::graphics::{ImageCacheKey, SharedImageBuffer};
+use crate::types::Pixels;
 
 /// Frames an image may go unused before its texture is dropped.
 const KEEP_FRAMES: u64 = 120;
@@ -90,7 +90,7 @@ impl Uploader<'_> {
 #[derive(Default)]
 pub(crate) struct ImageCache {
     frame: u64,
-    entries: HashMap<(ImageCacheKey, [u32; 2]), (Rc<GpuImage>, u64)>,
+    entries: HashMap<(u64, [u32; 2]), (Rc<GpuImage>, u64)>,
 }
 
 impl ImageCache {
@@ -101,82 +101,28 @@ impl ImageCache {
             .retain(|_, (_, used)| frame.saturating_sub(*used) <= KEEP_FRAMES);
     }
 
-    /// Returns the cached texture for `key` at `size`, or uploads `buffer`.
-    /// An image without a cache key is uploaded every time.
+    /// Returns the cached texture for `key` at `size`, or uploads what
+    /// `pixels` returns. An image without a key is uploaded every time, and
+    /// pixels whose length does not match their size are not drawn.
     pub fn get(
         &mut self,
         uploader: &Uploader<'_>,
-        key: ImageCacheKey,
-        buffer: impl FnOnce() -> Option<SharedImageBuffer>,
+        key: Option<u64>,
+        pixels: impl FnOnce() -> Option<Pixels>,
         size: [u32; 2],
     ) -> Option<Rc<GpuImage>> {
-        let cacheable = !matches!(key, ImageCacheKey::Invalid);
-        let slot = (key, size);
-        if cacheable && let Some((image, used)) = self.entries.get_mut(&slot) {
+        if let Some(key) = key
+            && let Some((image, used)) = self.entries.get_mut(&(key, size))
+        {
             *used = self.frame;
             return Some(image.clone());
         }
-        let buffer = buffer()?;
-        let (width, height, pixels) = premultiplied_rgba(&buffer);
-        let image = uploader.upload(width, height, &pixels);
-        if cacheable {
-            self.entries.insert(slot, (image.clone(), self.frame));
+        let pixels = pixels().filter(Pixels::is_valid)?;
+        let image = uploader.upload(pixels.width, pixels.height, &pixels.data);
+        if let Some(key) = key {
+            self.entries
+                .insert((key, size), (image.clone(), self.frame));
         }
         Some(image)
-    }
-}
-
-pub(crate) fn premultiplied_rgba(buffer: &SharedImageBuffer) -> (u32, u32, Vec<u8>) {
-    match buffer {
-        SharedImageBuffer::RGB8(pixels) => (
-            pixels.width(),
-            pixels.height(),
-            pixels
-                .as_slice()
-                .iter()
-                .flat_map(|p| [p.r, p.g, p.b, 255])
-                .collect(),
-        ),
-        SharedImageBuffer::RGBA8(pixels) => (
-            pixels.width(),
-            pixels.height(),
-            pixels
-                .as_slice()
-                .iter()
-                .flat_map(|p| {
-                    let a = u16::from(p.a);
-                    let m = |c: u8| ((u16::from(c) * a + 127) / 255) as u8;
-                    [m(p.r), m(p.g), m(p.b), p.a]
-                })
-                .collect(),
-        ),
-        SharedImageBuffer::RGBA8Premultiplied(pixels) => (
-            pixels.width(),
-            pixels.height(),
-            pixels
-                .as_slice()
-                .iter()
-                .flat_map(|p| [p.r, p.g, p.b, p.a])
-                .collect(),
-        ),
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use i_slint_core::graphics::{Rgba8Pixel, SharedPixelBuffer};
-
-    #[test]
-    fn straight_alpha_is_premultiplied() {
-        let mut buffer = SharedPixelBuffer::<Rgba8Pixel>::new(1, 1);
-        buffer.make_mut_slice()[0] = Rgba8Pixel {
-            r: 255,
-            g: 128,
-            b: 0,
-            a: 128,
-        };
-        let (_, _, pixels) = premultiplied_rgba(&SharedImageBuffer::RGBA8(buffer));
-        assert_eq!(pixels, [128, 64, 0, 128]);
     }
 }

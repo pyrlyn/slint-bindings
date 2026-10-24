@@ -17,6 +17,7 @@ swash = { workspace = true }
 lyon_tessellation = { workspace = true }
 bytemuck = { workspace = true }
 pollster = { workspace = true }
+thiserror = { workspace = true }
 
 [dev-dependencies]
 slint = { workspace = true }

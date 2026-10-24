@@ -3928,6 +3928,7 @@ dependencies = [
  "slint-embed",
  "slint-interpreter",
  "swash",
+ "thiserror 2.0.21",
  "wgpu",
 ]
 
