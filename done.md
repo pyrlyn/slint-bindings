@@ -397,6 +397,32 @@ Three cases were added and recorded with Slint (an unknown name in
 path). `@lib` and include paths are tested in the crate only, since stage 1
 runs Slint without library or include paths.
 
+### T76.1. Built-in catalog
+
+The built-in elements with their properties, callbacks and functions, the
+built-in structs and enums, and the namespaces (`Colors`, `Math`, `Key`,
+`FontWeight`, `Easing`, `Platform`, ...) as Slint declarations in a bundled
+`builtins.slint`, written from the Slint 1.18 docs. Methods on values
+(`color.darker()`, `string.to-float()`) belong to T77. Done when it parses
+with `slintx-syntax` and a harness test has Slint accept a generated file that
+uses every catalogued name with its catalogued type.
+
+Plan: a `slintx-builtins` crate holds `builtins.slint` (non-exported items are
+helpers: the shared bases and the global functions) and exposes its source.
+`slintx-conformance/tests/builtins.rs` parses it and generates one Slint file
+that reads every property, connects every callback with its arity, calls
+every function, names every enum value, reads every struct field and every
+namespace member, then compiles it with Slint. Verify with `cargo nextest run
+-p slintx-builtins -p slintx-conformance` and `scripts/slintx-check.sh
+license|wasm`.
+
+Result: `crates/slintx-builtins` bundles `builtins.slint` (structs, 36 enums,
+every element with its properties, callbacks and functions, and the `Math`,
+`Colors`, `Key`, `FontWeight`, `Easing`, `Platform` and `TextInputInterface`
+namespaces). `slintx-conformance/tests/builtins.rs` generates a probe from it
+that Slint 1.18.1 compiles without errors; wrong types, arities, enum values,
+colors and property names each make it fail.
+
 ### T19. Drop Intel macOS leftovers from the Flutter copy
 
 `flutter/` still listed Intel targets after the workspace dropped Intel macOS:

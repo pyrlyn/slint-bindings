@@ -17,6 +17,8 @@ publish = false
 slintx-syntax = { path = "../slintx-syntax" }
 # The module loader stage 3 checks.
 slintx-modules = { path = "../slintx-modules" }
+# The catalog checked against Slint in tests/builtins.rs.
+slintx-builtins = { path = "../slintx-builtins" }
 
 [target.'cfg(not(target_arch = "wasm32"))'.dev-dependencies]
 slint-interpreter = { workspace = true }
