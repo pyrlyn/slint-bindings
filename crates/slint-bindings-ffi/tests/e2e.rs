@@ -147,6 +147,58 @@ fn listen(host: &Host, slot: *mut Vec<String>) {
 }
 
 #[test]
+fn callback_cannot_resize_or_destroy_a_host_dispatching_input() {
+    struct State {
+        host: *mut SbHost,
+        resize_refused: bool,
+        free_refused: bool,
+    }
+    extern "C" fn callback(user_data: *mut c_void, _args: *const c_char) {
+        // SAFETY: the test keeps State and its host live throughout the callback.
+        unsafe {
+            let state = &mut *user_data.cast::<State>();
+            state.resize_refused =
+                !sb_host_resize(state.host, 10, 10, 1.0) && last_error().contains("busy");
+            sb_host_free(state.host);
+            state.free_refused = last_error().contains("active Slint call");
+        }
+    }
+    run_on_test_ui_thread(|| {
+        let host = open(FORM_WIDTH, FORM_HEIGHT, 1.0);
+        render(&host);
+        set_name(&host, "Ada");
+        let mut state = State {
+            host: host.0,
+            resize_refused: false,
+            free_refused: false,
+        };
+        // SAFETY: state remains live until the callback is unregistered below.
+        unsafe {
+            assert!(sb_on_callback(
+                host.0,
+                c"submitted".as_ptr(),
+                Some(callback),
+                (&raw mut state).cast()
+            ));
+        }
+        click(&host, BUTTON_X, BUTTON_Y);
+        assert!(state.resize_refused);
+        assert!(state.free_refused);
+        // SAFETY: the host remains live and can be resized after dispatch returns.
+        unsafe {
+            assert!(sb_on_callback(
+                host.0,
+                c"submitted".as_ptr(),
+                None,
+                ptr::null_mut()
+            ));
+            assert!(sb_host_resize(host.0, FORM_WIDTH * 2, FORM_HEIGHT, 1.0));
+        }
+        render(&host);
+    });
+}
+
+#[test]
 fn type_ascii_then_continue_submits_the_name() {
     run_on_test_ui_thread(|| {
         let host = open(FORM_WIDTH, FORM_HEIGHT, 1.0);

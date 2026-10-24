@@ -162,6 +162,8 @@ struct SbFrame sb_host_gpu_render(struct SbHost *host);
 
 /**
  * Destroys a host. Null is ignored.
+ * A call from a different thread or from an active Slint callback is refused;
+ * the host stays live and `sb_last_error` describes the failure.
  *
  * # Safety
  * `host` must be null or a pointer from `sb_component_new*` (or

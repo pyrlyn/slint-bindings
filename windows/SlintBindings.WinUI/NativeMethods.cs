@@ -56,6 +56,7 @@ internal static partial class NativeMethods
     internal static partial bool sb_host_is_gpu(IntPtr host);
 
     [LibraryImport(Lib)] internal static partial SbFrame sb_host_gpu_render(IntPtr host);
+    // Wrong-thread and reentrant frees leave the host live; sb_last_error reports the refusal.
     [LibraryImport(Lib)] internal static partial void sb_host_free(IntPtr host);
     [LibraryImport(Lib)] internal static partial nuint sb_host_frame_len(IntPtr host);
 
