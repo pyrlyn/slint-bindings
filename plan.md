@@ -39,11 +39,6 @@ Not added: `slint_embed::events` is used only by slint_dart and stays there; `i-
 
 | # | Status | Priority | Complexity | Readiness | Agent |
 | --- | --- | --- | --- | --- | --- |
-| T4 | done | P1 | 3 | 100% | cursor |
-| T6 | done | P1 | 3 | 100% | cursor |
-| T7 | done | P1 | 4 | 100% | cursor |
-| T8 | done | P1 | 5 | 100% | cursor |
-| T5 | todo | P1 | 2 | 0% | |
 | T9 | todo | P2 | 3 | 0% | |
 | T13 | todo | P2 | 4 | 0% | |
 | T14 | in progress | P2 | 5 | 90% | Claude / opus-5.5 |
@@ -110,84 +105,6 @@ remaining tasks until the creator decides how to proceed.
 | slintx copies Slint's code by accident (clean room). | Apache-2.0 release of slintx is no longer possible. | Work from the docs only (`research.md` §8); settle open behaviour by black-box comparison in T74, never by reading Slint's sources. |
 | A Slint crate leaks into the slintx dependency graph. | Same. | Licence gate in T73: the check fails when `slint`, `slint-*` or `i-slint-*` enters a slintx crate's normal dependencies. |
 | Slint behaviour the docs leave open (`research.md` §8.4, OPEN items). | Previews differ from Slint. | Every OPEN item becomes a T74 harness case before the task that implements it closes. |
-
-### T4. macOS keyboard, IME and focus
-
-Adopt `NSTextInputClient` in `SlintNSView` so composition (CJK, dead keys,
-emoji picker) reaches Slint as preedit and commit text; complete the AppKit →
-Slint key map (function keys, Home/End, Page Up/Down, modifiers as separate
-key events) with table-driven tests; make Tab move focus out of the Slint view
-into SwiftUI when Slint has no next focus item. Done when a Japanese input
-method commits text into the demo field and the key-map tests cover every
-`slint::platform::Key`.
-
-Execution: the AppKit → Slint map lives in `slint-bindings-core` (one table,
-tested on every `Key`). `SlintNSView` adopts `NSTextInputClient`: marked text
-is a preedit, `insertText` commits, and a rejected Tab or Backtab calls
-`selectNextKeyView` / `selectPreviousKeyView`.
-
-### T6. WinUI host builds and runs (M2)
-
-Build the code-only skeleton on Windows and fix it; generate
-`NativeMethods.cs` from the C header (evaluate csbindgen versus a small
-cbindgen-driven generator) so it cannot drift; let the core render BGRA
-directly so the C# swizzle goes away; map `VirtualKey` to Slint key text and
-route `CharacterReceived`; IME via `CoreTextEditContext`. Done when the WinUI
-demo behaves like the macOS one (T2 checklist).
-
-Execution: the WinUI → Slint map lives in `slint-bindings-core` next to the
-AppKit map (one table, tested on every `Key`) and the host calls
-`sb_virtual_key_command` / `sb_virtual_key_text`. `CoreTextEditContext` updates
-go through `sb_host_ime_*`, which keeps only the preedit and commits it into
-the field; `GetForCurrentView` failing (Windows 10 desktop, no CoreWindow)
-leaves `CharacterReceived` as the text path. `sb_host_render_bgra` writes
-BGRA8. `windows/Directory.Build.targets` copies the DLL for the active RID
-(`just windows-dll`, or `just windows-dll aarch64-pc-windows-msvc`) into the
-output and into `runtimes/<rid>/native`. `just pinvoke-check` diffs `sb_*`
-names against `NativeMethods.cs`; marshalling stays hand-written because
-csbindgen is not a dependency. The demo window has not been launched.
-
-### T7. GPU path on macOS (M3)
-
-Two candidates, measured against the CPU path:
-(a) Skia on Metal through `i-slint-renderer-skia`, reusing slint_dart's
-`platform/metal.rs` (renders into an `MTLTexture` over an IOSurface-backed
-`CVPixelBuffer`), presented through a `CAMetalLayer` or as IOSurface layer
-contents; (b) `FemtoVGWGPURenderer::render_to_texture` (public, `slint::platform::femtovg_renderer`)
-with a wgpu Metal surface created from the view's layer
-(`SurfaceTargetUnsafe::CoreAnimationLayer`). Prefer (a) if T3 lands, since the
-code exists. Done when the M3 checkpoint numbers are met on macOS and live
-resize shows no stretched or black frames (`presentsWithTransaction` during resize).
-
-Execution: FemtoVG on wgpu (`renderer-femtovg-wgpu`, `unstable-wgpu-30`), not
-Skia. `i-slint-renderer-skia` compiles all of Skia and is not a public renderer.
-The GPU window is staged through `slint_embed::platform::set_next_window`, so
-CPU and GPU hosts share the one software platform. `sb_demo_new_metal` takes a
-`CAMetalLayer` sublayer (the view's own layer is left alone). Live resize sets
-`presentsWithTransaction`. A failed device or surface falls back to
-`sb_demo_new`. The 4K timing checkpoint was not measured.
-
-### T8. GPU path on Windows (M3)
-
-Replace the `Image` with a `SwapChainPanel`. Candidates: (a) wgpu D3D12 surface
-from the panel (`SurfaceTargetUnsafe::SwapChainPanel`, wgpu PR #4191) plus
-`FemtoVGWGPURenderer`; (b) Skia on D3D12 rendering into a shared texture
-(slint_dart `platform/d3d.rs`) copied into a composition swap chain that the
-host binds with `ISwapChainPanelNative::SetSwapChain` on the UI thread.
-Handle `CompositionScaleChanged` for DPI. Done when the M3 checkpoint holds on
-Windows.
-
-Execution: the same FemtoVG wgpu renderer. `sb_demo_new_swapchain` takes
-`ISwapChainPanelNative`; wgpu creates the DXGI swap chain and calls
-`SetSwapChain` on the UI thread. `CompositionScaleChanged` resizes the panel.
-If the COM pointer or the adapter fails, the panel keeps the `WriteableBitmap`.
-The frame-time checkpoint was not measured, and the window was not launched.
-### T5. CI
-
-GitHub Actions: `macos-26` (arm64) runs `just check`; `windows-latest` runs
-`cargo build -p slint-bindings-ffi`, `cargo nextest run` and
-`dotnet build windows/SlintDemo.WinUI`. Use the shared workflows from
-`pyrlyn/ci` where they fit. Done when both jobs are required checks on `main`.
 
 ### T9. Packaging (M4)
 
