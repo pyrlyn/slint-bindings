@@ -47,6 +47,10 @@ swash = "0.2.10"
 lyon_tessellation = "1.0.23"
 bytemuck = { version = "1.25.2", features = ["derive"] }
 pollster = "0.4.0"
+# slintx-wgpu's text: parley glyph runs and layouts. The version Slint already
+# locks, so Slint's `sharedparley` hands the adapter the same parley types. No
+# default features: font discovery (`system`) is the caller's choice.
+parley = { version = "0.11.1", default-features = false, features = ["std"] }
 # Screenshot tests: the demo frame is stored as a PNG snapshot (FFI e2e), and
 # slintx-wgpu frames are compared with the software renderer's. rgba-png is shared
 # with scull and not on crates.io, so it is pinned by rev.

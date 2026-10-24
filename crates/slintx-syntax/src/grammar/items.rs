@@ -96,8 +96,11 @@ fn export(p: &mut Parser, checkpoint: rowan::Checkpoint) {
         if p.at_keyword("from") {
             p.bump();
             p.expect(K::String, "a file path string");
+            p.expect(K::Semicolon, "`;`");
+        } else {
+            // Slint takes a local export list with or without the `;`.
+            p.eat(K::Semicolon);
         }
-        p.expect(K::Semicolon, "`;`");
     } else if p.eat(K::Star) {
         p.expect_keyword("from");
         p.expect(K::String, "a file path string");
@@ -124,7 +127,17 @@ fn declaration(p: &mut Parser, checkpoint: rowan::Checkpoint) -> bool {
     .into_iter()
     .find_map(|(keyword, kind)| p.at_keyword(keyword).then_some(kind));
     let Some(kind) = kind else {
-        return false;
+        // The pre-1.0 `Name := Base { }` component, which Slint still accepts.
+        if !(p.at(K::Ident) && p.nth(1) == Some(K::ColonEqual)) {
+            return false;
+        }
+        p.start_at(checkpoint, K::Component);
+        p.bump();
+        p.bump();
+        qualified_name(p);
+        element_body(p);
+        p.finish();
+        return true;
     };
     p.start_at(checkpoint, kind);
     p.bump();

@@ -21,7 +21,7 @@ accesskit = { workspace = true }
 # the build (`just renderer-check`). Only macOS and Windows present on the GPU,
 # so Linux skips the wgpu compile.
 [target.'cfg(any(target_os = "macos", target_os = "windows"))'.dependencies]
-slintx-wgpu = { workspace = true }
+slintx-wgpu = { workspace = true, features = ["slint"] }
 pollster = { workspace = true }
 
 [target.'cfg(target_os = "macos")'.dependencies]

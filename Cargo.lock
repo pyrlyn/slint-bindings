@@ -3891,6 +3891,7 @@ version = "0.1.0"
 dependencies = [
  "pollster",
  "slint-interpreter",
+ "slintx-syntax",
 ]
 
 [[package]]
@@ -3926,12 +3927,15 @@ dependencies = [
  "bytemuck",
  "i-slint-core",
  "lyon_tessellation",
+ "parley",
  "pollster",
  "rgba-png",
  "slint",
  "slint-embed",
  "slint-interpreter",
+ "slintx-wgpu",
  "swash",
+ "thiserror 2.0.21",
  "wgpu",
 ]
 

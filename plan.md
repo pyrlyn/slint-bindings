@@ -39,26 +39,11 @@ Not added: `slint_embed::events` is used only by slint_dart and stays there; `i-
 
 | # | Status | Priority | Complexity | Readiness | Agent |
 | --- | --- | --- | --- | --- | --- |
-| T4 | done | P1 | 3 | 100% | cursor |
-| T6 | done | P1 | 3 | 100% | cursor |
-| T7 | done | P1 | 4 | 100% | cursor |
-| T8 | done | P1 | 5 | 100% | cursor |
-| T5 | todo | P1 | 2 | 0% | |
 | T9 | todo | P2 | 3 | 0% | |
 | T13 | todo | P2 | 4 | 0% | |
 | T14 | in progress | P2 | 5 | 90% | Claude / opus-5.5 |
 | T15 | todo | P3 | 3 | 0% | |
 | T17 | todo | P3 | 3 | 0% | |
-| T73 | in progress | P0 | 4 | 0% | Claude / opus-5.5 |
-| T73.1 | in progress | P0 | 4 | 100% | Claude / opus-5.5 |
-| T73.1.1 | in progress | P0 | 3 | 100% | Claude / opus-5.5 |
-| T73.1.2 | in progress | P0 | 3 | 100% | Claude / opus-5.5 |
-| T73.1.3 | in progress | P0 | 3 | 100% | Claude / opus-5.5 |
-| T73.1.4 | in progress | P0 | 3 | 100% | Claude / opus-5.5 |
-| T73.1.5 | in progress | P0 | 3 | 100% | Claude / opus-5.5 |
-| T73.1.6 | in progress | P0 | 2 | 100% | Claude / opus-5.5 |
-| T73.2 | in progress | P0 | 2 | 90% | Claude / opus-5.5 |
-| T74 | in progress | P0 | 3 | 60% | Claude / opus-5.5 |
 | T75 | todo | P1 | 3 | 0% | |
 | T76 | todo | P1 | 3 | 0% | |
 | T77 | todo | P1 | 5 | 0% | |
@@ -67,7 +52,6 @@ Not added: `slint_embed::events` is used only by slint_dart and stays there; `i-
 | T80 | todo | P1 | 5 | 0% | |
 | T81 | todo | P1 | 4 | 0% | |
 | T82 | todo | P1 | 5 | 0% | |
-| T83 | todo | P1 | 4 | 0% | |
 | T84 | todo | P1 | 4 | 0% | |
 | T85 | todo | P1 | 3 | 0% | |
 | T86 | todo | P2 | 5 | 0% | |
@@ -112,84 +96,6 @@ remaining tasks until the creator decides how to proceed.
 | slintx copies Slint's code by accident (clean room). | Apache-2.0 release of slintx is no longer possible. | Work from the docs only (`research.md` §8); settle open behaviour by black-box comparison in T74, never by reading Slint's sources. |
 | A Slint crate leaks into the slintx dependency graph. | Same. | Licence gate in T73: the check fails when `slint`, `slint-*` or `i-slint-*` enters a slintx crate's normal dependencies. |
 | Slint behaviour the docs leave open (`research.md` §8.4, OPEN items). | Previews differ from Slint. | Every OPEN item becomes a T74 harness case before the task that implements it closes. |
-
-### T4. macOS keyboard, IME and focus
-
-Adopt `NSTextInputClient` in `SlintNSView` so composition (CJK, dead keys,
-emoji picker) reaches Slint as preedit and commit text; complete the AppKit →
-Slint key map (function keys, Home/End, Page Up/Down, modifiers as separate
-key events) with table-driven tests; make Tab move focus out of the Slint view
-into SwiftUI when Slint has no next focus item. Done when a Japanese input
-method commits text into the demo field and the key-map tests cover every
-`slint::platform::Key`.
-
-Execution: the AppKit → Slint map lives in `slint-bindings-core` (one table,
-tested on every `Key`). `SlintNSView` adopts `NSTextInputClient`: marked text
-is a preedit, `insertText` commits, and a rejected Tab or Backtab calls
-`selectNextKeyView` / `selectPreviousKeyView`.
-
-### T6. WinUI host builds and runs (M2)
-
-Build the code-only skeleton on Windows and fix it; generate
-`NativeMethods.cs` from the C header (evaluate csbindgen versus a small
-cbindgen-driven generator) so it cannot drift; let the core render BGRA
-directly so the C# swizzle goes away; map `VirtualKey` to Slint key text and
-route `CharacterReceived`; IME via `CoreTextEditContext`. Done when the WinUI
-demo behaves like the macOS one (T2 checklist).
-
-Execution: the WinUI → Slint map lives in `slint-bindings-core` next to the
-AppKit map (one table, tested on every `Key`) and the host calls
-`sb_virtual_key_command` / `sb_virtual_key_text`. `CoreTextEditContext` updates
-go through `sb_host_ime_*`, which keeps only the preedit and commits it into
-the field; `GetForCurrentView` failing (Windows 10 desktop, no CoreWindow)
-leaves `CharacterReceived` as the text path. `sb_host_render_bgra` writes
-BGRA8. `windows/Directory.Build.targets` copies the DLL for the active RID
-(`just windows-dll`, or `just windows-dll aarch64-pc-windows-msvc`) into the
-output and into `runtimes/<rid>/native`. `just pinvoke-check` diffs `sb_*`
-names against `NativeMethods.cs`; marshalling stays hand-written because
-csbindgen is not a dependency. The demo window has not been launched.
-
-### T7. GPU path on macOS (M3)
-
-Two candidates, measured against the CPU path:
-(a) Skia on Metal through `i-slint-renderer-skia`, reusing slint_dart's
-`platform/metal.rs` (renders into an `MTLTexture` over an IOSurface-backed
-`CVPixelBuffer`), presented through a `CAMetalLayer` or as IOSurface layer
-contents; (b) `FemtoVGWGPURenderer::render_to_texture` (public, `slint::platform::femtovg_renderer`)
-with a wgpu Metal surface created from the view's layer
-(`SurfaceTargetUnsafe::CoreAnimationLayer`). Prefer (a) if T3 lands, since the
-code exists. Done when the M3 checkpoint numbers are met on macOS and live
-resize shows no stretched or black frames (`presentsWithTransaction` during resize).
-
-Execution: FemtoVG on wgpu (`renderer-femtovg-wgpu`, `unstable-wgpu-30`), not
-Skia. `i-slint-renderer-skia` compiles all of Skia and is not a public renderer.
-The GPU window is staged through `slint_embed::platform::set_next_window`, so
-CPU and GPU hosts share the one software platform. `sb_demo_new_metal` takes a
-`CAMetalLayer` sublayer (the view's own layer is left alone). Live resize sets
-`presentsWithTransaction`. A failed device or surface falls back to
-`sb_demo_new`. The 4K timing checkpoint was not measured.
-
-### T8. GPU path on Windows (M3)
-
-Replace the `Image` with a `SwapChainPanel`. Candidates: (a) wgpu D3D12 surface
-from the panel (`SurfaceTargetUnsafe::SwapChainPanel`, wgpu PR #4191) plus
-`FemtoVGWGPURenderer`; (b) Skia on D3D12 rendering into a shared texture
-(slint_dart `platform/d3d.rs`) copied into a composition swap chain that the
-host binds with `ISwapChainPanelNative::SetSwapChain` on the UI thread.
-Handle `CompositionScaleChanged` for DPI. Done when the M3 checkpoint holds on
-Windows.
-
-Execution: the same FemtoVG wgpu renderer. `sb_demo_new_swapchain` takes
-`ISwapChainPanelNative`; wgpu creates the DXGI swap chain and calls
-`SetSwapChain` on the UI thread. `CompositionScaleChanged` resizes the panel.
-If the COM pointer or the adapter fails, the panel keeps the `WriteableBitmap`.
-The frame-time checkpoint was not measured, and the window was not launched.
-### T5. CI
-
-GitHub Actions: `macos-26` (arm64) runs `just check`; `windows-latest` runs
-`cargo build -p slint-bindings-ffi`, `cargo nextest run` and
-`dotnet build windows/SlintDemo.WinUI`. Use the shared workflows from
-`pyrlyn/ci` where they fit. Done when both jobs are required checks on `main`.
 
 ### T9. Packaging (M4)
 
@@ -279,177 +185,6 @@ drawing into a canvas (`ImageData`), or Slint's own web backend, and render Weft
 trees in the browser through the existing Weft WASM tooling. Done when the
 login sample renders in a browser from its `.weft` file.
 
-### T73. slintx-syntax: a standalone AST parser
-
-slintx's first layer, and a public library on its own: `.slint` source in, a
-lossless syntax tree (rowan) and a typed AST out, with byte spans on every node
-and error recovery (an error node plus a diagnostic, then parsing goes on). It
-covers the whole syntax in `research.md` §8.4.1 and the declaration forms of
-§8.4.2, and depends on no checker or runtime. It also adds the licence gate:
-a `just` check, part of `just check`, that fails when `slint`, `slint-*` or
-`i-slint-*` enters the normal dependency graph of any `slintx-*` crate. Done
-when round-trip tests (tree printed back equals the input, byte for byte) and
-span tests pass on the fixture corpus, broken inputs produce a tree plus
-diagnostics, and the crate builds and its tests run for `wasm32-unknown-unknown`
-on its own.
-
-Execution: split so that parallel sessions touch different files. T73.1 is
-the crate; T73.2 is the gate and the wasm32 build around it. T73 closes when
-both are on `main` and the parser round-trips the T74 corpus.
-
-### T73.1. slintx-syntax crate: lexer, lossless tree, parser, typed AST
-
-`crates/slintx-syntax`: syntax kinds, a hand-written lexer (nested block
-comments, `-` in identifiers, unit suffixes, string interpolation), a rowan
-tree built by a recursive-descent parser with error recovery, typed AST views,
-and diagnostics with byte spans. Own fixtures under
-`crates/slintx-syntax/tests/fixtures/`. Done when round-trip, span and
-error-recovery tests pass on those fixtures and the crate has no dependency on
-`slint`, `slint-*` or `i-slint-*`.
-
-Split at claim time: the whole crate is about 2300 lines of code, so it goes
-in six commits of at most 500 lines each (T73.1.1–T73.1.6), stacked on this
-branch; T73.1.4 was split in two when its code passed 500 lines. Each commit builds, passes its own tests and adds fixtures.
-
-Execution plan:
-
-1. T73.1.1 — `Cargo.toml` (rowan from `[workspace.dependencies]`, workspace
-   lints), `src/kind.rs`, `src/lexer.rs`, `src/lib.rs` (`parse`, `lex`,
-   `Parse`, `Diagnostic { message, range }`).
-2. T73.1.2 — `src/parser.rs` (token cursor, trivia attachment, error nodes,
-   nesting limit), `src/grammar/expr.rs`, `parse_binding_expression`.
-3. T73.1.3 — `src/grammar/macros.rs` (strings, escapes, interpolation, `@`
-   macros) and `src/grammar/stmt.rs` (types, code blocks, statements).
-4. T73.1.4 — `src/grammar/items.rs` (top-level items) and
-   `src/grammar/element.rs` (child elements, bindings, handlers).
-5. T73.1.5 — `src/grammar/decl.rs`: declarations in element bodies.
-6. T73.1.6 — `src/ast.rs`: typed views, one per node kind.
-7. Tests in `tests/`: every fixture in `tests/fixtures/*.slint` round-trips
-   byte for byte and parses with no diagnostics; every `tests/fixtures/errors/`
-   file round-trips and yields the diagnostics in its `.expected` file (message
-   and byte range); span tests check node ranges against substrings.
-8. Verify: `cargo fmt --check`, `cargo clippy -p slintx-syntax --all-targets
-   -- -D warnings`, `cargo nextest run -p slintx-syntax`, `cargo build -p
-   slintx-syntax --target wasm32-unknown-unknown`, the tests on wasm32 through
-   `wasm-bindgen-test-runner` (T73.2's wasm-check), `cargo tree -p
-   slintx-syntax` shows no Slint crate.
-
-### T73.1.1. slintx-syntax: kinds, lexer and lossless tree API
-
-Token and node kinds, the hand-written lexer (BOM, nested block comments,
-identifiers with `-`, numbers with unit suffixes and `%`, `#` colors, strings
-with escapes and `\{expr}` interpolation, `@`, punctuation), the rowan
-language and the public `parse` and `lex` API. Done when lexer tests pass and
-any input prints back byte for byte.
-
-### T73.1.2. slintx-syntax: parser core and expressions
-
-The parser core (trivia attachment, error nodes, nesting limit against stack
-overflow on untrusted input) and expressions with Slint's precedence and the
-non-associativity diagnostics, postfix chains, array and object literals.
-Done when expression tests round-trip with no diagnostics and broken
-expressions recover.
-
-### T73.1.3. slintx-syntax: strings, macros, types and statements
-
-String templates and escape checks; the `@tr`, `@image-url`, gradient,
-`@markdown` and `@keys` macros; types; code blocks and statements (`let`,
-`return`, `if`/`else`, assignments). Done when their tests round-trip with no
-diagnostics and broken input recovers.
-
-### T73.1.4. slintx-syntax: items and element bodies
-
-Imports, exports, components with `inherits`, globals, structs with field
-defaults, enums, elements with ids, bindings, two-way bindings, callback
-handlers and `@children`. Done when one fixture per construct round-trips with
-no diagnostics and broken items recover.
-
-### T73.1.5. slintx-syntax: declarations in element bodies
-
-Property, callback and function declarations with visibility and purity,
-`changed`, `states` with transitions, `animate`, `for` and `if`, plus the
-fixtures that need them. Done when one fixture per construct round-trips with
-no diagnostics, the valid fixtures cover every node kind and broken
-declarations recover.
-
-### T73.1.6. slintx-syntax: typed AST views
-
-One typed view per node kind with accessors, plus span tests through the
-views. Done when every fixture can be walked through the typed AST.
-
-### T73.2. Licence gate and wasm32 build for slintx crates
-
-`justfile`, CI and `toolchain.md` only: a `license-check` recipe in `just
-check` that fails when `slint`, `slint-*` or `i-slint-*` appears in the normal
-(non-dev) dependency graph of any workspace crate named `slintx-*`, proven by a
-test against a throwaway crate that depends on one; and a `wasm-check` recipe
-plus CI job that builds every `slintx-*` crate for `wasm32-unknown-unknown`
-and runs its tests there. Done when both recipes run in CI and pass with no
-`slintx-*` crate yet and with T73.1's crate once it lands.
-
-Execution plan:
-
-1. `scripts/slintx-check.sh license|wasm [Cargo.toml]`: lists workspace members
-   named `slintx-*` (`cargo tree --workspace --depth 0`); `license` runs
-   `cargo tree -p <crate> --target all -e normal,build` and fails on `slint`,
-   `slint-*`, `i-slint-*`; `wasm` builds the crates for `wasm32-unknown-unknown`
-   and runs `cargo test --tests` there through `wasm-bindgen-test-runner` on
-   Node, failing a crate with no wasm32 `wasm-bindgen-test` dev-dependency
-   (the runner would pass it untested). No `slintx-*` crate: both print that
-   and exit 0. `slintx-wgpu` (T72) is exempt from `license` until T83 and from
-   `wasm` until T85; `slintx-conformance` (T74, a native-only harness) from
-   `wasm` for good.
-2. `scripts/slintx-check-test.sh` with offline path-only fixture workspaces in
-   `scripts/fixtures/license-check/` (stub crates named `slint`,
-   `i-slint-core`, `slint-build`): none, clean (dev-only or non-slintx use) and
-   exempt pass; direct, transitive, build-dependency and wasm-only dependencies
-   fail; a manifest cargo cannot load errors instead of passing.
-3. `justfile`: `license-check`, `license-check-test`, `wasm-check`, all in
-   `just check`. `mise.toml`: `wasm32-unknown-unknown` rustup target, Node LTS,
-   `wasm-bindgen` CLI at the lockfile's `wasm-bindgen` version. `toolchain.md`
-   rows.
-4. CI: a Linux `slintx` job (mise, `just license-check license-check-test
-   wasm-check`) in `ci.yml`, required by the gate.
-
-Verify: `just check` locally; the fixture test fails if the gate is weakened.
-
-### T74. slintx-conformance: differential harness against Slint
-
-An unpublished crate (`publish = false`) that runs each `.slint` fixture
-through slintx and through Slint (`slint-interpreter` and the software
-renderer, test-only) and compares: accept or reject and diagnostic positions
-first, then property values after scripted steps, layout geometry and pixels
-(reusing `rgba-png`). The corpus is written here from the docs and from
-penpotx emitter outputs; every OPEN item in `research.md` §8.4 gets a case.
-Slint is the oracle only and never a dependency of a shipped crate. Done when
-the harness runs in `just check` with the parser-level comparison live and the
-later comparisons stubbed behind the stages that do not exist yet.
-
-Execution:
-
-1. `crates/slintx-conformance`, `publish = false`, no normal dependencies.
-   `slint-interpreter` (workspace pin) and `pollster` are dev-dependencies
-   for non-wasm targets only, so T73.2's gate (normal graph) needs no
-   exception and its wasm32 build sees a Slint-free crate with no tests.
-2. `corpus/<group>/*.slint`: one construct per file, valid and invalid, a
-   header comment naming the docs page and the `research.md` §8.4 OPEN item
-   it pins. A directory holding `main.slint` is one multi-file case.
-3. Each case has a checked-in `<name>.expected` beside it: Slint's verdict and
-   every diagnostic (level, file, line, column, message). Stage 1
-   (`tests/stage1_slint.rs`) compiles each case with Slint and fails on any
-   drift; `SLINTX_BLESS=1` rewrites the files. A small own format, not
-   `insta`, because later stages read the expectations back as data.
-4. Stage 2 (`tests/stage2_slintx.rs`): a `Frontend` trait in `src/lib.rs`,
-   stubbed until T73.1 lands; then every case Slint accepts must parse with
-   no syntax errors and round-trip byte for byte. Values, geometry and pixels
-   stay documented stubs.
-5. `just check` picks the tests up through `cargo nextest`; no recipe change.
-
-State: stage 1 is live on 229 cases in 16 groups; `corpus/OPEN.md` numbers
-the 60 OPEN items of §8.4.1 and §8.4.2 and a test checks each has a case.
-Left: plug `slintx-syntax` into stage 2 once T73.1 is on `main`, and add
-penpotx emitter outputs to the corpus.
-
 ### T75. Modules, imports and exports
 
 Load a file graph: relative and include-path imports, `@lib` library paths,
@@ -511,15 +246,6 @@ the same scripts through slintx and Slint with equal results.
 `cross-axis-self-alignment`, `layout-order`, implicit sizes and text measuring
 with parley. Try taffy for `FlexboxLayout` and keep it only if its results match
 Slint. Done when the harness geometry cases match Slint.
-
-### T83. slintx-wgpu without i-slint-core
-
-`slintx-wgpu` (T72) takes Slint's renderer traits, `Brush`/`Color` and
-`sharedparley` text from `i-slint-core`. Give it its own scene input types and
-parley-based text, and keep the `i-slint-core` adapter behind a feature for
-today's hosts. Starts after T72 is on `main`, agreed with T72's owner. Done when
-the crate builds without `i-slint-core` and T72's comparison tests still pass
-through the adapter.
 
 ### T84. Visual items on slintx-wgpu
 

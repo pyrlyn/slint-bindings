@@ -1,6 +1,6 @@
 Convert a .slint file to XML, HTML, an Apple Storyboard or GTK Blueprint
 
-Usage: slint-convert [OPTIONS] --to <TO> <INPUT>
+Usage: slint-convert[EXE] [OPTIONS] --to <TO> <INPUT>
 
 Arguments:
   <INPUT>  The .slint file to convert

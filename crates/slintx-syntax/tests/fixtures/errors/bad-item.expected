@@ -1,2 +1,2 @@
 items: ErrorNode Component
-0..6: expected an item: import, export, component, global, struct or enum
+0..5: expected an item: import, export, component, global, struct or enum

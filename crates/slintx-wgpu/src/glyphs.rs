@@ -6,7 +6,7 @@
 
 use std::collections::HashMap;
 
-use i_slint_core::textlayout::sharedparley::{fontique, parley};
+use parley::fontique;
 use swash::scale::{Render, ScaleContext, Source, StrikeWith};
 use swash::zeno::{Angle, Format, Stroke, Transform, Vector};
 

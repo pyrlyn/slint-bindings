@@ -8,21 +8,33 @@ license.workspace = true
 repository.workspace = true
 publish.workspace = true
 
+[features]
+# `WgpuRenderer`: Slint's renderer traits over the canvas, for hosts that run
+# Slint itself (slint-bindings-core). Off by default, so slintx builds and the
+# licence gate see no Slint crate.
+slint = ["dep:i-slint-core"]
+
 [dependencies]
 # The renderer traits (`RendererSealed`, `ItemRenderer`) and the shared parley
 # text layout live here; they are internal API, hence the exact pin.
-i-slint-core = { workspace = true, features = ["std", "shared-parley", "path"] }
+i-slint-core = { workspace = true, features = ["std", "shared-parley", "path"], optional = true }
 wgpu = { workspace = true }
 swash = { workspace = true }
 lyon_tessellation = { workspace = true }
+parley = { workspace = true }
 bytemuck = { workspace = true }
 pollster = { workspace = true }
+thiserror = { workspace = true }
 
 [dev-dependencies]
+# The comparison tests drive the Slint adapter, so tests always build it.
+slintx-wgpu = { path = ".", features = ["slint"] }
 slint = { workspace = true }
 slint-embed = { workspace = true }
 slint-interpreter = { workspace = true }
 rgba-png = { workspace = true }
+# System fonts for the text test.
+parley = { workspace = true, features = ["system"] }
 
 [lints]
 workspace = true
