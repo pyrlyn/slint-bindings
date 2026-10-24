@@ -110,3 +110,7 @@ convert-platforms:
     docker --context colima build -t slintx-convert-platforms crates/slintx-convert/tests/platform
     docker --context colima run --rm --init --ulimit core=0 -v "$PWD:/src" -v slintx-convert-registry:/usr/local/cargo/registry -v slintx-convert-target:/target -e CARGO_TARGET_DIR=/target slintx-convert-platforms
 
+# slintx-convert's Xcode tests: storyboards through ibtool and the AppKit geometry. The UIKit
+# geometry also needs a booted iOS Simulator, so it runs by hand: add `| test(uikit)`.
+convert-apple:
+    cargo nextest run -p slintx-convert --run-ignored only -E 'test(ibtool) | test(interface_builder) | test(appkit)'

@@ -65,6 +65,8 @@ jobs:
         run: cargo install cbindgen --locked --force
       - name: just check
         run: just check
+      - name: slintx-convert Xcode tests
+        run: just convert-apple
 
   # The slintx-* checks on Linux too, so they still gate a PR while MACOS_CI_DISABLED skips
   # the macOS `just check`.

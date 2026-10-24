@@ -666,3 +666,191 @@ const GTK_KNOWN: Known = &[
 fn gtk_matches_slint() {
     check("gtk", GTK_KNOWN, gtk);
 }
+
+/// The fixture's storyboard compiled with `ibtool --compile` and `extra`
+/// arguments, and the controller class it names.
+#[cfg(target_os = "macos")]
+fn compiled_storyboard(
+    name: &str,
+    platform: Platform,
+    dir: &Path,
+    extra: &[&str],
+) -> (PathBuf, String) {
+    let text = converted(name, Format::Storyboard, platform);
+    let class = text
+        .split_once(r#"<viewController id=""#)
+        .and_then(|(_, rest)| rest.split_once(r#"customClass=""#))
+        .and_then(|(_, rest)| rest.split_once('"'))
+        .map(|(class, _)| class.to_owned())
+        .unwrap_or_else(|| unreachable!("{name}: no controller class"));
+    let storyboard = dir.join(format!("{name}.storyboard"));
+    let compiled = dir.join(format!("{name}.storyboardc"));
+    write(&storyboard, text);
+    let _ = std::fs::remove_dir_all(&compiled);
+    run(Command::new("xcrun")
+        .args(["ibtool", "--compile"])
+        .arg(&compiled)
+        .args(extra)
+        .arg(&storyboard));
+    (compiled, class)
+}
+
+/// Measures the AppKit storyboard: compiled, then laid out by the Swift
+/// `loader`.
+#[cfg(target_os = "macos")]
+fn appkit(loader: &Path, name: &str, width: u32, height: u32, dir: &Path) -> Frame {
+    let (compiled, class) = compiled_storyboard(name, Platform::AppKit, dir, &[]);
+    let png = dir.join(format!("{name}-appkit.png"));
+    let rects = run(Command::new(loader)
+        .arg(&compiled)
+        .arg(&png)
+        .arg(width.to_string())
+        .arg(height.to_string())
+        .arg(class));
+    Frame {
+        rects: parse_rects(&rects),
+        pixels: Some(read_png(&png)),
+    }
+}
+
+#[cfg(target_os = "macos")]
+const APPKIT_KNOWN: Known = &[
+    (
+        "bindings",
+        "Slint grows equal-stretch items by the same amount past their own size; \
+         the converter's proportional constraints make them the same size",
+    ),
+    (
+        "nested_layouts",
+        "the grid's rows keep their own height where Slint grows them alike, \
+         and the stack gives the rest to the bottom row, which Slint caps at its content",
+    ),
+    (
+        "properties",
+        "the content is taller than its 480 px window: Slint overflows and \
+         squeezes the TextEdit to nothing, Auto Layout breaks constraints instead; \
+         native controls are 24 px where Fluent's are 32 px",
+    ),
+    (
+        "repeat_if",
+        "a `for` is emitted once, as a template, and Slint lays out every instance",
+    ),
+    ("unicode", "equal growth as in `bindings`"),
+    (
+        "widgets",
+        "native controls have their own sizes (an NSButton is 24 px, Fluent's 32 px)",
+    ),
+];
+
+#[cfg(target_os = "macos")]
+#[test]
+#[ignore = "needs Xcode's ibtool and swiftc"]
+fn appkit_matches_slint() {
+    let loader = scratch("appkit").join("appkit_geometry");
+    let script = Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/platform/appkit_geometry.swift");
+    run(Command::new("xcrun")
+        .args(["swiftc", "-O", "-o"])
+        .arg(&loader)
+        .arg(script));
+    check("appkit", APPKIT_KNOWN, |name, width, height, dir| {
+        appkit(&loader, name, width, height, dir)
+    });
+}
+
+/// The bundle identifier in `tests/platform/uikit_geometry.plist`.
+#[cfg(target_os = "macos")]
+const UIKIT_APP: &str = "dev.slintx.convert.geometry";
+
+/// Measures the UIKit storyboard in the booted iOS Simulator: compiled for
+/// the iPhone, then laid out by the app `uikit_geometry.swift` builds, which
+/// writes its rectangles and every stack view's margins to a file.
+#[cfg(target_os = "macos")]
+fn uikit(name: &str, width: u32, height: u32, dir: &Path) -> Frame {
+    let (compiled, class) = compiled_storyboard(
+        name,
+        Platform::UiKit,
+        dir,
+        &[
+            "--target-device",
+            "iphone",
+            "--minimum-deployment-target",
+            "17.0",
+        ],
+    );
+    let out = dir.join(format!("{name}.txt"));
+    let png = dir.join(format!("{name}-uikit.png"));
+    let _ = std::fs::remove_file(&out);
+    // `--console-pty` waits for the app to exit.
+    run(Command::new("xcrun")
+        .args([
+            "simctl",
+            "launch",
+            "--console-pty",
+            "--terminate-running-process",
+            "booted",
+            UIKIT_APP,
+        ])
+        .env("SIMCTL_CHILD_SLINTX_STORYBOARD", &compiled)
+        .env("SIMCTL_CHILD_SLINTX_OUT", &out)
+        .env("SIMCTL_CHILD_SLINTX_PNG", &png)
+        .env("SIMCTL_CHILD_SLINTX_WIDTH", width.to_string())
+        .env("SIMCTL_CHILD_SLINTX_HEIGHT", height.to_string())
+        .env("SIMCTL_CHILD_SLINTX_CLASS", class));
+    let text = std::fs::read_to_string(&out)
+        .unwrap_or_else(|e| unreachable!("{name}: the app wrote no {}: {e}", out.display()));
+    // Padded stacks are tagged by Slint position: their margins must survive
+    // `ibtool`, which Interface Builder's own save drops.
+    for line in text.lines().filter(|l| l.starts_with("stack ")) {
+        let fields: Vec<&str> = line.split_whitespace().collect();
+        if let ["stack", key, relative, ref margins @ ..] = fields[..] {
+            let padded = margins
+                .iter()
+                .any(|m| m.parse::<f64>().is_ok_and(|m| m != 0.0));
+            assert!(
+                !padded || relative == "YES",
+                "{name} {key}: margins {margins:?} without layoutMarginsRelativeArrangement"
+            );
+        }
+    }
+    Frame {
+        rects: parse_rects(&text),
+        pixels: Some(read_png(&png)),
+    }
+}
+
+#[cfg(target_os = "macos")]
+const UIKIT_KNOWN: Known = APPKIT_KNOWN;
+
+#[cfg(target_os = "macos")]
+#[test]
+#[ignore = "needs Xcode and a booted iOS Simulator"]
+fn uikit_matches_slint() {
+    let dir = scratch("uikit");
+    let app = dir.join("UIKitGeometry.app");
+    let platform = Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/platform");
+    std::fs::create_dir_all(&app).unwrap_or_else(|e| unreachable!("{}: {e}", app.display()));
+    run(Command::new("xcrun")
+        .args([
+            "--sdk",
+            "iphonesimulator",
+            "swiftc",
+            "-O",
+            "-target",
+            "arm64-apple-ios17.0-simulator",
+            "-o",
+        ])
+        .arg(app.join("UIKitGeometry"))
+        .arg(platform.join("uikit_geometry.swift")));
+    std::fs::copy(
+        platform.join("uikit_geometry.plist"),
+        app.join("Info.plist"),
+    )
+    .unwrap_or_else(|e| unreachable!("{e}"));
+    run(Command::new("codesign")
+        .args(["--sign", "-", "--force"])
+        .arg(&app));
+    run(Command::new("xcrun")
+        .args(["simctl", "install", "booted"])
+        .arg(&app));
+    check("uikit", UIKIT_KNOWN, uikit);
+}
