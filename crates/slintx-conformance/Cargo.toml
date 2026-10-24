@@ -12,6 +12,10 @@ publish = false
 # Slint is the oracle only. As dev-dependencies it stays out of the normal
 # graph the slintx licence gate checks, and the wasm32 build of slintx crates
 # never sees it: the oracle is a native test.
+[dev-dependencies]
+# The front end stage 2 checks.
+slintx-syntax = { path = "../slintx-syntax" }
+
 [target.'cfg(not(target_arch = "wasm32"))'.dev-dependencies]
 slint-interpreter = { workspace = true }
 # The compiler API is async; the corpus only reads local files, so blocking is fine.

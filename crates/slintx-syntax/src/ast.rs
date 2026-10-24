@@ -218,10 +218,7 @@ views! {
         declaration: child(Item),
     }
     ExportSpecifier { name: ident(0), alias: ident(2) }
-    Component {
-        attrs: children(RustAttr), name: ident(1), base: child(QualifiedName),
-        body: child(ElementBody),
-    }
+    Component { attrs: children(RustAttr), base: child(QualifiedName), body: child(ElementBody) }
     Global { attrs: children(RustAttr), name: ident(1), body: child(ElementBody) }
     Struct { attrs: children(RustAttr), name: ident(1), fields: children(StructField) }
     StructField { name: ident(0), ty: child(Type), default: child(Expr) }
@@ -302,6 +299,14 @@ impl QualifiedName {
     /// The names between the dots: `a.b.c` has three.
     pub fn segments(&self) -> impl Iterator<Item = SyntaxToken> + use<> {
         tokens(&self.0, SyntaxKind::Ident)
+    }
+}
+
+impl Component {
+    /// The name after `component`, or before `:=` in the pre-1.0 form.
+    pub fn name(&self) -> Option<SyntaxToken> {
+        let legacy = token(&self.0, SyntaxKind::ColonEqual).is_some();
+        tokens(&self.0, SyntaxKind::Ident).nth(usize::from(!legacy))
     }
 }
 
