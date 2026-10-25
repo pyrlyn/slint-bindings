@@ -15,7 +15,7 @@
 | Docker on Colima | global (`brew install colima docker`) on macOS; preinstalled on GitHub's Ubuntu runners | Runs `slintx-convert`'s Linux platform tests in `crates/slintx-convert/tests/platform` (`just convert-platforms`) | https://github.com/abiosoft/colima |
 | Chromium | apt in the `slintx-convert` test image | Lays out and screenshots the HTML `slintx-convert` writes (geometry test) | https://www.chromium.org/ |
 | GTK 4, PyGObject, Xvfb | apt in the `slintx-convert` test image (`gir1.2-gtk-4.0`, `python3-gi`, `xvfb`) | Show the converted Blueprint as GTK windows and measure them (geometry test) | https://gitlab.gnome.org/GNOME/gtk |
-| dunnage | ketch | Post-test `target/` cleanup in `just test`; a no-op when missing | https://github.com/listepo/dunnage |
+| dunnage | the package manager | Post-test `target/` cleanup in `just test`; a no-op when missing | https://github.com/listepo/dunnage |
 
 ## cargo
 
