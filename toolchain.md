@@ -15,7 +15,7 @@
 | Docker on Colima | global (`brew install colima docker`) on macOS; preinstalled on GitHub's Ubuntu runners | Runs `slintx-convert`'s Linux platform tests in `crates/slintx-convert/tests/platform` (`just convert-platforms`) | https://github.com/abiosoft/colima |
 | Chromium | apt in the `slintx-convert` test image | Lays out and screenshots the HTML `slintx-convert` writes (geometry test) | https://www.chromium.org/ |
 | GTK 4, PyGObject, Xvfb | apt in the `slintx-convert` test image (`gir1.2-gtk-4.0`, `python3-gi`, `xvfb`) | Show the converted Blueprint as GTK windows and measure them (geometry test) | https://gitlab.gnome.org/GNOME/gtk |
-| dunnage | ketch | Post-test `target/` cleanup in `just test`; a no-op when missing | https://github.com/listepo/dunnage |
+| dunnage | The package manager | Post-test `target/` cleanup in `just test`; a no-op when missing | https://github.com/listepo/dunnage |
 
 ## cargo
 
@@ -35,7 +35,7 @@
 | lyon_tessellation | local | https://github.com/nical/lyon | Path fill and stroke tessellation in slintx-wgpu |
 | parley | local | https://github.com/linebender/parley | Text glyph runs and layouts slintx-wgpu draws, the same parley Slint locks |
 | bytemuck | local | https://github.com/Lokathor/bytemuck | Plain-data vertex and storage buffers in slintx-wgpu |
-| rgba-png | local (dev, git rev) | https://github.com/pyrlyn/crates | PNG snapshots and pixel comparison in the screenshot tests and `slintx-convert`'s geometry tests; shared with scull |
+| rgba-png | local (dev, git rev) | https://github.com/pyrlyn/crates | PNG snapshots and pixel comparison in the screenshot tests and `slintx-convert`'s geometry tests; shared with the terminal emulator |
 | png | local (via rgba-png) | https://github.com/image-rs/image-png | Encode and decode the frame snapshots |
 | rowan | local | https://github.com/rust-analyzer/rowan | Lossless syntax tree of `slintx-syntax` |
 | wasm-bindgen-test | local | https://github.com/wasm-bindgen/wasm-bindgen | Runs the `slintx-syntax` and `slintx-modules` tests on `wasm32-unknown-unknown` |

@@ -1,14 +1,14 @@
 # Windows host (WinUI 3)
 
 The control mirrors the Swift host. CI runs the host tests, builds the demo
-and opens it on the weft login screen (`fixtures/weft/login.slint`), failing
+and opens it on the UI description format login screen (`fixtures/weft/login.slint`), failing
 when the Slint panel is one colour (`smoke.ps1`).
 
 | Project | What it is |
 | --- | --- |
 | `SlintBindings.WinUI` | `SlintPanel` control, `SlintHost` (owns the Rust handle), P/Invoke declarations |
 | `SlintDemo.WinUI` | Unpackaged demo app: a WinUI pane and a Slint pane sharing state. A `.slint` path argument shows that file instead and lists its `perform` calls |
-| `SlintBindings.Tests` | MSTest: the weft screen through `SlintHost` (render, typing, clicks, callbacks, adoption). Compiles the host's sources, so it needs no Windows App Runtime |
+| `SlintBindings.Tests` | MSTest: the UI description format screen through `SlintHost` (render, typing, clicks, callbacks, adoption). Compiles the host's sources, so it needs no Windows App Runtime |
 
 ## Build (on Windows)
 
@@ -26,7 +26,7 @@ are staged when both DLLs have been built.
 
 ## A host from another library
 
-A library that makes its own `SbHost*` (weft's `ws_surface_new`, say) hands it
+A library that makes its own `SbHost*` (the UI description format's `ws_surface_new`, say) hands it
 to the panel through `HostFactory`; `SlintHost.Adopt` takes ownership and reads
 the size from the host. The factory gets the swap chain pointer, or zero for a
 CPU host, and is asked again with zero when it throws for the pointer.

@@ -420,7 +420,7 @@ time with `slint-interpreter` (`=1.18.1`, the same pin as `slint`; one
 `i-slint-core`), and properties and callbacks cross as JSON through slint_dart's
 `slint-dart-interpreter`, reused as a path dependency
 (`flutter/packages/slint_build/interpreter`) and excluded from this workspace so
-it keeps flutter/'s lints and dependency versions. Closes weft T69.1's G1 and G2.
+it keeps flutter/'s lints and dependency versions. Closes the UI description format's T69.1's G1 and G2.
 
 - Core: `runtime::compile(source, path)` returns the last exported component
   (`source: None` reads the file); `runtime::instantiate` hosts a
@@ -455,10 +455,10 @@ tests cover the file-loaded form, JSON errors and invoke. WinUI: the same in
 `demo.slint` next to the app. `just check` passes on macOS; the WinUI projects
 were not built or run (no Windows machine here), only `just pinvoke-check`.
 
-### T70. SwiftUI hosts a component built elsewhere (weft G3, T68 on macOS)
+### T70. SwiftUI hosts a component built elsewhere (the UI description format G3, T68 on macOS)
 
-Weft's editor builds its `SbHost*` in its own Rust library and shows it in
-`SlintNSView` (weft T69.1d). Closes weft T69.1's G3 and the macOS half of weft
+The UI description format's editor builds its `SbHost*` in its own Rust library and shows it in
+`SlintNSView` (the UI description format's T69.1d). Closes the UI description format's T69.1's G3 and the macOS half of the UI description format
 T68.
 
 - `SlintHost(adopting:)` takes ownership of an `SbHost*` another C function
@@ -472,8 +472,8 @@ T68.
 - The `SlintBindings` library target links no Rust library; the demo and test
   targets do. `just swift-package-check` (in `just check`) fails when the
   library target has unsafe flags.
-- `fixtures/weft/login.slint` is weft's `weft-slint` output for the login screen
-  (weft `b623a5b9`). The Rust e2e renders it at 480×800 (not one colour), clicks
+- `fixtures/weft/login.slint` is the UI description format's `weft-slint` output for the login screen
+  (the UI description format `b623a5b9`). The Rust e2e renders it at 480×800 (not one colour), clicks
   the email field, types into it, reads `email` back, and gets
   `perform("auth.submit", "form")` from the button and from Enter and
   `perform("nav.signup", "signup")` from the link; the button does nothing while
@@ -487,9 +487,9 @@ T68.
 
 `just check` passes on macOS.
 
-### T71. WinUI 3 hosts a component built elsewhere (weft G4, T68 on Windows)
+### T71. WinUI 3 hosts a component built elsewhere (the UI description format G4, T68 on Windows)
 
-Weft's Windows shell (weft T69.1e) hands `SlintPanel` a host from its own
+The UI description format's Windows shell (the UI description format's T69.1e) hands `SlintPanel` a host from its own
 library. The panel created hosts only from `Definition`, and CI compiled the
 WinUI code without running any of it.
 
@@ -504,14 +504,14 @@ WinUI code without running any of it.
 - `windows/SlintBindings.Tests` (MSTest.Sdk, Microsoft.Testing.Platform, run with
   `dotnet run --project`): compiles `SlintHost.cs` and `NativeMethods.cs` rather
   than referencing the WinUI library, so it needs no Windows App Runtime. On the
-  weft login screen it checks the BGRA frame is not one colour, walks the
+  the UI description format login screen it checks the BGRA frame is not one colour, walks the
   columns to click (the reset link while submit is disabled, then submit and
   "Create an account"), types into both fields with Backtab between them, and
   presses Enter; `perform` gets each action. An adopted host keeps its size and
   renders; adopting a failed constructor throws.
 - The demo takes a `.slint` path argument and shows that file through
   `HostFactory`, listing its `perform` calls. `windows/smoke.ps1` starts it on
-  the weft screen, captures the window and fails when the Slint panel is one
+  the UI description format screen, captures the window and fails when the Slint panel is one
   colour.
 - CI `windows-host`: the host tests, a self-contained build
   (`WindowsAppSDKSelfContained`), the smoke run, and the capture as the
@@ -550,18 +550,18 @@ popups. `GpuHost::focus_changed` still needs the same `close_auto_popups` call
 once the GPU path is replaced (T72). The demo opens a second window,
 "Slint popups", with two CPU views.
 
-### T12. Weft → Slint renderer (dropped)
+### T12. The UI description format → Slint renderer (dropped)
 
-Dropped, not done. It would have built `slint-bindings-weft`, a second Weft →
-Slint mapping beside weft's own `weft-slint` (weft T67), which already
-generates every corpus screen. The creator approved dropping it (weft T69.1,
+Dropped, not done. It would have built `slint-bindings-weft`, a second the UI description format →
+Slint mapping beside the UI description format's own `weft-slint` (the UI description format's T67), which already
+generates every corpus screen. The creator approved dropping it (the UI description format's T69.1,
 decision 3). The hosts show `weft-slint`'s output instead: T70 and T71.
 
-### T16. Slint desktop app for Weft (dropped)
+### T16. Slint desktop app for the UI description format (dropped)
 
-Dropped, not done. Weft builds its desktop editor itself (weft T69,
+Dropped, not done. The UI description format builds its desktop editor itself (the UI description format's T69,
 WeftStudio) on these bindings; a second app here would duplicate it. Approved
-with T12 (weft T69.1, decision 3).
+with T12 (the UI description format's T69.1, decision 3).
 
 ### T90. Screenshot helpers from the shared rgba-png crate
 
@@ -569,7 +569,7 @@ Merged as 5e8fae1 under the id T89, which the open slintx-convert PR had already
 taken; renumbered so that id stays with it.
 
 `crates/pixel-diff` (T72) is the same code as `rgba-png` in pyrlyn/crates
-(`rust/rgba-png`), which scull also uses. The workspace rule moves code shared by
+(`rust/rgba-png`), which the terminal emulator also uses. The workspace rule moves code shared by
 two projects into one package, so the crate is deleted and the dev-dependencies of
 `slint-bindings-ffi` and `slintx-wgpu` pin `rgba-png` by git rev (it is not on
 crates.io). `encode_png`, `decode_png`, `differing_pixels` and `diff_image` are
