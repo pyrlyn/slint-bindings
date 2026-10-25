@@ -1,4 +1,4 @@
 [tools]
 flutter = "latest"
 just = "latest"
-hugo = "0.165.0"
+hugo = "0.168.0"
