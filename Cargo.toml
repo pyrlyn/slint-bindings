@@ -68,6 +68,11 @@ unimplemented = "deny"
 
 [profile.dev]
 debug = "line-tables-only"
+split-debuginfo = "unpacked"
 
 [profile.dev.package."*"]
+debug = false
+
+[profile.dev.build-override]
+opt-level = 3
 debug = false
