@@ -71,3 +71,4 @@ debug = "line-tables-only"
 
 [profile.dev.package."*"]
 debug = false
+opt-level = 1
