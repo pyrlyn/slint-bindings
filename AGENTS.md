@@ -1,7 +1,7 @@
 # Slint Bindings: instructions for agents
 
 **What this is.** Embedding Slint into native hosts (SwiftUI/AppKit, WinUI 3) through a
-host-driven custom Slint platform and a C ABI. Weft rendering builds on it later.
+host-driven custom Slint platform and a C ABI. The UI description format rendering builds on it later.
 
 If an `AGENTS.md` or `CLAUDE.md` exists higher in the tree, follow it too; on conflict, ask the creator.
 

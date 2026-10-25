@@ -5,7 +5,7 @@ uv = "0.12.23" # installs the pipx: ptools tool
 "pipx:git+https://github.com/pyrlyn/tools.git" = "d6eb6452cbb7ec4b350de87194548915c2648c27" # `mise run sweep`, `just cache`, `just swarfr` (ptools, Python; pyrlyn/tools#8, repin to a tag once merged)
 "cargo:cargo-sweep" = "0.8.0" # `mise run sweep`: drops build artifacts unused for 1 day (ptools sweep)
 mold = { version = "2.42.1", os = ["linux"] } # linker, Linux only; mise [env] below turns it on where it is installed
-# Same pin as weft, so the Weft milestone can share one toolchain.
+# Same pin as the UI description format, so the UI description format milestone can share one toolchain.
 rust = { version = "1.99.1", components = "rustfmt,clippy", targets = "wasm32-unknown-unknown" } # wasm32: `just wasm-check` (T73.2)
 "cargo:cargo-nextest" = "0.9.143"
 just = "1.58.0"
