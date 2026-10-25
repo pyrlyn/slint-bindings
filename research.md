@@ -101,7 +101,7 @@ a custom platform has to provide it itself (plan T14).
 | Option | For | Against | Decision |
 | --- | --- | --- | --- |
 | Hand-written C ABI + cbindgen header | One ABI for Swift (module map) and C# (P/Invoke); no runtime; full control over threading and buffers | Wrappers written by hand per language | **M1–M4** |
-| UniFFI ([repo](https://github.com/mozilla/uniffi-rs), [Swift guide](https://mozilla.github.io/uniffi-rs/next/swift/overview.html)) | Generated Swift/Kotlin, C# via third party; already used by the coding agent | Object model and per-call overhead are a poor fit for frame buffers and raw surface pointers; Swift 6 support partial per its docs | Revisit for the typed API (T13) |
+| UniFFI ([repo](https://github.com/mozilla/uniffi-rs), [Swift guide](https://mozilla.github.io/uniffi-rs/next/swift/overview.html)) | Generated Swift/Kotlin, C# via third party; already used by cox | Object model and per-call overhead are a poor fit for frame buffers and raw surface pointers; Swift 6 support partial per its docs | Revisit for the typed API (T13) |
 | swift-bridge | Idiomatic Swift both ways | Swift only | No |
 | Swift C++ interop over Slint's C++ API | Reuses `slint-platform.h`, `SkiaRenderer` | Drags CMake and the C++ SDK into SwiftPM; the community PoC hit `extern "C"` import limits | No |
 | csbindgen / generated P/Invoke | Keeps C# in sync with the header | Extra tool | T6 |
