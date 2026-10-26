@@ -43,7 +43,11 @@ jobs:
       contents: read
       actions: write
     uses: pyrlyn/ci/.github/workflows/ci-rust.yml@main
+    secrets:
+      R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
     with:
+      sccache: true # R2 compiler cache, see pyrlyn/ci docs/sccache.md
       mold: true # mold + clang on Linux runners (mise.toml [env])
       package-args: --workspace
       feature-args: ""
