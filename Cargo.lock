@@ -3886,11 +3886,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "slintx-builtins"
+version = "0.1.0"
+dependencies = [
+ "slintx-syntax",
+ "wasm-bindgen-test",
+]
+
+[[package]]
 name = "slintx-conformance"
 version = "0.1.0"
 dependencies = [
  "pollster",
  "slint-interpreter",
+ "slintx-builtins",
  "slintx-modules",
  "slintx-syntax",
 ]

@@ -1,0 +1,923 @@
+// Slint 1.18's built-in elements, structs, enums and namespaces, written as
+// Slint declarations from the docs (research.md §8.4.1-§8.4.3 and
+// https://releases.slint.dev/1.18.0/docs/slint/reference/), never from Slint's
+// sources. Exported items are the names user code sees; the others are
+// helpers: shared bases and the functions callable without a namespace.
+// Defaults are the documented ones where the docs give a constant.
+// `numeric` stands for any of angle, duration, float, int, length, percent.
+
+// Structs
+
+export struct Point { x: length, y: length }
+// Documented, but user code cannot name it.
+struct LogicalPosition { x: length, y: length }
+export struct Size { width: length, height: length }
+export struct Edges { left: length, top: length, right: length, bottom: length }
+export struct FontMetrics { ascent: length, descent: length, x-height: length, cap-height: length }
+export struct KeyboardModifiers { alt: bool, control: bool, shift: bool, meta: bool }
+export struct KeyEvent { text: string, modifiers: KeyboardModifiers, repeat: bool }
+export struct PointerEvent {
+    button: PointerEventButton,
+    kind: PointerEventKind,
+    modifiers: KeyboardModifiers,
+    touch-finger-id: int,
+}
+export struct PointerScrollEvent { delta-x: length, delta-y: length, modifiers: KeyboardModifiers }
+export struct InputMethodHints { capitalization: CapitalizationMode, auto-correct: bool, auto-complete: bool }
+export struct DropEvent { data: data-transfer, position: LogicalPosition, proposed-action: DragAction }
+export struct StandardListViewItem { text: string }
+export struct TableColumn {
+    title: string,
+    min-width: length,
+    horizontal-stretch: float,
+    sort-order: SortOrder,
+    width: length,
+}
+
+// Enums, values in the docs' order
+
+export enum AccessibleLiveness { off, polite, assertive }
+export enum AccessibleRole {
+    none, button, checkbox, combobox, groupbox, image, list, slider, spinbox, tab, tab-list,
+    tab-panel, text, table, tree, progress-indicator, text-input, switch, list-item,
+    radio-button, radio-group, window-title-bar, banner, complementary, content-info, form,
+    main, navigation, region, search,
+}
+export enum AnimationDirection { normal, reverse, alternate, alternate-reverse }
+export enum CapitalizationMode { none, sentences, words, characters }
+export enum ColorScheme { unknown, dark, light }
+export enum CrossAxisAlignment { auto, stretch, start, end, center }
+export enum DialogButtonRole { none, accept, reject, apply, reset, help, action }
+export enum DragAction { none, copy, move, link }
+export enum EventResult { reject, accept }
+export enum FillRule { nonzero, evenodd }
+export enum FlexboxLayoutDirection { row, row-reverse, column, column-reverse }
+export enum FlexboxLayoutWrap { wrap, no-wrap, wrap-reverse }
+export enum FocusReason { programmatic, tab-navigation, pointer-click, popup-activation, window-activation }
+export enum ImageFit { fill, contain, cover, preserve }
+export enum ImageHorizontalAlignment { center, left, right }
+export enum ImageRendering { smooth, pixelated }
+export enum ImageTiling { none, repeat, round }
+export enum ImageVerticalAlignment { center, top, bottom }
+export enum InputType { text, password, number, decimal, search }
+export enum LayoutAlignment { stretch, center, start, end, space-between, space-around, space-evenly }
+export enum LineCap { butt, round, square }
+export enum LineJoin { miter, round, bevel }
+export enum MouseCursor {
+    default, none, help, pointer, progress, wait, crosshair, text, alias, copy, move, no-drop,
+    not-allowed, grab, grabbing, col-resize, row-resize, n-resize, e-resize, s-resize, w-resize,
+    ne-resize, nw-resize, se-resize, sw-resize, ew-resize, ns-resize, nesw-resize, nwse-resize,
+}
+export enum OperatingSystemType { android, ios, macos, linux, windows, other }
+export enum Orientation { horizontal, vertical }
+// Documented, but user code cannot name it.
+enum PathEvent { begin, line, quadratic, cubic, end-open, end-closed }
+export enum PointerEventButton { other, left, right, middle, back, forward }
+export enum PointerEventKind { cancel, down, up, move }
+export enum PopupClosePolicy { close-on-click, close-on-click-outside, no-auto-close }
+export enum ScrollBarPolicy { as-needed, always-off, always-on }
+export enum SortOrder { unsorted, ascending, descending }
+export enum StandardButtonKind { ok, cancel, apply, close, reset, help, yes, no, abort, retry, ignore }
+export enum TextHorizontalAlignment { start, end, left, center, right }
+export enum TextOverflow { clip, elide }
+export enum TextStrokeStyle { outside, center }
+export enum TextVerticalAlignment { top, center, bottom }
+export enum TextWrap { no-wrap, word-wrap, char-wrap }
+
+// Shared bases
+
+/// Every element, visual or not.
+component Element {
+    callback init();
+}
+
+/// The common properties of visual items, layout constraints and accessibility.
+component Item inherits Element {
+    in property <length> x: 0px;
+    in property <length> y: 0px;
+    in property <length> width;
+    in property <length> height;
+    in property <float> z: 0;
+    in property <angle> transform-rotation: 0deg;
+    in property <Point> transform-origin;
+    in property <float> transform-scale: 1;
+    in property <float> transform-scale-x;
+    in property <float> transform-scale-y;
+    in property <float> opacity: 1;
+    in property <bool> visible: true;
+    out property <Point> absolute-position;
+    in property <bool> cache-rendering-hint: false;
+    in property <DialogButtonRole> dialog-button-role: DialogButtonRole.none;
+    in property <length> min-width: 0px;
+    in property <length> min-height: 0px;
+    in property <length> max-width;
+    in property <length> max-height;
+    in property <length> preferred-width;
+    in property <length> preferred-height;
+    in-out property <float> horizontal-stretch: 0;
+    in-out property <float> vertical-stretch: 0;
+    in property <int> col;
+    in property <int> row;
+    in property <int> colspan: 1;
+    in property <int> rowspan: 1;
+    in property <int> layout-order: 0;
+    in property <CrossAxisAlignment> cross-axis-self-alignment: CrossAxisAlignment.auto;
+    in property <AccessibleRole> accessible-role: AccessibleRole.none;
+    in property <bool> accessible-checkable: false;
+    in property <bool> accessible-checked: false;
+    in property <string> accessible-description: "";
+    in property <bool> accessible-enabled: true;
+    in property <bool> accessible-expandable: false;
+    in property <bool> accessible-expanded: false;
+    in property <string> accessible-id: "";
+    in property <string> accessible-label: "";
+    in property <Orientation> accessible-orientation: Orientation.horizontal;
+    in property <AccessibleLiveness> accessible-live-region: AccessibleLiveness.off;
+    in property <float> accessible-value-maximum: 0;
+    in property <float> accessible-value-minimum: 0;
+    in property <float> accessible-value-step: 0;
+    in property <string> accessible-value: "";
+    in property <string> accessible-placeholder-text: "";
+    in property <bool> accessible-read-only: false;
+    in property <bool> accessible-item-selectable: false;
+    in property <bool> accessible-item-selected: false;
+    in property <int> accessible-item-index: 0;
+    in property <int> accessible-item-count: 0;
+    callback accessible-action-default();
+    callback accessible-action-set-value(string);
+    callback accessible-action-increment();
+    callback accessible-action-decrement();
+    callback accessible-action-expand();
+    callback accessible-action-set-selection-offsets(int, int);
+}
+
+/// Spacing and padding of the box layouts.
+component BoxLayout inherits Item {
+    in property <length> spacing: 0px;
+    in property <length> padding: 0px;
+    in property <length> padding-left: 0px;
+    in property <length> padding-right: 0px;
+    in property <length> padding-top: 0px;
+    in property <length> padding-bottom: 0px;
+    in property <LayoutAlignment> alignment: LayoutAlignment.stretch;
+    in property <CrossAxisAlignment> cross-axis-alignment;
+}
+
+// Elements
+
+export component Rectangle inherits Item {
+    in property <brush> background: transparent;
+    in property <brush> border-color: transparent;
+    in property <length> border-width: 0px;
+    in property <bool> clip: false;
+    in property <length> border-radius: 0px;
+    in property <length> border-top-left-radius: 0px;
+    in property <length> border-top-right-radius: 0px;
+    in property <length> border-bottom-left-radius: 0px;
+    in property <length> border-bottom-right-radius: 0px;
+    in property <length> drop-shadow-blur: 0px;
+    in property <color> drop-shadow-color: transparent;
+    in property <length> drop-shadow-offset-x: 0px;
+    in property <length> drop-shadow-offset-y: 0px;
+    in property <length> drop-shadow-spread: 0px;
+    in property <length> inner-shadow-blur: 0px;
+    in property <color> inner-shadow-color: transparent;
+    in property <length> inner-shadow-offset-x: 0px;
+    in property <length> inner-shadow-offset-y: 0px;
+    in property <length> inner-shadow-spread: 0px;
+}
+
+export component Image inherits Item {
+    in property <image> source;
+    in property <brush> colorize: transparent;
+    in property <ImageFit> image-fit;
+    in property <ImageRendering> image-rendering: ImageRendering.smooth;
+    in property <ImageHorizontalAlignment> horizontal-alignment: ImageHorizontalAlignment.center;
+    in property <ImageVerticalAlignment> vertical-alignment: ImageVerticalAlignment.center;
+    in property <ImageTiling> horizontal-tiling: ImageTiling.none;
+    in property <ImageTiling> vertical-tiling: ImageTiling.none;
+    in property <int> source-clip-x: 0;
+    in property <int> source-clip-y: 0;
+    in property <int> source-clip-width;
+    in property <int> source-clip-height;
+}
+
+export component Path inherits Item {
+    in property <brush> fill: transparent;
+    in property <FillRule> fill-rule: FillRule.nonzero;
+    in property <brush> stroke: transparent;
+    in property <length> stroke-width: 0px;
+    in property <LineCap> stroke-line-cap: LineCap.butt;
+    in property <LineJoin> stroke-line-join: LineJoin.miter;
+    in property <float> stroke-miter-limit: 4;
+    in property <ImageFit> fit: ImageFit.contain;
+    in property <bool> clip: false;
+    in property <bool> anti-alias: true;
+    in property <float> viewbox-x: 0;
+    in property <float> viewbox-y: 0;
+    in property <float> viewbox-width: 0;
+    in property <float> viewbox-height: 0;
+    /// Settable in a binding only; it cannot be read.
+    in property <string> commands: "";
+    public function point-at(t: float) -> Point {}
+    public function angle-at(t: float) -> angle {}
+}
+
+export component MoveTo inherits Element {
+    in property <float> x: 0;
+    in property <float> y: 0;
+}
+
+export component LineTo inherits Element {
+    in property <float> x: 0;
+    in property <float> y: 0;
+}
+
+export component ArcTo inherits Element {
+    in property <float> radius-x: 0;
+    in property <float> radius-y: 0;
+    in property <float> x: 0;
+    in property <float> y: 0;
+    in property <float> x-rotation: 0;
+    in property <bool> large-arc: false;
+    in property <bool> sweep: false;
+}
+
+export component CubicTo inherits Element {
+    in property <float> control-1-x: 0;
+    in property <float> control-1-y: 0;
+    in property <float> control-2-x: 0;
+    in property <float> control-2-y: 0;
+    in property <float> x: 0;
+    in property <float> y: 0;
+}
+
+export component QuadraticTo inherits Element {
+    in property <float> control-x: 0;
+    in property <float> control-y: 0;
+    in property <float> x: 0;
+    in property <float> y: 0;
+}
+
+export component Close inherits Element {}
+
+export component Text inherits Item {
+    in property <string> text: "";
+    in property <brush> color;
+    in property <length> font-size: 0px;
+    in property <int> font-weight: 0;
+    in property <string> font-family: "";
+    in property <bool> font-italic: false;
+    in property <TextHorizontalAlignment> horizontal-alignment: TextHorizontalAlignment.start;
+    in property <TextVerticalAlignment> vertical-alignment: TextVerticalAlignment.top;
+    in property <TextOverflow> overflow: TextOverflow.clip;
+    in property <TextWrap> wrap: TextWrap.no-wrap;
+    in property <int> max-lines: 0;
+    in property <length> letter-spacing: 0px;
+    in property <float> line-height-factor: 1;
+    in property <brush> stroke: transparent;
+    in property <length> stroke-width: 0px;
+    in property <TextStrokeStyle> stroke-style: TextStrokeStyle.outside;
+    out property <FontMetrics> font-metrics;
+}
+
+export component StyledText inherits Item {
+    in property <styled-text> text;
+    in property <brush> default-color;
+    in property <string> default-font-family: "";
+    in property <length> default-font-size: 0px;
+    in property <TextHorizontalAlignment> horizontal-alignment: TextHorizontalAlignment.start;
+    in property <TextVerticalAlignment> vertical-alignment: TextVerticalAlignment.top;
+    in property <color> link-color: #0000ff;
+    in property <int> max-lines: 0;
+    callback link-clicked(link: string);
+}
+
+export component TouchArea inherits Item {
+    in property <bool> enabled: true;
+    out property <bool> has-hover;
+    in property <MouseCursor> mouse-cursor: MouseCursor.default;
+    out property <length> mouse-x;
+    out property <length> mouse-y;
+    out property <length> pressed-x;
+    out property <length> pressed-y;
+    out property <bool> pressed;
+    callback clicked();
+    callback double-clicked();
+    callback moved();
+    callback pointer-event(event: PointerEvent);
+    callback scroll-event(event: PointerScrollEvent) -> EventResult;
+}
+
+export component Flickable inherits Item {
+    in property <length> content-width;
+    in property <length> content-height;
+    in-out property <length> content-x: 0px;
+    in-out property <length> content-y: 0px;
+    in property <bool> interactive: true;
+    in property <bool> mouse-drag-pan-enabled: true;
+    callback flicked();
+}
+
+export component SwipeGestureHandler inherits Item {
+    in property <bool> enabled: true;
+    out property <Point> pressed-position;
+    out property <Point> current-position;
+    out property <bool> swiping;
+    in property <bool> handle-swipe-left: false;
+    in property <bool> handle-swipe-right: false;
+    in property <bool> handle-swipe-up: false;
+    in property <bool> handle-swipe-down: false;
+    callback moved();
+    callback swiped();
+    callback cancelled();
+    public function cancel() {}
+}
+
+export component ScaleRotateGestureHandler inherits Item {
+    in property <bool> enabled: true;
+    out property <bool> active;
+    out property <float> scale;
+    out property <angle> rotation;
+    out property <Point> center;
+    callback started();
+    callback updated();
+    callback ended();
+    callback cancelled();
+}
+
+export component DragArea inherits Item {
+    in property <bool> enabled: true;
+    in property <data-transfer> data;
+    in property <image> drag-image;
+    in property <int> drag-image-offset-x: 0;
+    in property <int> drag-image-offset-y: 0;
+    in property <bool> allow-copy: false;
+    in property <bool> allow-move: false;
+    in property <bool> allow-link: false;
+    out property <bool> dragging;
+    callback drag-finished(action: DragAction);
+}
+
+export component DropArea inherits Item {
+    in property <bool> enabled: true;
+    out property <bool> has-drag;
+    out property <DragAction> current-action;
+    callback can-drop(event: DropEvent) -> DragAction;
+    callback dropped(event: DropEvent) -> DragAction;
+}
+
+export component FocusScope inherits Item {
+    out property <bool> has-focus;
+    in property <bool> enabled: true;
+    in property <bool> focus-on-click: true;
+    in property <bool> focus-on-tab-navigation: true;
+    callback capture-key-pressed(event: KeyEvent) -> EventResult;
+    callback capture-key-released(event: KeyEvent) -> EventResult;
+    callback key-pressed(event: KeyEvent) -> EventResult;
+    callback key-released(event: KeyEvent) -> EventResult;
+    callback focus-changed-event(reason: FocusReason);
+    callback focus-gained(reason: FocusReason);
+    callback focus-lost(reason: FocusReason);
+    public function focus() {}
+    public function clear-focus() {}
+}
+
+export component KeyBinding inherits Element {
+    in property <keys> keys;
+    in property <bool> enabled: true;
+    callback activated();
+}
+
+export component TextInput inherits Item {
+    in-out property <string> text: "";
+    in property <string> font-family: "";
+    in property <length> font-size: 0px;
+    in property <bool> font-italic: false;
+    in property <int> font-weight: 0;
+    in property <brush> color;
+    in property <color> selection-foreground-color: transparent;
+    in property <color> selection-background-color: transparent;
+    in property <TextHorizontalAlignment> horizontal-alignment: TextHorizontalAlignment.start;
+    in property <TextVerticalAlignment> vertical-alignment: TextVerticalAlignment.top;
+    in property <TextWrap> wrap: TextWrap.no-wrap;
+    in property <length> letter-spacing: 0px;
+    in property <float> line-height-factor: 1;
+    in property <length> page-height: 0px;
+    in property <length> text-cursor-width;
+    out property <bool> has-focus;
+    out property <FontMetrics> font-metrics;
+    in property <InputType> input-type: InputType.text;
+    in property <InputMethodHints> input-method-hints;
+    in property <bool> single-line: true;
+    in property <bool> read-only: false;
+    callback accepted();
+    callback edited();
+    callback cursor-position-changed(position: Point);
+    callback key-pressed(event: KeyEvent) -> EventResult;
+    callback key-released(event: KeyEvent) -> EventResult;
+    public function set-selection-offsets(anchor: int, focus: int) {}
+    public function select-all() {}
+    public function clear-selection() {}
+    public function cut() {}
+    public function copy() {}
+    public function paste() {}
+    public function undo() {}
+    public function redo() {}
+    public function focus() {}
+    public function clear-focus() {}
+}
+
+export component HorizontalLayout inherits BoxLayout {}
+export component VerticalLayout inherits BoxLayout {}
+
+export component GridLayout inherits Item {
+    in property <length> spacing: 0px;
+    in property <length> spacing-horizontal: 0px;
+    in property <length> spacing-vertical: 0px;
+    in property <length> padding: 0px;
+    in property <length> padding-left: 0px;
+    in property <length> padding-right: 0px;
+    in property <length> padding-top: 0px;
+    in property <length> padding-bottom: 0px;
+}
+
+/// Groups the children of a `GridLayout` into one row.
+export component Row inherits Element {}
+
+export component FlexboxLayout inherits BoxLayout {
+    in property <FlexboxLayoutDirection> flex-direction: FlexboxLayoutDirection.row;
+    in property <FlexboxLayoutWrap> flex-wrap: FlexboxLayoutWrap.wrap;
+    in property <LayoutAlignment> cross-axis-line-alignment: LayoutAlignment.stretch;
+    in property <length> spacing-horizontal: 0px;
+    in property <length> spacing-vertical: 0px;
+}
+
+export component Window inherits Item {
+    in property <bool> always-on-top: false;
+    in-out property <bool> full-screen;
+    in-out property <bool> minimized: false;
+    in-out property <bool> maximized: false;
+    in property <brush> background;
+    in property <string> default-font-family: "";
+    in property <length> default-font-size: 0px;
+    in property <int> default-font-weight: 0;
+    in property <image> icon;
+    in property <bool> no-frame: false;
+    in property <length> resize-border-width: 0px;
+    in property <string> title;
+    out property <Edges> safe-area-insets;
+    out property <Point> virtual-keyboard-position;
+    out property <Size> virtual-keyboard-size;
+    public function close() -> bool {}
+    public function hide() {}
+}
+
+export component Dialog inherits Window {}
+
+export component PopupWindow inherits Item {
+    in property <PopupClosePolicy> close-policy: PopupClosePolicy.close-on-click;
+    out property <bool> is-open;
+    public function show() {}
+    public function close() {}
+}
+
+export component MenuBar inherits Element {
+    in property <bool> visible: true;
+}
+
+export component Menu inherits Element {
+    in property <string> title: "";
+    in property <bool> enabled: true;
+    in property <image> icon;
+}
+
+export component MenuItem inherits Element {
+    in property <string> title: "";
+    in property <bool> enabled: true;
+    in property <bool> checkable: false;
+    in-out property <bool> checked: false;
+    in property <keys> shortcut;
+    in property <image> icon;
+    callback activated();
+}
+
+export component MenuSeparator inherits Element {}
+
+export component ContextMenuArea inherits Item {
+    in property <bool> enabled: true;
+    public function show(position: Point) {}
+    public function close() {}
+}
+
+export component Tooltip inherits Element {
+    in property <styled-text> text;
+}
+
+// A top-level component of its own, without `init`.
+export component SystemTrayIcon {
+    in property <image> icon;
+    in property <string> tooltip: "";
+    in property <bool> visible: true;
+    in property <string> title: "";
+    callback clicked();
+}
+
+export component WindowMoveArea inherits Item {
+    in property <bool> enabled: true;
+}
+
+export component Timer inherits Element {
+    in property <duration> interval: 0ms;
+    in property <bool> running: true;
+    callback triggered();
+    public function start() {}
+    public function stop() {}
+    public function restart() {}
+}
+
+/// The fields of an `animate` block.
+export component PropertyAnimation inherits Element {
+    in property <duration> delay: 0ms;
+    in property <duration> duration: 0ms;
+    in property <float> iteration-count: 1;
+    in property <easing> easing;
+    in property <AnimationDirection> direction: AnimationDirection.normal;
+    in property <bool> enabled: true;
+}
+
+// Namespaces
+
+export global Math {
+    pure callback abs(numeric) -> numeric;
+    pure callback clamp(numeric, numeric, numeric) -> numeric;
+    pure callback min(numeric, numeric) -> numeric;
+    pure callback max(numeric, numeric) -> numeric;
+    pure callback mod(numeric, numeric) -> numeric;
+    pure callback ceil(float) -> int;
+    pure callback floor(float) -> int;
+    pure callback round(float) -> int;
+    pure callback sign(float) -> float;
+    pure callback sqrt(float) -> float;
+    pure callback pow(float, float) -> float;
+    pure callback exp(float) -> float;
+    pure callback ln(float) -> float;
+    pure callback log(float, float) -> float;
+    pure callback sin(angle) -> float;
+    pure callback cos(angle) -> float;
+    pure callback tan(angle) -> float;
+    pure callback asin(float) -> angle;
+    pure callback acos(float) -> angle;
+    pure callback atan(float) -> angle;
+    pure callback atan2(float, float) -> angle;
+}
+
+/// Callable without a namespace: the Math functions and these.
+global GlobalFunctions {
+    callback animation-tick() -> duration;
+    pure callback rgb(int, int, int) -> color;
+    pure callback rgba(int, int, int, float) -> color;
+    pure callback hsv(float, float, float) -> color;
+    pure callback oklch(float, float, float) -> color;
+}
+
+export global FontWeight {
+    out property <float> thin: 100;
+    out property <float> extra-light: 200;
+    out property <float> light: 300;
+    out property <float> normal: 400;
+    out property <float> medium: 500;
+    out property <float> semi-bold: 600;
+    out property <float> bold: 700;
+    out property <float> extra-bold: 800;
+    out property <float> black: 900;
+}
+
+export global Easing {
+    out property <easing> linear;
+    out property <easing> ease;
+    out property <easing> ease-in;
+    out property <easing> ease-out;
+    out property <easing> ease-in-out;
+    out property <easing> ease-in-quad;
+    out property <easing> ease-out-quad;
+    out property <easing> ease-in-out-quad;
+    out property <easing> ease-in-quart;
+    out property <easing> ease-out-quart;
+    out property <easing> ease-in-out-quart;
+    out property <easing> ease-in-quint;
+    out property <easing> ease-out-quint;
+    out property <easing> ease-in-out-quint;
+    out property <easing> ease-in-expo;
+    out property <easing> ease-out-expo;
+    out property <easing> ease-in-out-expo;
+    out property <easing> ease-in-sine;
+    out property <easing> ease-out-sine;
+    out property <easing> ease-in-out-sine;
+    out property <easing> ease-in-back;
+    out property <easing> ease-out-back;
+    out property <easing> ease-in-out-back;
+    out property <easing> ease-in-circ;
+    out property <easing> ease-out-circ;
+    out property <easing> ease-in-out-circ;
+    out property <easing> ease-in-elastic;
+    out property <easing> ease-out-elastic;
+    out property <easing> ease-in-out-elastic;
+    out property <easing> ease-in-bounce;
+    out property <easing> ease-out-bounce;
+    out property <easing> ease-in-out-bounce;
+    pure callback cubic-bezier(float, float, float, float) -> easing;
+    pure callback spring(float) -> easing;
+}
+
+export global Platform {
+    out property <OperatingSystemType> os;
+    out property <bool> uses-mock-data;
+    out property <string> style-name;
+    out property <string> decimal-separator: ".";
+    public function open-url(url: string) -> bool {}
+    public function macos-bring-all-windows-to-front() {}
+}
+
+export global TextInputInterface {
+    in-out property <bool> text-input-focused: false;
+}
+
+/// Key names; their values are private-use characters the docs do not list.
+export global Key {
+    out property <string> Backspace;
+    out property <string> Tab;
+    out property <string> Return;
+    out property <string> Escape;
+    out property <string> Backtab;
+    out property <string> Delete;
+    out property <string> Shift;
+    out property <string> Control;
+    out property <string> Alt;
+    out property <string> AltGr;
+    out property <string> CapsLock;
+    out property <string> ShiftR;
+    out property <string> ControlR;
+    out property <string> Meta;
+    out property <string> MetaR;
+    out property <string> Space;
+    out property <string> UpArrow;
+    out property <string> DownArrow;
+    out property <string> LeftArrow;
+    out property <string> RightArrow;
+    out property <string> F1;
+    out property <string> F2;
+    out property <string> F3;
+    out property <string> F4;
+    out property <string> F5;
+    out property <string> F6;
+    out property <string> F7;
+    out property <string> F8;
+    out property <string> F9;
+    out property <string> F10;
+    out property <string> F11;
+    out property <string> F12;
+    out property <string> F13;
+    out property <string> F14;
+    out property <string> F15;
+    out property <string> F16;
+    out property <string> F17;
+    out property <string> F18;
+    out property <string> F19;
+    out property <string> F20;
+    out property <string> F21;
+    out property <string> F22;
+    out property <string> F23;
+    out property <string> F24;
+    out property <string> Insert;
+    out property <string> Home;
+    out property <string> End;
+    out property <string> PageUp;
+    out property <string> PageDown;
+    out property <string> ScrollLock;
+    out property <string> Pause;
+    out property <string> SysReq;
+    out property <string> Stop;
+    out property <string> Menu;
+    out property <string> Back;
+    out property <string> A;
+    out property <string> B;
+    out property <string> C;
+    out property <string> D;
+    out property <string> E;
+    out property <string> F;
+    out property <string> G;
+    out property <string> H;
+    out property <string> I;
+    out property <string> J;
+    out property <string> K;
+    out property <string> L;
+    out property <string> M;
+    out property <string> N;
+    out property <string> O;
+    out property <string> P;
+    out property <string> Q;
+    out property <string> R;
+    out property <string> S;
+    out property <string> T;
+    out property <string> U;
+    out property <string> V;
+    out property <string> W;
+    out property <string> X;
+    out property <string> Y;
+    out property <string> Z;
+    out property <string> Digit0;
+    out property <string> Digit1;
+    out property <string> Digit2;
+    out property <string> Digit3;
+    out property <string> Digit4;
+    out property <string> Digit5;
+    out property <string> Digit6;
+    out property <string> Digit7;
+    out property <string> Digit8;
+    out property <string> Digit9;
+    out property <string> Circumflex;
+    out property <string> Exclamation;
+    out property <string> DoubleQuote;
+    out property <string> Hash;
+    out property <string> Dollar;
+    out property <string> Percent;
+    out property <string> Ampersand;
+    out property <string> Underscore;
+    out property <string> OpenParen;
+    out property <string> CloseParen;
+    out property <string> Asterisk;
+    out property <string> Plus;
+    out property <string> Pipe;
+    out property <string> HyphenMinus;
+    out property <string> OpenCurlyBracket;
+    out property <string> CloseCurlyBracket;
+    out property <string> Tilde;
+    out property <string> Colon;
+    out property <string> Semicolon;
+    out property <string> LessThan;
+    out property <string> Equals;
+    out property <string> GreaterThan;
+    out property <string> QuestionMark;
+    out property <string> At;
+    out property <string> Comma;
+    out property <string> Period;
+    out property <string> Slash;
+    out property <string> BackQuote;
+    out property <string> OpenBracket;
+    out property <string> BackSlash;
+    out property <string> CloseBracket;
+    out property <string> Quote;
+}
+
+// The SVG color keywords of CSS Color Level 3
+// (https://www.w3.org/TR/css-color-3/#svg-color), which the Slint docs point to.
+export global Colors {
+    out property <color> aliceblue: #f0f8ff;
+    out property <color> antiquewhite: #faebd7;
+    out property <color> aqua: #00ffff;
+    out property <color> aquamarine: #7fffd4;
+    out property <color> azure: #f0ffff;
+    out property <color> beige: #f5f5dc;
+    out property <color> bisque: #ffe4c4;
+    out property <color> black: #000000;
+    out property <color> blanchedalmond: #ffebcd;
+    out property <color> blue: #0000ff;
+    out property <color> blueviolet: #8a2be2;
+    out property <color> brown: #a52a2a;
+    out property <color> burlywood: #deb887;
+    out property <color> cadetblue: #5f9ea0;
+    out property <color> chartreuse: #7fff00;
+    out property <color> chocolate: #d2691e;
+    out property <color> coral: #ff7f50;
+    out property <color> cornflowerblue: #6495ed;
+    out property <color> cornsilk: #fff8dc;
+    out property <color> crimson: #dc143c;
+    out property <color> cyan: #00ffff;
+    out property <color> darkblue: #00008b;
+    out property <color> darkcyan: #008b8b;
+    out property <color> darkgoldenrod: #b8860b;
+    out property <color> darkgray: #a9a9a9;
+    out property <color> darkgreen: #006400;
+    out property <color> darkgrey: #a9a9a9;
+    out property <color> darkkhaki: #bdb76b;
+    out property <color> darkmagenta: #8b008b;
+    out property <color> darkolivegreen: #556b2f;
+    out property <color> darkorange: #ff8c00;
+    out property <color> darkorchid: #9932cc;
+    out property <color> darkred: #8b0000;
+    out property <color> darksalmon: #e9967a;
+    out property <color> darkseagreen: #8fbc8f;
+    out property <color> darkslateblue: #483d8b;
+    out property <color> darkslategray: #2f4f4f;
+    out property <color> darkslategrey: #2f4f4f;
+    out property <color> darkturquoise: #00ced1;
+    out property <color> darkviolet: #9400d3;
+    out property <color> deeppink: #ff1493;
+    out property <color> deepskyblue: #00bfff;
+    out property <color> dimgray: #696969;
+    out property <color> dimgrey: #696969;
+    out property <color> dodgerblue: #1e90ff;
+    out property <color> firebrick: #b22222;
+    out property <color> floralwhite: #fffaf0;
+    out property <color> forestgreen: #228b22;
+    out property <color> fuchsia: #ff00ff;
+    out property <color> gainsboro: #dcdcdc;
+    out property <color> ghostwhite: #f8f8ff;
+    out property <color> gold: #ffd700;
+    out property <color> goldenrod: #daa520;
+    out property <color> gray: #808080;
+    out property <color> grey: #808080;
+    out property <color> green: #008000;
+    out property <color> greenyellow: #adff2f;
+    out property <color> honeydew: #f0fff0;
+    out property <color> hotpink: #ff69b4;
+    out property <color> indianred: #cd5c5c;
+    out property <color> indigo: #4b0082;
+    out property <color> ivory: #fffff0;
+    out property <color> khaki: #f0e68c;
+    out property <color> lavender: #e6e6fa;
+    out property <color> lavenderblush: #fff0f5;
+    out property <color> lawngreen: #7cfc00;
+    out property <color> lemonchiffon: #fffacd;
+    out property <color> lightblue: #add8e6;
+    out property <color> lightcoral: #f08080;
+    out property <color> lightcyan: #e0ffff;
+    out property <color> lightgoldenrodyellow: #fafad2;
+    out property <color> lightgray: #d3d3d3;
+    out property <color> lightgreen: #90ee90;
+    out property <color> lightgrey: #d3d3d3;
+    out property <color> lightpink: #ffb6c1;
+    out property <color> lightsalmon: #ffa07a;
+    out property <color> lightseagreen: #20b2aa;
+    out property <color> lightskyblue: #87cefa;
+    out property <color> lightslategray: #778899;
+    out property <color> lightslategrey: #778899;
+    out property <color> lightsteelblue: #b0c4de;
+    out property <color> lightyellow: #ffffe0;
+    out property <color> lime: #00ff00;
+    out property <color> limegreen: #32cd32;
+    out property <color> linen: #faf0e6;
+    out property <color> magenta: #ff00ff;
+    out property <color> maroon: #800000;
+    out property <color> mediumaquamarine: #66cdaa;
+    out property <color> mediumblue: #0000cd;
+    out property <color> mediumorchid: #ba55d3;
+    out property <color> mediumpurple: #9370db;
+    out property <color> mediumseagreen: #3cb371;
+    out property <color> mediumslateblue: #7b68ee;
+    out property <color> mediumspringgreen: #00fa9a;
+    out property <color> mediumturquoise: #48d1cc;
+    out property <color> mediumvioletred: #c71585;
+    out property <color> midnightblue: #191970;
+    out property <color> mintcream: #f5fffa;
+    out property <color> mistyrose: #ffe4e1;
+    out property <color> moccasin: #ffe4b5;
+    out property <color> navajowhite: #ffdead;
+    out property <color> navy: #000080;
+    out property <color> oldlace: #fdf5e6;
+    out property <color> olive: #808000;
+    out property <color> olivedrab: #6b8e23;
+    out property <color> orange: #ffa500;
+    out property <color> orangered: #ff4500;
+    out property <color> orchid: #da70d6;
+    out property <color> palegoldenrod: #eee8aa;
+    out property <color> palegreen: #98fb98;
+    out property <color> paleturquoise: #afeeee;
+    out property <color> palevioletred: #db7093;
+    out property <color> papayawhip: #ffefd5;
+    out property <color> peachpuff: #ffdab9;
+    out property <color> peru: #cd853f;
+    out property <color> pink: #ffc0cb;
+    out property <color> plum: #dda0dd;
+    out property <color> powderblue: #b0e0e6;
+    out property <color> purple: #800080;
+    out property <color> red: #ff0000;
+    out property <color> rosybrown: #bc8f8f;
+    out property <color> royalblue: #4169e1;
+    out property <color> saddlebrown: #8b4513;
+    out property <color> salmon: #fa8072;
+    out property <color> sandybrown: #f4a460;
+    out property <color> seagreen: #2e8b57;
+    out property <color> seashell: #fff5ee;
+    out property <color> sienna: #a0522d;
+    out property <color> silver: #c0c0c0;
+    out property <color> skyblue: #87ceeb;
+    out property <color> slateblue: #6a5acd;
+    out property <color> slategray: #708090;
+    out property <color> slategrey: #708090;
+    out property <color> snow: #fffafa;
+    out property <color> springgreen: #00ff7f;
+    out property <color> steelblue: #4682b4;
+    out property <color> tan: #d2b48c;
+    out property <color> teal: #008080;
+    out property <color> thistle: #d8bfd8;
+    out property <color> tomato: #ff6347;
+    out property <color> turquoise: #40e0d0;
+    out property <color> violet: #ee82ee;
+    out property <color> wheat: #f5deb3;
+    out property <color> white: #ffffff;
+    out property <color> whitesmoke: #f5f5f5;
+    out property <color> yellow: #ffff00;
+    out property <color> yellowgreen: #9acd32;
+}
