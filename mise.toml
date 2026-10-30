@@ -7,7 +7,7 @@ uv = "0.12.23" # installs the pipx: ptools tool
 mold = { version = "2.42.1", os = ["linux"] } # linker, Linux only; mise [env] below turns it on where it is installed
 # Same pin as the UI description format, so the UI description format milestone can share one toolchain.
 rust = { version = "1.99.1", components = "rustfmt,clippy", targets = "wasm32-unknown-unknown" } # wasm32: `just wasm-check` (T73.2)
-"cargo:cargo-nextest" = "0.9.143"
+"cargo:cargo-nextest" = "0.9.149"
 just = "1.58.0"
 # `just wasm-check`: wasm-bindgen-test-runner runs the slintx-* tests on Node. The CLI must
 # match the `wasm-bindgen` version in Cargo.lock exactly.
