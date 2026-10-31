@@ -26,6 +26,8 @@ jobs:
   # Which runner the macOS jobs use: pyrlyn/ci's macos-runner action reads the MACOS_RUNNER
   # variable (unset or `hosted` = the hosted label, `xcode-27-local` = the dedicated Mac).
   macos-runner:
+    permissions:
+      actions: write
     runs-on: ubuntu-latest
     timeout-minutes: 5
     outputs:
@@ -36,6 +38,9 @@ jobs:
         with:
           runner: ${{ vars.MACOS_RUNNER }}
           value: '["macos-26"]'
+      - name: Cancel the run on failure
+        if: failure()
+        uses: pyrlyn/ci/.github/actions/cancel-run@main
 
   rust:
     if: github.event_name != 'pull_request' || !github.event.pull_request.draft
@@ -58,11 +63,12 @@ jobs:
 
   macos:
     if: vars.MACOS_CI_DISABLED != 'true' && (github.event_name != 'pull_request' || !github.event.pull_request.draft)
-    needs: macos-runner
+    needs: [macos-runner, rust]
     # MACOS_RUNNER (pyrlyn/ci macos-runner): unset/hosted = the hosted label, xcode-27-local = the dedicated Mac (fork PRs keep the hosted label)
     runs-on: ${{ (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && fromJSON(needs.macos-runner.outputs.value)[0] || 'macos-26' }}
     timeout-minutes: 45
     permissions:
+      actions: write
       contents: read
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -75,6 +81,9 @@ jobs:
         run: just check
       - name: slintx-convert Xcode tests
         run: just convert-apple
+      - name: Cancel the run on failure
+        if: failure()
+        uses: pyrlyn/ci/.github/actions/cancel-run@main
 
   # The slintx-* checks on Linux too, so they still gate a PR while MACOS_CI_DISABLED skips
   # the macOS `just check`.
@@ -83,6 +92,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
+      actions: write
       contents: read
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -94,6 +104,9 @@ jobs:
           install_args: rust just node github:wasm-bindgen/wasm-bindgen
       - name: Licence gate and wasm32 tests
         run: just license-check license-check-test wasm-check
+      - name: Cancel the run on failure
+        if: failure()
+        uses: pyrlyn/ci/.github/actions/cancel-run@main
 
   # slintx-convert's ignored Linux tests (Blueprint through blueprint-compiler and GTK 4,
   # HTML through headless Chromium) in the image `just convert-platforms` runs on Colima.
@@ -102,6 +115,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     permissions:
+      actions: write
       contents: read
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -118,12 +132,17 @@ jobs:
           name: slintx-convert-geometry
           path: target/tmp/slintx-convert-geometry
           if-no-files-found: ignore
+      - name: Cancel the run on failure
+        if: failure()
+        uses: pyrlyn/ci/.github/actions/cancel-run@main
 
   windows-host:
+    needs: rust
     if: github.event_name != 'pull_request' || !github.event.pull_request.draft
     runs-on: windows-latest
     timeout-minutes: 45
     permissions:
+      actions: write
       contents: read
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -158,6 +177,9 @@ jobs:
           name: weft-winui
           path: weft-winui.png
           if-no-files-found: ignore
+      - name: Cancel the run on failure
+        if: failure()
+        uses: pyrlyn/ci/.github/actions/cancel-run@main
 
   # Release builds of the shipped command-line tools. Test, example and demo apps
   # (flutter/examples, swift SlintDemo, windows SlintDemo.WinUI) are not built here.
@@ -165,13 +187,14 @@ jobs:
     if: github.event_name != 'pull_request' || !github.event.pull_request.draft
     needs: macos-runner
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
         os: [linux, macos]
     # macOS: MACOS_RUNNER (pyrlyn/ci macos-runner), fork PRs keep the hosted label
     runs-on: ${{ matrix.os == 'linux' && 'ubuntu-latest' || ((github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && fromJSON(needs.macos-runner.outputs.value)[0] || 'macos-26') }}
     timeout-minutes: 45
     permissions:
+      actions: write
       contents: read
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -194,8 +217,13 @@ jobs:
           cargo run --locked --release -q -p slintx-convert -- --help
           dir=$(cargo metadata --format-version 1 --no-deps --manifest-path flutter/Cargo.toml | python3 -c 'import json,sys; print(json.load(sys.stdin)["target_directory"])')
           ls -l "$dir/release/slint-introspect"
+      - name: Cancel the run on failure
+        if: failure()
+        uses: pyrlyn/ci/.github/actions/cancel-run@main
 
   gate:
+    permissions:
+      actions: write
     needs: [rust, macos, slintx, convert-platforms, windows-host, cli]
     # always(): report failed or cancelled needs instead of reading a skipped gate as passing.
     if: >-
@@ -208,3 +236,6 @@ jobs:
         with:
           needs: ${{ toJSON(needs) }}
           skip-ok: macos
+      - name: Cancel the run on failure
+        if: failure()
+        uses: pyrlyn/ci/.github/actions/cancel-run@main
